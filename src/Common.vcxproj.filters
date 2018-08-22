@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\class">
+      <UniqueIdentifier>{046e91c2-a50f-44de-b1c8-89c22a2cf714}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\app">
+      <UniqueIdentifier>{b801be60-58f7-459e-a3fd-87f05456e824}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sqlite">
+      <UniqueIdentifier>{f62052dd-2d6b-473b-b7ea-014ee6d6e9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="inc\class">
+      <UniqueIdentifier>{b9087847-a65f-4af7-9a09-b3d5855f3ce5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\app">
+      <UniqueIdentifier>{43509108-e5dc-4403-ab0a-414f31adfc01}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DragDrop.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="LogList.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectCtrl.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="PathCtrl.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="ProFile.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="DockView.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWnd.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="Page.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLiteDB.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="WorkThread.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="sqlite\shell.c">
+      <Filter>sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="sqlite\sqlite3.c">
+      <Filter>sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="fsutil.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\inc\App.h">
+      <Filter>inc\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\DockView.h">
+      <Filter>inc\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\MainWnd.h">
+      <Filter>inc\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Page.h">
+      <Filter>inc\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\LogList.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\ObjectCtrl.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\PathCtrl.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\ProFile.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\ProgressDlg.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\SQLiteDB.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\DragDrop.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Common.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Def.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\IDB.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\CDispatch.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\inc\WorkThread.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite\sqlite3.h">
+      <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite\sqlite3ext.h">
+      <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\util.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="CommonApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\fsutil.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Common.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Common.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\PathTree_State.bmp" />
+    <Image Include="res\PathTree_Normal.bmp" />
+    <Image Include="res\PathTree_Small.bmp" />
+  </ItemGroup>
+</Project>
