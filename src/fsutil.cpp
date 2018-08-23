@@ -434,10 +434,11 @@ CString CFolderDlg::Show(CWnd& WndOwner, LPCTSTR lpszInitDir, LPCTSTR lpszTitle,
 		m_nHeight = nHeight;
 	}
 
+	//(void)::EnableWindow(WndOwner.m_hWnd, FALSE);
 
 	BROWSEINFO browseInfo;
 	::ZeroMemory(&browseInfo, sizeof browseInfo);
-	browseInfo.ulFlags = BIF_RETURNONLYFSDIRS | BIF_DONTGOBELOWDOMAIN | BIF_STATUSTEXT;
+	browseInfo.ulFlags = BIF_RETURNONLYFSDIRS | BIF_DONTGOBELOWDOMAIN | BIF_STATUSTEXT | BIF_BROWSEFORCOMPUTER;
 
 	browseInfo.hwndOwner = WndOwner.m_hWnd;
 	browseInfo.lpfn = BrowseFolderCallBack;
@@ -696,37 +697,6 @@ void CFileDlg::ShowMultiSel(list<wstring>& lstFiles)
 			*itrFile = strDir + L"\\" + *itrFile;
 		}
 	}
-}
-
-CPath::CPath()
-	: m_bDir(FALSE)
-	, m_pParentPath(NULL)
-	, m_plstSubPath(NULL)
-{
-}
-
-CPath::CPath(const wstring& strName, bool bDir, CPath *pParentPath)
-	: m_strName(strName)
-	, m_bDir(bDir)
-	, m_pParentPath(pParentPath)
-	, m_plstSubPath(NULL)
-{
-}
-
-CPath::CPath(const wstring& strName, const TD_PathList & lstSubPath)
-	: m_strName(strName)
-	, m_bDir(TRUE)
-	, m_pParentPath(NULL)
-{
-	m_plstSubPath = new TD_PathList();
-	m_plstSubPath->Insert(lstSubPath);
-}
-
-CPath::~CPath()
-{
-	ClearSubPath();
-
-	delete m_plstSubPath;
 }
 
 wstring CPath::GetPath()

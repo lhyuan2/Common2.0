@@ -16,7 +16,7 @@ class CDockView;
 
 class CPage;
 
-typedef struct MainWndInfo
+struct tagMainWndInfo
 {
 	wstring strText;
 	HICON hIcon = NULL;
@@ -29,7 +29,7 @@ typedef struct MainWndInfo
 
 	UINT uMinWidth = 0;
 	UINT uMinHeight = 0;
-} *LPMainWndInfo;
+};
 
 class COMMON_EXT_CLASS CMainWnd: public CWnd
 {
@@ -60,10 +60,10 @@ private:
 
 	TD_DockViewVector m_vctDockViews;
 	
-	MainWndInfo m_WndInfo;
+	tagMainWndInfo m_WndInfo;
 
 public:
-	virtual BOOL Create(LPMainWndInfo pWndInfo);
+	virtual BOOL Create(tagMainWndInfo& MainWndInfo);
 
 	virtual void Show();
 

@@ -73,23 +73,41 @@ class COMMON_EXT_CLASS CPath
 	};
 
 public:
-	CPath();
+	CPath()
+	{
+	}
 
-	CPath(const wstring& strName, bool bDir, CPath *pParentPath);
-	
-	CPath(const wstring& strName, const TD_PathList& lstSubPath);
-	
-	virtual ~CPath();
+	CPath(const wstring& strName, bool bDir, CPath *pParentPath)
+		: m_strName(strName)
+		, m_bDir(bDir)
+		, m_pParentPath(pParentPath)
+	{
+	}
+
+	CPath(const wstring& strName, const TD_PathList & lstSubPath)
+		: m_strName(strName)
+		, m_bDir(TRUE)
+	{
+		m_plstSubPath = new TD_PathList();
+		m_plstSubPath->Insert(lstSubPath);
+	}
+
+	virtual ~CPath()
+	{
+		ClearSubPath();
+
+		delete m_plstSubPath;
+	}
 
 public:
-	bool m_bDir;
+	bool m_bDir = false;
 
 	wstring m_strName;
 
-	CPath *m_pParentPath;
+	CPath *m_pParentPath = NULL;
 
 protected:
-	TD_PathList *m_plstSubPath;
+	TD_PathList *m_plstSubPath = NULL;
 
 protected:
 	virtual CPath *NewSubPath(CFileFind &FindFile, CPath *pParentPath) = 0; 

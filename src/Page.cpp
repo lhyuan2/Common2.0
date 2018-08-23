@@ -33,7 +33,7 @@ BOOL CPage::Active()
 {
 	if (!::IsWindowVisible(this->m_hWnd))
 	{
-		ENSURE_RETURN_EX(((CMainWnd*)AfxGetMainWnd())->ActivePage(this), FALSE);
+		ENSURE_RETURN_EX(CMainApp::GetMainWnd()->ActivePage(this), FALSE);
 	}
 
 	(void)this->SetFocus();
@@ -43,15 +43,12 @@ BOOL CPage::Active()
 
 BOOL CPage::SetTitle(const CString& cstrTitle)
 {
-	return ((CMainWnd*)AfxGetMainWnd())->SetPageTitle(this, cstrTitle);
+	return CMainApp::GetMainWnd()->SetPageTitle(this, cstrTitle);
 }
 
 int CPage::MsgBox(const CString& cstrText, UINT uType)
 {
-	CMainWnd *pMainWnd = (CMainWnd*)AfxGetMainWnd();
-	ASSERT_RETURN_EX(pMainWnd, -1);
-
-	return pMainWnd->MsgBox(cstrText, m_cstrTitle, uType); 
+	return CMainApp::GetMainWnd()->MsgBox(cstrText, m_cstrTitle, uType);
 }
 
 BOOL CPage::OnSetActive()

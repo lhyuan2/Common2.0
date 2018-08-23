@@ -5,7 +5,7 @@
 
 #include "Resource.h"
 
-
+#define __ColorBlack RGB(0,0,0)
 
 // CBaseTree
 
@@ -23,30 +23,26 @@ END_MESSAGE_MAP()
 
 // CBaseTree 消息处理程序
 
-BOOL CBaseTree::_InitCtrl(ULONG uFontSize)
+void CBaseTree::PreSubclassWindow()
 {
-	ASSERT_RETURN_EX(m_hWnd, FALSE);
+	__super::PreSubclassWindow();
 
-	(void)__super::ModifyStyle(0, TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS);
-
-	if (0 < uFontSize)
-	{
-		m_fontGuide.setFontSize(*this, uFontSize);
-	}
-
-	return TRUE;
+	(void)ModifyStyle(0, TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS);
 }
 
 BOOL CBaseTree::InitCtrl(CBitmap *pBitmap, ULONG uFontSize)
 {
-	ASSERT_RETURN_EX(_InitCtrl(uFontSize), FALSE);
+	if (0 < uFontSize)
+	{
+		(void)m_fontGuide.setFontSize(*this, uFontSize);
+	}
 
 	if (pBitmap)
 	{
 		BITMAP bmp;
 		(void)pBitmap->GetBitmap(&bmp);
 		ASSERT_RETURN_EX(m_ImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-		(void)m_ImageList.Add(pBitmap, RGB(0, 0, 0));
+		(void)m_ImageList.Add(pBitmap, __ColorBlack);
 
 		(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
 	}
@@ -56,7 +52,10 @@ BOOL CBaseTree::InitCtrl(CBitmap *pBitmap, ULONG uFontSize)
 
 BOOL CBaseTree::InitCtrl(const TD_ICONLIST& lstIcon, UINT uIconSize, ULONG uFontSize)
 {
-	ASSERT_RETURN_EX(_InitCtrl(uFontSize), FALSE);
+	if (0 < uFontSize)
+	{
+		(void)m_fontGuide.setFontSize(*this, uFontSize);
+	}
 
 	ASSERT_RETURN_EX(m_ImageList.Create(uIconSize, uIconSize, ILC_COLOR32, 0, lstIcon.size()), FALSE);
 	for (auto hIcon : lstIcon)
@@ -146,9 +145,9 @@ END_MESSAGE_MAP()
 
 // CCheckObjectTree 消息处理程序
 
-BOOL CCheckObjectTree::InitCtrl(CBitmap *pNormalBitmap, UINT uFontSize)
+BOOL CCheckObjectTree::InitCtrl()
 {
-	ENSURE_RETURN_EX(__super::InitCtrl(pNormalBitmap, uFontSize), FALSE);
+	ENSURE_RETURN_EX(__super::InitCtrl(), FALSE);
 
 
 	HBITMAP hStateBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_CHECKTREE_STATE));
@@ -161,15 +160,13 @@ BOOL CCheckObjectTree::InitCtrl(CBitmap *pNormalBitmap, UINT uFontSize)
 	(void)StateBitmap.GetBitmap(&bmp);
 
 	ASSERT_RETURN_EX(m_StateImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-	(void)m_StateImageList.Add(&StateBitmap, RGB(0,0,0));
+	(void)m_StateImageList.Add(&StateBitmap, __ColorBlack);
 	
 	(void)StateBitmap.DeleteObject();
 
 	(void)__super::SetImageList(&m_StateImageList, TVSIL_STATE);
 
-
-	(void)__super::ModifyStyle(TVS_CHECKBOXES, 0);
-
+	(void)ModifyStyle(TVS_CHECKBOXES, 0);
 
 	return TRUE;
 }
@@ -445,17 +442,21 @@ void CObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects)
 
 // CObjectList
 
+void CObjectList::PreSubclassWindow()
+{
+	__super::PreSubclassWindow();
+
+	(void)ModifyStyle(0, LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS);
+
+	(void)SetExtendedStyle(__super::GetExtendedStyle()
+		| LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_LABELTIP);
+}
+
 BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 {
-	ASSERT_RETURN_EX(m_hWnd, FALSE);
-	(void)__super::ModifyStyle(0, LVS_SHOWSELALWAYS| LVS_SHAREIMAGELISTS);
-
-	(void)__super::SetExtendedStyle(__super::GetExtendedStyle() 
-		| LVS_EX_FULLROWSELECT |LVS_EX_HEADERDRAGDROP |LVS_EX_LABELTIP);
-
 	if (0 < uFontSize)
 	{
-		m_fontGuide.setFontSize(*this, uFontSize);
+		(void)m_fontGuide.setFontSize(*this, uFontSize);
 	}
 
 	if (!lstColumns.empty())
@@ -464,7 +465,7 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 		for (ColumnList::const_iterator itColumn = lstColumns.begin(); itColumn != lstColumns.end()
 			; ++itColumn, ++m_nColumnCount)
 		{
-			(void)__super::InsertColumn(m_nColumnCount, itColumn->first, 0, itColumn->second);
+			(void)__super::InsertColumn(m_nColumnCount, L' ' + itColumn->first, 0, itColumn->second);
 		}
 	}
 
@@ -497,10 +498,10 @@ BOOL CObjectList::InitImage(CBitmap& Bitmap)
 	(void)Bitmap.GetBitmap(&bmp);
 	
 	ASSERT_RETURN_EX(m_ImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-	(void)m_ImageList.Add(&Bitmap, RGB(0, 0, 0));
+	(void)m_ImageList.Add(&Bitmap, __ColorBlack);
 
 	//ASSERT_RETURN_EX(m_ImageListSmall.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-	//(void)m_ImageListSmall.Add(&Bitmap, RGB(0, 0, 0));
+	//(void)m_ImageListSmall.Add(&Bitmap, __ColorBlack);
 
 	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
 	(void)__super::SetImageList(&m_ImageList, LVSIL_SMALL);

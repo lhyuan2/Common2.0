@@ -118,47 +118,33 @@ BOOL CMainApp::InitInstance()
 
 	ASSERT_RETURN_EX(::SetCurrentDirectory(this->GetAppPath().c_str()), FALSE);
 
-	return TRUE;
-}
-
-BOOL CMainApp::Run()
-{
-	CMainWnd *pMainWnd = NULL;
-	
-	MainWndInfo WndInfo;
-	ZeroMemory(&WndInfo, sizeof(WndInfo));
-	
-	if (!OnInitMainWnd(pMainWnd, &WndInfo))
-	{
-		return FALSE;
-	}
-	
+	tagMainWndInfo MainWndInfo;
+	CMainWnd *pMainWnd = OnInitMainWnd(MainWndInfo);
 	if (NULL == pMainWnd)
 	{
-		 pMainWnd = new CMainWnd();
+		pMainWnd = new CMainWnd();
 	}
-	
-	ENSURE_RETURN_EX(pMainWnd->Create(&WndInfo), FALSE);
-	
-	CMainApp::m_pMainWnd = pMainWnd;
-	
-	for (ModuleVector::iterator itModule=m_vctModules.begin(); itModule!=m_vctModules.end(); ++itModule)
+
+	ENSURE_RETURN_EX(pMainWnd->Create(MainWndInfo), FALSE);
+	m_pMainWnd = pMainWnd;
+
+	for (ModuleVector::iterator itModule = m_vctModules.begin(); itModule != m_vctModules.end(); ++itModule)
 	{
-		if (!(*itModule)->OnReady(pMainWnd))
+		if (!(*itModule)->OnReady((CMainWnd*)m_pMainWnd))
 		{
 			AfxPostQuitMessage(0);
 			return FALSE;
 		}
 	}
 
-	pMainWnd->Show();
+	((CMainWnd*)m_pMainWnd)->Show();
 
-	return __super::Run();
+	return TRUE;
 }
 
 BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->hwnd == AfxGetMainWnd()->GetSafeHwnd())
+	if (pMsg->hwnd == CMainApp::GetMainWnd()->GetSafeHwnd())
 	{
 		switch (pMsg->message)
 		{
@@ -313,7 +299,7 @@ BOOL CMainApp::Quit()
 	{
 		if (0 != itrHotkeyInfo->nID)
 		{
-			(void)::UnregisterHotKey(AfxGetMainWnd()->GetSafeHwnd(), itrHotkeyInfo->nID);
+			(void)::UnregisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), itrHotkeyInfo->nID);
 		}
 	}
 
@@ -394,7 +380,7 @@ BOOL CMainApp::RegHotkey(const tagHotkeyInfo &HotkeyInfo)
 	{
 		if (HotkeyInfo.bGlobal)
 		{
-			if (!::RegisterHotKey(AfxGetMainWnd()->GetSafeHwnd(), HotkeyInfo.nID, HotkeyInfo.nFlag, HotkeyInfo.nKey))
+			if (!::RegisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), HotkeyInfo.nID, HotkeyInfo.nFlag, HotkeyInfo.nKey))
 			{
 				return FALSE;
 			}

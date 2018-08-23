@@ -10,18 +10,16 @@
 
 //CPathList
 
-BOOL CPathList::_InitCtrl(UINT uFontSize)
+void CPathList::PreSubclassWindow()
 {
-	ENSURE_RETURN_EX(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
+	__super::PreSubclassWindow();
 
-	(void)__super::ModifyStyle(LVS_ALIGNLEFT, LVS_AUTOARRANGE);
-
-	return TRUE;
+	(void)ModifyStyle(LVS_ALIGNLEFT, LVS_AUTOARRANGE);
 }
 
 BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize)
 {
-	ENSURE_RETURN_EX(_InitCtrl(uFontSize), FALSE);
+	ENSURE_RETURN_EX(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
 	ENSURE_RETURN_EX(__super::InitImage(lstIcon, uSize, uSmallSize), FALSE);
 
@@ -30,8 +28,8 @@ BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize,
 
 BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap)
 {
-	ENSURE_RETURN_EX(_InitCtrl(uFontSize), FALSE);
-	
+	ENSURE_RETURN_EX(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
+
 	CBitmap Bitmap;
 	if (NULL == pBitmap)
 	{

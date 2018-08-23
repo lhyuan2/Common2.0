@@ -245,15 +245,15 @@ public:
 private:
 	ColumnList m_lstColumns = {
 		{_T("名称"), 400}
-		, {_T("大小"), 100}
-		, {_T("修改日期"), 190}
+		, {_T("大小"), 80}
+		, {_T("修改日期"), 150}
 	};
 	
 private:
-	BOOL _InitCtrl(UINT uFontSize);
+	virtual void PreSubclassWindow() override;
 
 public:
-	BOOL InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize);
+	BOOL InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
 
 	BOOL InitCtrl(UINT uFontSize = 0, CBitmap *pBitmap = NULL);
 

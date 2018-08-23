@@ -53,7 +53,7 @@ BOOL CDockView::Create()
 
 		if (m_uTabFontSize > 0)
 		{
-			m_fontGuide.setFontSize(*pTabCtrl, m_uTabFontSize);
+			(void)m_fontGuide.setFontSize(*pTabCtrl, m_uTabFontSize);
 		}
 
 		if (m_uTabHeight > 0)
@@ -74,11 +74,6 @@ BOOL CDockView::Create()
 
 BOOL CDockView::AddPage(CPage* pPage)
 {
-	//if (TS_Null == m_nTabStyle)
-	//{
-	//	ASSERT_RETURN_EX(m_vctPages.empty(), FALSE);
-	//}
-
 	ASSERT_RETURN_EX(!util::ContainerFind(m_vctPages, pPage), FALSE);
 
 	m_vctPages.push_back(pPage);
@@ -89,6 +84,8 @@ BOOL CDockView::AddPage(CPage* pPage)
 	{
 		ASSERT_RETURN_EX(this->Create(), FALSE);
 	}
+
+	//pPage->MoveWindow(m_rtPos);
 
 	if (__TabStyle(m_nStyle) && !pPage->m_cstrTitle.IsEmpty())
 	{

@@ -25,10 +25,9 @@ BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
 	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
-BOOL CMainWnd::Create(LPMainWndInfo pWndInfo)
+BOOL CMainWnd::Create(tagMainWndInfo& MainWndInfo)
 {
-	ASSERT_RETURN_EX(pWndInfo, FALSE);
-	m_WndInfo = *pWndInfo;
+	m_WndInfo = MainWndInfo;
 
 	LPCTSTR lpszClassName = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS
 		, 0, ::GetSysColorBrush(CTLCOLOR_DLG), m_WndInfo.hIcon);

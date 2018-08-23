@@ -11,26 +11,32 @@ private:
 public:
 	bool setFontSize(CWnd& wnd, UINT uFontSize)
 	{
-		if (0 < uFontSize)
+		if (0 == uFontSize)
 		{
-			LOGFONT logFont;
-			::ZeroMemory(&logFont, sizeof(logFont));
+			return true;
+		}
+
+		if (NULL==m_font.GetSafeHandle())
+		{
 			CFont *pFont = wnd.GetFont();
 			if (NULL == pFont)
 			{
 				return false;
 			}
+			
+			LOGFONT logFont;
+			::ZeroMemory(&logFont, sizeof(logFont));
 			(void)pFont->GetLogFont(&logFont);
-
+			
 			logFont.lfHeight = (LONG)uFontSize;
 
 			if (!m_font.CreateFontIndirect(&logFont))
 			{
 				return false;
 			}
-
-			wnd.SetFont(&m_font);
 		}
+
+		wnd.SetFont(&m_font);
 
 		return true;
 	}

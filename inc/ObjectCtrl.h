@@ -34,12 +34,11 @@ public:
 protected:
 	virtual HTREEITEM InsertItem(HTREEITEM hParentItem, LPCTSTR lpszItem, DWORD_PTR dwData, int nImage=0);
 
-private:
-	BOOL _InitCtrl(ULONG uFontSize);
-
 	void GetChildItems(HTREEITEM hItem, std::list<HTREEITEM>& lstItems);
 
 public:
+	virtual void PreSubclassWindow() override;
+
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 		
 	BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
@@ -138,7 +137,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	BOOL InitCtrl(CBitmap *pNormalBitmap=NULL, UINT uFontSize = 0);
+	BOOL InitCtrl();
 
 protected:
 	CImageList m_StateImageList;
@@ -274,6 +273,8 @@ public:
 	void DeselectAllItems();
 
 public:
+	virtual void PreSubclassWindow() override;
+
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	
 	virtual void OnNMNotify(NMHDR* pNMHDR, BOOL* pResult);

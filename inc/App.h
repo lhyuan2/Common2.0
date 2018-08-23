@@ -128,7 +128,7 @@ private:
 	HINSTANCE m_hPreInstance;
 };
 
-struct MainWndInfo;
+struct tagMainWndInfo;
 
 //CMainApp
 typedef vector<IModuleApp*> ModuleVector;
@@ -139,6 +139,11 @@ public:
 	CMainApp();
 
 	virtual ~CMainApp();
+
+	static CMainWnd* GetMainWnd()
+	{
+		return (CMainWnd*)AfxGetMainWnd();
+	}
 
 private:
 	static ModuleVector m_vctModules;
@@ -152,9 +157,7 @@ private:
 protected:
 	virtual BOOL InitInstance();
 	
-	virtual BOOL Run();
-	
-	virtual BOOL OnInitMainWnd(CMainWnd *&pMainWnd, MainWndInfo *pWndInfo)=0;
+	virtual CMainWnd* OnInitMainWnd(tagMainWndInfo& MainWndInfo)=0;
 	
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
