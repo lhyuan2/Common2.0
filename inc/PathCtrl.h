@@ -245,8 +245,8 @@ public:
 private:
 	ColumnList m_lstColumns = {
 		{_T("名称"), 400}
-		, {_T("大小"), 90}
-		, {_T("修改日期"), 180}
+		, {_T("大小"), 100}
+		, {_T("修改日期"), 190}
 	};
 	
 private:
