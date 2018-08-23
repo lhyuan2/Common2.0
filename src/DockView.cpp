@@ -53,17 +53,7 @@ BOOL CDockView::Create()
 
 		if (m_uTabFontSize > 0)
 		{
-			LOGFONT logFont;
-			::ZeroMemory(&logFont, sizeof(logFont));
-			(void)pTabCtrl->GetFont()->GetLogFont(&logFont);
-
-			logFont.lfHeight = (LONG)m_uTabFontSize;
-			if (!m_font.CreateFontIndirect(&logFont))
-			{
-				return FALSE;
-			}
-
-			pTabCtrl->SetFont(&m_font);
+			m_fontGuide.setFontSize(*pTabCtrl, m_uTabFontSize);
 		}
 
 		if (m_uTabHeight > 0)
@@ -106,7 +96,7 @@ BOOL CDockView::AddPage(CPage* pPage)
 
 		TCITEM tci = {0};
 		tci.mask = TCIF_TEXT;
-		tci.pszText = (LPTSTR)(LPCTSTR)pPage->m_cstrTitle;  
+		tci.pszText = (LPTSTR)(LPCTSTR)pPage->m_cstrTitle;
 		(void)pTabCtrl->SetItem(pTabCtrl->GetItemCount()-1, &tci);
 	}
 
@@ -140,9 +130,11 @@ BOOL CDockView::SetPageTitle(CPage *pPage, const CString& cstrTitle)
 	CTabCtrl *pTabCtrl = this->GetTabControl();
 	ASSERT_RETURN_EX(pTabCtrl->GetItemCount() > nPage, TRUE);
 
+	pPage->m_cstrTitle = cstrTitle;
+
 	TCITEM tci = {0};
 	tci.mask = TCIF_TEXT;
-	tci.pszText = (LPTSTR)(LPCTSTR)(pPage->m_cstrTitle = cstrTitle);
+	tci.pszText = (LPTSTR)(LPCTSTR)pPage->m_cstrTitle;
 	(void)pTabCtrl->SetItem(nPage, &tci);
 
 	return TRUE;

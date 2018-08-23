@@ -25,6 +25,8 @@
 
 #include "fsutil.h"
 
+#include "FontGuide.h"
+
 #include "ObjectCtrl.h"
 
 #include "PathCtrl.h"

@@ -5,6 +5,7 @@
 
 #include "Page.h"
 
+#include "FontGuide.h"
 
 #define __DXView 5
 
@@ -65,7 +66,7 @@ private:
 
 	PageVector m_vctPages;
 
-	CFont m_font;
+	CFontGuide m_fontGuide;
 
 	CImageList m_ImageList;
 

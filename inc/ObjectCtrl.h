@@ -5,7 +5,9 @@
 
 #include <afxcmn.h>
 
-#include <util.h>
+#include "util.h"
+
+#include "FontGuide.h"
 
 using TD_ICONLIST = list<HICON>;
 
@@ -21,7 +23,7 @@ public:
 private:
 	CImageList m_ImageList;
 
-	CFont m_font;
+	CFontGuide m_fontGuide;
 
 public:
 	BOOL InitCtrl(CBitmap *pBitmap = NULL, ULONG uFontSize = 0);
@@ -227,7 +229,7 @@ private:
 
 	bool m_bChangeView = false;
 
-	CFont m_font;
+	CFontGuide m_fontGuide;
 
 public:
 	BOOL InitCtrl(UINT uFontSize, const ColumnList &lstColumns = ColumnList());

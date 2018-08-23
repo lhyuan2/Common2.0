@@ -17,7 +17,7 @@ class COMMON_EXT_CLASS CPage: public CPropertyPage
 	DECLARE_DYNAMIC(CPage);
 
 public:
-	CPage(IModuleApp *pModule, UINT nIDDlgRes, const CString& cstrTitle=_T(""));
+	CPage(IModuleApp *pModule, UINT nIDDlgRes, const CString& cstrTitle=L"");
 
 	virtual ~CPage() {}
 
@@ -38,7 +38,7 @@ public:
 
 	BOOL SetTitle(const CString& cstrTitle);
 
-	int MsgBox(const wstring& strText, UINT uType=MB_OK);
+	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
 
 protected:
 	BOOL OnSetActive();

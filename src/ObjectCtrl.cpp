@@ -31,18 +31,7 @@ BOOL CBaseTree::_InitCtrl(ULONG uFontSize)
 
 	if (0 < uFontSize)
 	{
-		LOGFONT logFont;
-		::ZeroMemory(&logFont, sizeof(logFont));
-		(void)this->GetFont()->GetLogFont(&logFont);
-
-		logFont.lfHeight = (LONG)uFontSize;
-
-		if (!m_font.CreateFontIndirect(&logFont))
-		{
-			return FALSE;
-		}
-
-		this->SetFont(&m_font);
+		m_fontGuide.setFontSize(*this, uFontSize);
 	}
 
 	return TRUE;
@@ -466,18 +455,7 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 
 	if (0 < uFontSize)
 	{
-		LOGFONT logFont;
-		::ZeroMemory(&logFont, sizeof(logFont));
-		(void)this->GetFont()->GetLogFont(&logFont);
-
-		logFont.lfHeight = (LONG)uFontSize;
-
-		if (!m_font.CreateFontIndirect(&logFont))
-		{
-			return FALSE;
-		}
-
-		this->SetFont(&m_font);
+		m_fontGuide.setFontSize(*this, uFontSize);
 	}
 
 	if (!lstColumns.empty())

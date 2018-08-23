@@ -46,12 +46,12 @@ BOOL CPage::SetTitle(const CString& cstrTitle)
 	return ((CMainWnd*)AfxGetMainWnd())->SetPageTitle(this, cstrTitle);
 }
 
-int CPage::MsgBox(const wstring& strText, UINT uType)
+int CPage::MsgBox(const CString& cstrText, UINT uType)
 {
 	CMainWnd *pMainWnd = (CMainWnd*)AfxGetMainWnd();
 	ASSERT_RETURN_EX(pMainWnd, -1);
 
-	return pMainWnd->MsgBox(strText, (LPCWSTR)m_cstrTitle, uType); 
+	return pMainWnd->MsgBox(cstrText, m_cstrTitle, uType); 
 }
 
 BOOL CPage::OnSetActive()

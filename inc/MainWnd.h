@@ -82,7 +82,7 @@ public:
 
 	BOOL SetPageTitle(CPage *pPage, const CString& cstrTitle);
 	
-	int MsgBox(const wstring& strText, const wstring& strTitle=L"", UINT uType=MB_OK);
+	int MsgBox(const CString& cstrText, const CString& cstrTitle=L"", UINT uType=MB_OK);
 	
 private:
 	void OnSize();

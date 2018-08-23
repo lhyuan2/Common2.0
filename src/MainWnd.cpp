@@ -218,19 +218,19 @@ BOOL CMainWnd::SetPageTitle(CPage *pPage, const CString& cstrTitle)
 	return FALSE;
 }
 
-int CMainWnd::MsgBox(const wstring& strText, const wstring& strTitle, UINT uType)
+int CMainWnd::MsgBox(const CString& cstrText, const CString& cstrTitle, UINT uType)
 {
-	LPCWSTR pszTitle = NULL;
-	if (!strTitle.empty())
+	LPCTSTR pszTitle = NULL;
+	if (!cstrTitle.IsEmpty())
 	{
-		pszTitle = strTitle.c_str();
+		pszTitle = cstrTitle;
 	}
 	else
 	{
 		pszTitle = m_WndInfo.strText.c_str();
 	}
 
-	int nResult = ::MessageBox(this->GetSafeHwnd(), strText.c_str(), pszTitle, uType);
+	int nResult = ::MessageBox(this->GetSafeHwnd(), cstrText, pszTitle, uType);
 
 	(void)this->EnableWindow(TRUE);
 

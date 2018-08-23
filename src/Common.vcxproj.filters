@@ -137,10 +137,10 @@
       <Filter>inc\class</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="CommonApp.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\fsutil.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\FontGuide.h">
       <Filter>inc\class</Filter>
     </ClInclude>
   </ItemGroup>

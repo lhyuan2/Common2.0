@@ -171,6 +171,7 @@
     <ClInclude Include="..\inc\Def.h" />
     <ClInclude Include="..\inc\DockView.h" />
     <ClInclude Include="..\inc\DragDrop.h" />
+    <ClInclude Include="..\inc\FontGuide.h" />
     <ClInclude Include="..\inc\fsutil.h" />
     <ClInclude Include="..\inc\IDB.h" />
     <ClInclude Include="..\inc\LogList.h" />
@@ -183,7 +184,6 @@
     <ClInclude Include="..\inc\SQLiteDB.h" />
     <ClInclude Include="..\inc\util.h" />
     <ClInclude Include="..\inc\WorkThread.h" />
-    <ClInclude Include="CommonApp.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="sqlite\sqlite3.h" />
     <ClInclude Include="sqlite\sqlite3ext.h" />
