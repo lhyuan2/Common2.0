@@ -103,10 +103,8 @@ using namespace std;
 _CLASS *_CLASS::m_pInstance = NULL;
 
 
-#ifndef COMMON_EXT_CLASS
-	#ifdef _COMMON
-		#define COMMON_EXT_CLASS __declspec(dllexport)
-	#else
-		#define COMMON_EXT_CLASS __declspec(dllimport)
-	#endif
+#ifdef __CommonPrj
+	#define __CommonPrjExt __declspec(dllexport)
+#else
+	#define __CommonPrjExt __declspec(dllimport)
 #endif

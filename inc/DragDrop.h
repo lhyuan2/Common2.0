@@ -15,7 +15,7 @@ public:
 	virtual void OnDragLeave(CWnd *pWnd, LPVOID pDragData) = 0;
 };
 
-class COMMON_EXT_CLASS CDragDropMgr : private COleDropTarget
+class __CommonPrjExt CDragDropMgr : private COleDropTarget
 {
 public:
 	CDragDropMgr()

@@ -4,7 +4,7 @@
 #include <def.h>
 
 
-class COMMON_EXT_CLASS CProFile
+class __CommonPrjExt CProFile
 {
 public:
 	CProFile(const string& strIniPath);

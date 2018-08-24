@@ -30,7 +30,7 @@ struct tagPathInfo
 class CPathObject;
 typedef ptrlist<CPathObject*> TD_PathObjectList;
 
-class COMMON_EXT_CLASS CPathObject: public CPath, public tagPathInfo, public CListObject
+class __CommonPrjExt CPathObject: public CPath, public tagPathInfo, public CListObject
 {
 public:
 	CPathObject()
@@ -233,7 +233,7 @@ private:
 };
 
 
-class COMMON_EXT_CLASS CPathList: public CObjectList
+class __CommonPrjExt CPathList: public CObjectList
 {
 public:
 	CPathList(const ColumnList& lstColumns, bool bChangeView = true)

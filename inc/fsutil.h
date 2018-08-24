@@ -7,7 +7,7 @@
 
 //fsutil
 
-class COMMON_EXT_CLASS fsutil
+class __CommonPrjExt fsutil
 {
 public:
 	static void SplitPath(const wstring& strPath, wstring *pstrDir, wstring *pstrFile);
@@ -52,7 +52,7 @@ public:
 class CPath;
 typedef ptrlist<CPath*> TD_PathList;
 
-class COMMON_EXT_CLASS CPath
+class __CommonPrjExt CPath
 {
 	struct tagPathSortor
 	{
@@ -135,7 +135,7 @@ public:
 
 //CCFolderDlg
 
-class COMMON_EXT_CLASS CFolderDlg
+class __CommonPrjExt CFolderDlg
 {
 public:
 	CFolderDlg(LPCTSTR lpszInitDir=NULL, LPCTSTR lpszTitle=NULL, LPCTSTR lpszMessage=NULL
@@ -171,7 +171,7 @@ public:
 };
 
 
-class COMMON_EXT_CLASS CFileDlg
+class __CommonPrjExt CFileDlg
 {
 public:
 	CFileDlg(const wstring& strTitle, const wstring& strFilter=L""

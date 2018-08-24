@@ -55,7 +55,7 @@ enum ST_ResourceType
 class CMainWnd;
 
 // IModuleApp
-class COMMON_EXT_CLASS IModuleApp: public CWinApp
+class __CommonPrjExt IModuleApp: public CWinApp
 {
 public:
 	IModuleApp();
@@ -108,7 +108,7 @@ struct tagMainWndInfo;
 //CMainApp
 typedef vector<IModuleApp*> ModuleVector;
 
-class COMMON_EXT_CLASS CMainApp: public IModuleApp
+class __CommonPrjExt CMainApp: public IModuleApp
 {
 public:
 	CMainApp();

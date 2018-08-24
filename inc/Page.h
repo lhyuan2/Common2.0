@@ -12,7 +12,7 @@ class IModuleApp;
 
 class CMainWnd;
 
-class COMMON_EXT_CLASS CPage: public CPropertyPage
+class __CommonPrjExt CPage: public CPropertyPage
 {
 	DECLARE_DYNAMIC(CPage);
 

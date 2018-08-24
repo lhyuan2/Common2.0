@@ -1,6 +1,6 @@
 #pragma once
 
-class COMMON_EXT_CLASS CFontGuide
+class __CommonPrjExt CFontGuide
 {
 public:
 	CFontGuide() {};

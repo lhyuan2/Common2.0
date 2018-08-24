@@ -15,7 +15,7 @@ struct tagWorkThreadInfo
 	CWorkThread *pThread;
 };
 
-class COMMON_EXT_CLASS CWorkThread
+class __CommonPrjExt CWorkThread
 {
 public:
 	CWorkThread();

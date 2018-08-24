@@ -4,7 +4,7 @@
 #include "def.h"
 
 
-class COMMON_EXT_CLASS util
+class __CommonPrjExt util
 {
 public:
 	static BOOL StrCompare(const wstring& str1, const wstring& str2);

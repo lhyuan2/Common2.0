@@ -31,7 +31,7 @@ struct tagMainWndInfo
 	UINT uMinHeight = 0;
 };
 
-class COMMON_EXT_CLASS CMainWnd: public CWnd
+class __CommonPrjExt CMainWnd: public CWnd
 {
 protected:
 	typedef vector<CDockView*> TD_DockViewVector;
@@ -98,7 +98,7 @@ public:
 
 // CWndRedrawGuide
 
-class COMMON_EXT_CLASS CRedrawGuide
+class __CommonPrjExt CRedrawGuide
 {
 public:
 	CRedrawGuide(CWnd& wndCtrl);
@@ -111,7 +111,7 @@ private:
 	CWnd& m_wndCtrl;
 };
 
-class COMMON_EXT_CLASS CMenuGuide : public CMenu
+class __CommonPrjExt CMenuGuide : public CMenu
 {
 public:
 	CMenuGuide(CPage& Page, UINT nIDMenu);

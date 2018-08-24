@@ -11,7 +11,7 @@
 
 using TD_ICONLIST = list<HICON>;
 
-class COMMON_EXT_CLASS CBaseTree: public CTreeCtrl
+class __CommonPrjExt CBaseTree: public CTreeCtrl
 {
 public:
 	CBaseTree();
@@ -68,7 +68,7 @@ class CTreeObject;
 
 typedef ptrlist<CTreeObject*> TD_TreeObjectList;
 
-class COMMON_EXT_CLASS CTreeObject
+class __CommonPrjExt CTreeObject
 {
 public:
 	CTreeObject()
@@ -96,7 +96,7 @@ public:
 };
 
 
-class COMMON_EXT_CLASS CObjectTree: public CBaseTree
+class __CommonPrjExt CObjectTree: public CBaseTree
 {
 public:
 	CObjectTree();
@@ -128,7 +128,7 @@ enum ST_CheckState
 };
 
 // CCheckObjectTree
-class COMMON_EXT_CLASS CCheckObjectTree: public CObjectTree
+class __CommonPrjExt CCheckObjectTree: public CObjectTree
 {
 public:
 	CCheckObjectTree();
@@ -164,7 +164,7 @@ protected:
 };
 
 
-class COMMON_EXT_CLASS CListObject
+class __CommonPrjExt CListObject
 {
 public:
 	virtual int GetListImage()
@@ -203,7 +203,7 @@ enum ST_ListViewType
 	LVT_Report = LVS_REPORT
 };
 
-class COMMON_EXT_CLASS CObjectList : public CListCtrl
+class __CommonPrjExt CObjectList : public CListCtrl
 {
 public:
 	typedef std::list<std::pair<CString, int>> ColumnList;
