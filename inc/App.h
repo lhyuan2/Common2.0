@@ -101,6 +101,8 @@ public:
 	virtual BOOL OnHotkey(const tagHotkeyInfo& HotkeyInfo);
 };
 
+class CModuleApp : public IModuleApp {};
+
 class CMainWnd;
 
 class CResourceLock

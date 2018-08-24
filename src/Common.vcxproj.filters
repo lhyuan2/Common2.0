@@ -123,7 +123,6 @@
     <ClInclude Include="..\inc\CDispatch.h">
       <Filter>inc\class</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
     <ClInclude Include="..\inc\WorkThread.h">
       <Filter>inc\class</Filter>
     </ClInclude>
@@ -146,13 +145,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Common.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\Common.rc2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\PathTree_State.bmp" />
-    <Image Include="res\PathTree_Normal.bmp" />
-    <Image Include="res\PathTree_Small.bmp" />
   </ItemGroup>
 </Project>

@@ -162,9 +162,6 @@
     <ResourceCompile Include="Common.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Common.rc2" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\inc\App.h" />
     <ClInclude Include="..\inc\CDispatch.h" />
     <ClInclude Include="..\inc\Common.h" />
@@ -184,15 +181,9 @@
     <ClInclude Include="..\inc\SQLiteDB.h" />
     <ClInclude Include="..\inc\util.h" />
     <ClInclude Include="..\inc\WorkThread.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="sqlite\sqlite3.h" />
     <ClInclude Include="sqlite\sqlite3ext.h" />
     <ClInclude Include="stdafx.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\PathTree_Normal.bmp" />
-    <Image Include="res\PathTree_Small.bmp" />
-    <Image Include="res\PathTree_State.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
