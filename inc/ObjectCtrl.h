@@ -104,16 +104,16 @@ public:
 	virtual ~CObjectTree();
 
 public:
-	void SetRootObject(CTreeObject *pObject);
+	void SetRootObject(CTreeObject& Object);
 
-	virtual HTREEITEM InsertObject(CTreeObject *pObject, CTreeObject *pParentObject=NULL);
-	HTREEITEM InsertObjectEx(CTreeObject *pObject, CTreeObject *pParentObject=NULL);
+	virtual HTREEITEM InsertObject(CTreeObject& Object, CTreeObject *pParentObject=NULL);
+	HTREEITEM InsertObjectEx(CTreeObject& Object, CTreeObject *pParentObject=NULL);
 
 	CTreeObject *GetSelectedObject();
 
 	CTreeObject *GetItemObject(HTREEITEM hItem);
 
-	CTreeObject *GetParentObject(CTreeObject *pTreeObject);
+	CTreeObject *GetParentObject(CTreeObject& Object);
 	
 	void GetAllObjects(TD_TreeObjectList& lstObjects);
 };
@@ -143,7 +143,7 @@ protected:
 	CImageList m_StateImageList;
 
 public:
-	HTREEITEM InsertObject(CTreeObject *pObject, CTreeObject *pParentObject=NULL);
+	HTREEITEM InsertObject(CTreeObject& Object, CTreeObject *pParentObject=NULL);
 
 	ST_CheckState GetItemCheckState(HTREEITEM hItem);
 
@@ -243,19 +243,20 @@ public:
 	
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);
 
-	int InsertObject(CListObject *pObject, int nItem=-1);
+	int InsertObject(CListObject& Object, int nItem=-1);
 	
 	void UpdateObjects();
-	void UpdateObject(CListObject *pObject);
+	void UpdateObject(CListObject& Object);
+	void UpdateItem(UINT uItem);
 
 	void DeleteObjects(const TD_ListObjectList& lstDeleteObjects);
 
-	BOOL DeleteObject(CListObject* pObject);
+	BOOL DeleteObject(CListObject& Object);
 
 public:
-	void SetItemObject(int nItem, CListObject *pObject);
+	void SetItemObject(int nItem, CListObject& Object);
 	CListObject *GetItemObject(int nItem);
-	int GetObjectItem(CListObject* pListObject);
+	int GetObjectItem(CListObject& Object);
 	void GetAllObjects(TD_ListObjectList& lstListObjects);
 
 	int GetSingleSelectedItem();
@@ -267,7 +268,7 @@ public:
 
 	BOOL SelectFirstItem();
 	void SelectItem(int nItem, BOOL bSetFocus=TRUE);
-	void SelectObject(CListObject *pObject, BOOL bSetFocus=TRUE);
+	void SelectObject(CListObject& Object, BOOL bSetFocus=TRUE);
 	void SelectItems(int nItem, int nSelectCount);
 	void SelectAllItems();
 	void DeselectAllItems();

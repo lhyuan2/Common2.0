@@ -17,7 +17,7 @@ class COMMON_EXT_CLASS CPage: public CPropertyPage
 	DECLARE_DYNAMIC(CPage);
 
 public:
-	CPage(IModuleApp *pModule, UINT nIDDlgRes, const CString& cstrTitle=L"");
+	CPage(IModuleApp& Module, UINT nIDDlgRes, const CString& cstrTitle=L"");
 
 	virtual ~CPage() {}
 
@@ -26,7 +26,7 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);
 
 public:
-	IModuleApp *m_pModule;
+	IModuleApp& m_Module;
 
 public:
 	CString m_cstrTitle;
@@ -46,11 +46,11 @@ protected:
 
 	virtual void OnActive(BOOL bActive);
 
-	BOOL RegDragableCtrl(CWnd *pwndCtrl)
+	BOOL RegDragableCtrl(CWnd& wndCtrl)
 	{
-		ASSERT_RETURN_EX(pwndCtrl->GetSafeHwnd(), FALSE);
+		ASSERT_RETURN_EX(wndCtrl.GetSafeHwnd(), FALSE);
 
-		m_setDragableCtrls.insert(pwndCtrl->GetSafeHwnd());
+		m_setDragableCtrls.insert(wndCtrl.GetSafeHwnd());
 		
 		return TRUE;
 	}

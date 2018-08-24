@@ -6,27 +6,23 @@
 #include <util.h>
 
 //CDockView
-CDockView::CDockView(CWnd* pParentWnd, ST_ViewStyle nStyle, UINT nDockSize, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
+CDockView::CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
 	: m_nStyle(nStyle)
 	, m_nDockSize(nDockSize)
 	, m_uOffset(uOffset)
 	, m_uTabFontSize(uTabFontSize)
 	, m_uTabHeight(uTabHeight)
 {
-	CPropertySheet::m_pParentWnd = pParentWnd;
+	CPropertySheet::m_pParentWnd = &wndParent;
 	
 	m_rtPos.SetRect(0,0,0,0);
 }
 
-CDockView::CDockView(CWnd* pParentWnd, ST_ViewStyle nStyle, const CRect& rtPos)
+CDockView::CDockView(CWnd& wndParent, ST_ViewStyle nStyle, const CRect& rtPos)
 	: m_nStyle(nStyle)
 	, m_rtPos(rtPos)
 {
-	CPropertySheet::m_pParentWnd = pParentWnd;
-}
-
-CDockView::~CDockView()
-{
+	CPropertySheet::m_pParentWnd = &wndParent;
 }
 
 BEGIN_MESSAGE_MAP(CDockView, CPropertySheet)
@@ -72,13 +68,13 @@ BOOL CDockView::Create()
 	return TRUE;
 }
 
-BOOL CDockView::AddPage(CPage* pPage)
+BOOL CDockView::AddPage(CPage& Page)
 {
-	ASSERT_RETURN_EX(!util::ContainerFind(m_vctPages, pPage), FALSE);
+	ASSERT_RETURN_EX(!util::ContainerFind(m_vctPages, &Page), FALSE);
 
-	m_vctPages.push_back(pPage);
+	m_vctPages.push_back(&Page);
 
-	CPropertySheet::AddPage(pPage);
+	CPropertySheet::AddPage(&Page);
 
 	if (!m_hWnd)
 	{
@@ -87,24 +83,24 @@ BOOL CDockView::AddPage(CPage* pPage)
 
 	//pPage->MoveWindow(m_rtPos);
 
-	if (__TabStyle(m_nStyle) && !pPage->m_cstrTitle.IsEmpty())
+	if (__TabStyle(m_nStyle) && !Page.m_cstrTitle.IsEmpty())
 	{
 		CTabCtrl *pTabCtrl = this->GetTabControl();
 
 		TCITEM tci = {0};
 		tci.mask = TCIF_TEXT;
-		tci.pszText = (LPTSTR)(LPCTSTR)pPage->m_cstrTitle;
+		tci.pszText = (LPTSTR)(LPCTSTR)Page.m_cstrTitle;
 		(void)pTabCtrl->SetItem(pTabCtrl->GetItemCount()-1, &tci);
 	}
 
 	return TRUE;
 }
 
-BOOL CDockView::ActivePage(CPage *pPage)
+BOOL CDockView::ActivePage(CPage& Page)
 {
 	int nActivePage = __super::GetActiveIndex();
 
-	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(), pPage);
+	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(), &Page);
 	ENSURE_RETURN_EX(itPage != m_vctPages.end(), FALSE);
 
 	if (itPage - m_vctPages.begin() != nActivePage)
@@ -117,9 +113,9 @@ BOOL CDockView::ActivePage(CPage *pPage)
 	return TRUE;
 }
 
-BOOL CDockView::SetPageTitle(CPage *pPage, const CString& cstrTitle)
+BOOL CDockView::SetPageTitle(CPage& Page, const CString& cstrTitle)
 {
-	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(), pPage);
+	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(),& Page);
 	ENSURE_RETURN_EX(itPage != m_vctPages.end(), FALSE);
 
 	int nPage = (int)(itPage - m_vctPages.begin());
@@ -127,17 +123,17 @@ BOOL CDockView::SetPageTitle(CPage *pPage, const CString& cstrTitle)
 	CTabCtrl *pTabCtrl = this->GetTabControl();
 	ASSERT_RETURN_EX(pTabCtrl->GetItemCount() > nPage, TRUE);
 
-	pPage->m_cstrTitle = cstrTitle;
+	Page.m_cstrTitle = cstrTitle;
 
 	TCITEM tci = {0};
 	tci.mask = TCIF_TEXT;
-	tci.pszText = (LPTSTR)(LPCTSTR)pPage->m_cstrTitle;
+	tci.pszText = (LPTSTR)(LPCTSTR)Page.m_cstrTitle;
 	(void)pTabCtrl->SetItem(nPage, &tci);
 
 	return TRUE;
 }
 
-void CDockView::Resize(CRect* pRestrictRect)
+void CDockView::Resize(CRect& rcRestrict)
 {
 	if (!__DockStyle(m_nStyle))
 	{
@@ -160,27 +156,27 @@ void CDockView::Resize(CRect* pRestrictRect)
 	switch (__DockStyle(m_nStyle))
 	{
 	case VS_DockLeft:
-		m_rtPos.SetRect(0, pRestrictRect->top + m_uOffset, m_nDockSize, pRestrictRect->bottom);
-		pRestrictRect->left += nOffSize;
+		m_rtPos.SetRect(0, rcRestrict.top + m_uOffset, m_nDockSize, rcRestrict.bottom);
+		rcRestrict.left += nOffSize;
 
 		break;
 	case VS_DockTop:
-		m_rtPos.SetRect(pRestrictRect->left, 0, pRestrictRect->Width(), m_nDockSize);
-		pRestrictRect->top += nOffSize;
+		m_rtPos.SetRect(rcRestrict.left, 0, rcRestrict.Width(), m_nDockSize);
+		rcRestrict.top += nOffSize;
 
 		break;
 	case VS_DockRight:
-		m_rtPos.SetRect(pRestrictRect->right - m_nDockSize, pRestrictRect->top, pRestrictRect->right, pRestrictRect->bottom);
-		pRestrictRect->right -= nOffSize;
+		m_rtPos.SetRect(rcRestrict.right - m_nDockSize, rcRestrict.top, rcRestrict.right, rcRestrict.bottom);
+		rcRestrict.right -= nOffSize;
 
 		break;
 	case VS_DockBottom:
-		m_rtPos.SetRect(pRestrictRect->left, pRestrictRect->bottom - m_nDockSize, pRestrictRect->right, pRestrictRect->bottom);
-		pRestrictRect->bottom -= nOffSize;
+		m_rtPos.SetRect(rcRestrict.left, rcRestrict.bottom - m_nDockSize, rcRestrict.right, rcRestrict.bottom);
+		rcRestrict.bottom -= nOffSize;
 
 		break;
 	case VS_DockCenter:
-		m_rtPos.CopyRect(pRestrictRect);
+		m_rtPos.CopyRect(rcRestrict);
 
 		break;
 	default:

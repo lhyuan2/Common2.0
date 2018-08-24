@@ -12,11 +12,11 @@
 
 IMPLEMENT_DYNAMIC(CPage, CPropertyPage);
 
-CPage::CPage(IModuleApp *pModule, UINT nIDDlgRes, const CString& cstrTitle)
-	: m_pModule(pModule)
+CPage::CPage(IModuleApp& Module, UINT nIDDlgRes, const CString& cstrTitle)
+	: m_Module(Module)
 	, m_cstrTitle(cstrTitle)
 {
-	m_pModule->ActivateResource();
+	m_Module.ActivateResource();
 
 	CPropertyPage::CommonConstruct(MAKEINTRESOURCE(nIDDlgRes), 0);
 }
@@ -33,7 +33,7 @@ BOOL CPage::Active()
 {
 	if (!::IsWindowVisible(this->m_hWnd))
 	{
-		ENSURE_RETURN_EX(CMainApp::GetMainWnd()->ActivePage(this), FALSE);
+		ENSURE_RETURN_EX(CMainApp::GetMainWnd()->ActivePage(*this), FALSE);
 	}
 
 	(void)this->SetFocus();
@@ -43,7 +43,7 @@ BOOL CPage::Active()
 
 BOOL CPage::SetTitle(const CString& cstrTitle)
 {
-	return CMainApp::GetMainWnd()->SetPageTitle(this, cstrTitle);
+	return CMainApp::GetMainWnd()->SetPageTitle(*this, cstrTitle);
 }
 
 int CPage::MsgBox(const CString& cstrText, UINT uType)

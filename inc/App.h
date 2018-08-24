@@ -5,67 +5,44 @@
 
 
 // Hotkey
-enum ST_HotkeyFlag
+enum class ST_HotkeyFlag
 {
-	HKF_Null
-	, HKF_Control
-	, HKF_Alt
-	, HKF_Shift
+	HKF_Null = 0
+
+	, HKF_Alt = MOD_ALT
+	, HKF_Control = MOD_CONTROL
+	, HKF_Shift = MOD_SHIFT
+
+	, HKF_AltControl = MOD_ALT | MOD_CONTROL
+	, HKF_AltShift = MOD_ALT | MOD_SHIFT
+	, HKF_ControlShift = MOD_CONTROL | MOD_SHIFT
+	, HKF_AltControlShift = MOD_ALT | MOD_CONTROL | MOD_SHIFT
 };
 
 struct tagHotkeyInfo
 {
-	tagHotkeyInfo(UINT nKey, ST_HotkeyFlag nHotkeyFlag = HKF_Null, BOOL bGlobal = TRUE, UINT nIDMenuItem = 0)
-		: bHandling(FALSE)
+	tagHotkeyInfo(UINT t_nKey, ST_HotkeyFlag eHotkeyFlag = ST_HotkeyFlag::HKF_Null, bool t_bGlobal=FALSE, UINT t_nIDMenuItem = 0)
+		: nKey(t_nKey)
+		, nFlag((UINT)eHotkeyFlag)
+		, lParam(MAKELPARAM(nFlag, nKey))
+		, bGlobal(t_bGlobal)
+		, nIDMenuItem(t_nIDMenuItem)
 	{
-		this->nKey = nKey;
-
-		switch (nHotkeyFlag)
-		{
-		case HKF_Control:
-			this->nFlag = MOD_CONTROL;
-			break;
-		case HKF_Alt:
-			this->nFlag = MOD_ALT;
-			break;
-		case HKF_Shift:
-			this->nFlag = MOD_SHIFT;
-			break;
-		default:
-			this->nFlag = 0;
-		}
-
-		this->bGlobal = bGlobal;
-		//if (bGlobal)
-		{
-			nID = (UINT)MAKELPARAM(nFlag, nKey);
-		}
-
-		this->nIDMenuItem = nIDMenuItem;
 	}
 
-	UINT nKey;
-	UINT nFlag;
-	BOOL bGlobal;
-	UINT nIDMenuItem;
+	UINT nKey = 0;
+	UINT nFlag = 0;
+	LPARAM lParam = 0;
 
-	UINT nID;
+	bool bGlobal = false;
 
-	BOOL bHandling;
+	UINT nIDMenuItem = 0;
+
+	bool bHandling = false;
 
 	bool operator ==(const tagHotkeyInfo &HotkeyInfo)
 	{
-		if (nKey == HotkeyInfo.nKey && nFlag == HotkeyInfo.nFlag && bGlobal == HotkeyInfo.bGlobal)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	bool operator ==(UINT nID)
-	{
-		return nID == this->nID;
+		return (lParam == HotkeyInfo.lParam && bGlobal == HotkeyInfo.bGlobal);
 	}
 };
 
@@ -90,7 +67,7 @@ public:
 	
 	HANDLE GetResource(ST_ResourceType nRCType, UINT nID);
 	
-	virtual BOOL OnReady(CMainWnd *pMainWnd);
+	virtual BOOL OnReady(CMainWnd& MainWnd) { return TRUE; }
 
 	virtual BOOL OnQuit();
 
@@ -108,14 +85,10 @@ class CMainWnd;
 class CResourceLock
 {
 public:
-	CResourceLock(IModuleApp *pModule)
-		: m_hPreInstance(NULL)
+	CResourceLock(IModuleApp& Module)
 	{
-		if (NULL != pModule)
-		{
-			m_hPreInstance = AfxGetResourceHandle();
-			pModule->ActivateResource();
-		}
+		m_hPreInstance = AfxGetResourceHandle();
+		Module.ActivateResource();
 	}
 
 	~CResourceLock()
@@ -127,7 +100,7 @@ public:
 	}
 
 private:
-	HINSTANCE m_hPreInstance;
+	HINSTANCE m_hPreInstance = NULL;
 };
 
 struct tagMainWndInfo;
@@ -164,8 +137,8 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 private:
-	static BOOL HandleHotkey(LPARAM lParam);
-	static BOOL HandleHotkey(tagHotkeyInfo &HotkeyInfo);
+	static bool HandleHotkey(LPARAM lParam, bool bGlobal);
+	static bool HandleHotkey(tagHotkeyInfo &HotkeyInfo);
 
 	static BOOL HandleCommand(UINT nID);
 
@@ -176,7 +149,7 @@ public:
 
 	static void DoEvents();
 
-	static BOOL AddModule(IModuleApp *pModule);
+	static BOOL AddModule(IModuleApp& Module);
 
 	static LRESULT SendMessage(UINT nMsg, WPARAM wParam=NULL, LPARAM lParam=NULL);
 	static void SendMessageEx(UINT nMsg, WPARAM wParam=NULL, LPARAM lParam=NULL);

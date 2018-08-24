@@ -107,28 +107,33 @@ void CMainWnd::OnSize()
 			continue;
 		}
 
-		(*itView)->Resize(&m_rtBlankArea);
+		(*itView)->Resize(m_rtBlankArea);
 	}
 
 	if (pCenterView)
 	{
-		pCenterView->Resize(&m_rtBlankArea);
+		pCenterView->Resize(m_rtBlankArea);
 	}
 }
 
-BOOL CMainWnd::CreateStatusBar(int nParts, ...)
+BOOL CMainWnd::CreateStatusBar(UINT nParts, ...)
 {
-	m_lpPartWidths = new int[nParts];
+	if (0 == nParts)
+	{
+		return FALSE;
+	}
+
+	m_vecStatusPartWidth.resize(nParts);
 
 	va_list argList;
 	va_start( argList, nParts );
 
 	int nWidth = 0;
-	for (int nIndex = 0; nIndex<nParts; nIndex++)
+	for (UINT nIndex = 0; nIndex<nParts; nIndex++)
 	{
 		nWidth += va_arg(argList, int);
 
-		m_lpPartWidths[nIndex] = nWidth;
+		m_vecStatusPartWidth[nIndex] = nWidth;
 	}
 
 	va_end( argList );
@@ -138,7 +143,7 @@ BOOL CMainWnd::CreateStatusBar(int nParts, ...)
 		return FALSE;
 	}
 
-	m_ctlStatusBar.SetParts(nParts, m_lpPartWidths);
+	m_ctlStatusBar.SetParts(nParts, &m_vecStatusPartWidth[0]);
 
 	return TRUE;
 }
@@ -150,12 +155,12 @@ BOOL CMainWnd::SetStatusText(UINT nPart, const CString& cstrText)
 	return m_ctlStatusBar.SetText(cstrText, (int)nPart, 0);
 }
 
-BOOL CMainWnd::AddDockView(CPage *pPage, ST_ViewStyle nStyle, UINT nDockSize
+BOOL CMainWnd::AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
 	, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
 {
-	CDockView *pView = new CDockView(this, nStyle, nDockSize, uOffset, uTabFontSize, uTabHeight);
+	CDockView *pView = new CDockView(*this, nStyle, nDockSize, uOffset, uTabFontSize, uTabHeight);
 
-	ASSERT_RETURN_EX(pView->AddPage(pPage), FALSE);
+	ASSERT_RETURN_EX(pView->AddPage(Page), FALSE);
 
 	m_vctDockViews.push_back(pView);
 
@@ -164,11 +169,11 @@ BOOL CMainWnd::AddDockView(CPage *pPage, ST_ViewStyle nStyle, UINT nDockSize
 	return TRUE;
 }
 
-BOOL CMainWnd::AddUndockView(CPage *pPage, const CRect& rtPos)
+BOOL CMainWnd::AddUndockView(CPage& Page, const CRect& rtPos)
 {
-	CDockView *pView = new CDockView(this, VS_Undock, rtPos);
+	CDockView *pView = new CDockView(*this, VS_Undock, rtPos);
 
-	ASSERT_RETURN_EX(pView->AddPage(pPage), FALSE);
+	ASSERT_RETURN_EX(pView->AddPage(Page), FALSE);
 
 	m_vctDockViews.push_back(pView);
 
@@ -177,13 +182,13 @@ BOOL CMainWnd::AddUndockView(CPage *pPage, const CRect& rtPos)
 	return TRUE;
 }
 
-BOOL CMainWnd::AddPage(CPage *pPage, ST_ViewStyle nStyle)
+BOOL CMainWnd::AddPage(CPage& Page, ST_ViewStyle nStyle)
 {
 	for (TD_DockViewVector::iterator itView=m_vctDockViews.begin(); itView!=m_vctDockViews.end(); ++itView)
 	{
 		if ((*itView)->m_nStyle & nStyle)
 		{
-			return (*itView)->AddPage(pPage);
+			return (*itView)->AddPage(Page);
 		}
 	}
 
@@ -191,11 +196,11 @@ BOOL CMainWnd::AddPage(CPage *pPage, ST_ViewStyle nStyle)
 	return FALSE;
 }
 
-BOOL CMainWnd::ActivePage(CPage *pPage)
+BOOL CMainWnd::ActivePage(CPage& Page)
 {
 	for (TD_DockViewVector::iterator itView=m_vctDockViews.begin(); itView!=m_vctDockViews.end(); ++itView)
 	{
-		if ((*itView)->ActivePage(pPage))
+		if ((*itView)->ActivePage(Page))
 		{
 			return TRUE;
 		}
@@ -204,11 +209,11 @@ BOOL CMainWnd::ActivePage(CPage *pPage)
 	return FALSE;
 }
 
-BOOL CMainWnd::SetPageTitle(CPage *pPage, const CString& cstrTitle)
+BOOL CMainWnd::SetPageTitle(CPage& Page, const CString& cstrTitle)
 {
 	for (TD_DockViewVector::iterator itView=m_vctDockViews.begin(); itView!=m_vctDockViews.end(); ++itView)
 	{
-		if ((*itView)->SetPageTitle(pPage, cstrTitle))
+		if ((*itView)->SetPageTitle(Page, cstrTitle))
 		{
 			return TRUE;
 		}
@@ -415,8 +420,8 @@ void CRedrawGuide::Unlock()
 }
 
 
-CMenuGuide::CMenuGuide(CPage *pPage, UINT nIDMenu)
-	: m_pPage(pPage)
+CMenuGuide::CMenuGuide(CPage& Page, UINT nIDMenu)
+	: m_Page(Page)
 	, m_nIDMenu(nIDMenu)
 {
 }
@@ -437,7 +442,7 @@ BOOL CMenuGuide::Popup()
 	
 	if (!*this)
 	{
-		CResourceLock ResourceLock(m_pPage->m_pModule);
+		CResourceLock ResourceLock(m_Page.m_Module);
 
 		ASSERT_RETURN_EX(__super::LoadMenu(m_nIDMenu), FALSE);
 	}
@@ -468,5 +473,5 @@ BOOL CMenuGuide::Popup()
 	CPoint ptCursor(0, 0);
 	(void)::GetCursorPos(&ptCursor);
 
-	return pSubMenu->TrackPopupMenu(0, ptCursor.x, ptCursor.y, m_pPage);
+	return pSubMenu->TrackPopupMenu(0, ptCursor.x, ptCursor.y, &m_Page);
 }

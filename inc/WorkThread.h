@@ -41,7 +41,7 @@ protected:
 	int GetWorkThreadCount();
 
 private:
-	virtual void WorkThreadProc(tagWorkThreadInfo *pThreadInfo) = 0;
+	virtual void WorkThreadProc(tagWorkThreadInfo& ThreadInfo) = 0;
 
 	static DWORD WINAPI ThreadProc(LPVOID lpThreadParam);
 };

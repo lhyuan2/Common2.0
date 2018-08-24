@@ -12,7 +12,7 @@
 // IModuleApp
 IModuleApp::IModuleApp()
 {
-	CMainApp::AddModule(this);
+	CMainApp::AddModule(*this);
 }
 
 IModuleApp::~IModuleApp()
@@ -26,7 +26,7 @@ void IModuleApp::ActivateResource()
 
 HANDLE IModuleApp::GetResource(ST_ResourceType nRCType, UINT nID)
 {
-	CResourceLock ResourceLock(this);
+	CResourceLock ResourceLock(*this);
 
 	switch (nRCType)
 	{
@@ -39,11 +39,6 @@ HANDLE IModuleApp::GetResource(ST_ResourceType nRCType, UINT nID)
 	}
 
 	return NULL;
-}
-
-BOOL IModuleApp::OnReady(CMainWnd *pMainWnd)
-{
-	return TRUE;
 }
 
 BOOL IModuleApp::OnQuit()
@@ -130,7 +125,7 @@ BOOL CMainApp::InitInstance()
 
 	for (ModuleVector::iterator itModule = m_vctModules.begin(); itModule != m_vctModules.end(); ++itModule)
 	{
-		if (!(*itModule)->OnReady((CMainWnd*)m_pMainWnd))
+		if (!(*itModule)->OnReady(*(CMainWnd*)m_pMainWnd))
 		{
 			AfxPostQuitMessage(0);
 			return FALSE;
@@ -170,7 +165,7 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 
 			break;
 		case WM_HOTKEY:
-			(void)HandleHotkey(pMsg->lParam);
+			(void)HandleHotkey(pMsg->lParam, TRUE);
 			
 			return TRUE;
 		default:
@@ -185,7 +180,19 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 		{
 			if (MOD_ALT == itrHotkeyInfo->nFlag && ::GetKeyState(itrHotkeyInfo->nKey)&0x8000)
 			{
-				if (HandleHotkey(itrHotkeyInfo->nID))
+				UINT uFlag = MOD_ALT;
+
+				if (0 == (::GetKeyState(VK_CONTROL) & 0x800))
+				{
+					uFlag |= MOD_CONTROL;
+				}
+
+				if (0 == (::GetKeyState(VK_SHIFT) & 0x800))
+				{
+					uFlag |= MOD_SHIFT;
+				}
+
+				if (HandleHotkey(MAKELPARAM(uFlag, itrHotkeyInfo->nKey), FALSE))
 				{
 					return TRUE;
 				}
@@ -197,7 +204,7 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 	{
 		UINT nKey = pMsg->wParam;
 				
-		if (VK_CONTROL != nKey && VK_SHIFT!= nKey)
+		if (VK_CONTROL != nKey && VK_SHIFT != nKey && VK_MENU != nKey)
 		{
 			UINT nFlag = 0;
 
@@ -205,12 +212,18 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 			{
 				nFlag = MOD_CONTROL;
 			}
-			else if(::GetKeyState(VK_SHIFT)&0x8000)
+
+			if (::GetKeyState(VK_SHIFT) & 0x8000)
 			{
-				nFlag = MOD_SHIFT;
+				nFlag |= MOD_SHIFT;
 			}
 
-			if (HandleHotkey(MAKELPARAM(nFlag, nKey)))
+			if (::GetKeyState(VK_MENU) & 0x8000)
+			{
+				nFlag |= MOD_ALT;
+			}
+			
+			if (HandleHotkey(MAKELPARAM(nFlag, nKey), FALSE))
 			{
 				return TRUE;
 			}
@@ -233,7 +246,7 @@ BOOL CMainApp::HandleCommand(UINT nID)
 	return FALSE;
 }
 
-BOOL CMainApp::HandleHotkey(LPARAM lParam)
+bool CMainApp::HandleHotkey(LPARAM lParam, bool bGlobal)
 {
 	static DWORD dwLastTime = 0;
 	if (500 > ::GetTickCount() - dwLastTime)
@@ -246,30 +259,39 @@ BOOL CMainApp::HandleHotkey(LPARAM lParam)
 	}
 	dwLastTime = ::GetTickCount();
 
-	std::vector<tagHotkeyInfo>::iterator itrHotkeyInfo = std::find(
-		m_vctHotkeyInfos.begin(), m_vctHotkeyInfos.end(), (UINT)lParam);
-	if (itrHotkeyInfo == m_vctHotkeyInfos.end())
+	for (auto& HotkeyInfo : m_vctHotkeyInfos)
 	{
-		return FALSE;
+		if (HotkeyInfo.bGlobal != bGlobal)
+		{
+			continue;
+		}
+
+		if (HotkeyInfo.lParam == lParam)
+		{
+			if (HandleHotkey(HotkeyInfo))
+			{
+				return true;
+			}
+		}
 	}
 
-	return HandleHotkey(*itrHotkeyInfo);
+	return false;
 }
 
-BOOL CMainApp::HandleHotkey(tagHotkeyInfo &HotkeyInfo)
+bool CMainApp::HandleHotkey(tagHotkeyInfo &HotkeyInfo)
 {
 	if (HotkeyInfo.bHandling)
 	{
-		return FALSE;
+		return false;
 	}
 	HotkeyInfo.bHandling = TRUE;
 
-	BOOL bResult = FALSE;
+	bool bResult = false;
 
 	if (0 != HotkeyInfo.nIDMenuItem)
 	{
 		HandleCommand(HotkeyInfo.nIDMenuItem);
-		bResult = TRUE;
+		bResult = true;
 	}
 	else
 	{
@@ -277,7 +299,7 @@ BOOL CMainApp::HandleHotkey(tagHotkeyInfo &HotkeyInfo)
 		{
 			if ((*itModule)->OnHotkey(HotkeyInfo))
 			{
-				bResult = TRUE;
+				bResult = true;
 			}
 		}
 	}
@@ -297,9 +319,9 @@ BOOL CMainApp::Quit()
 	for (std::vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
 		; itrHotkeyInfo != m_vctHotkeyInfos.end(); ++itrHotkeyInfo)
 	{
-		if (0 != itrHotkeyInfo->nID)
+		if (itrHotkeyInfo->bGlobal)
 		{
-			(void)::UnregisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), itrHotkeyInfo->nID);
+			(void)::UnregisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), itrHotkeyInfo->lParam);
 		}
 	}
 
@@ -313,13 +335,11 @@ void CMainApp::DoEvents()
 	::DoEvents();
 }
 
-BOOL CMainApp::AddModule(IModuleApp *pModule)
+BOOL CMainApp::AddModule(IModuleApp& Module)
 {
-	ASSERT_RETURN_EX(pModule, FALSE);
-	
-	ASSERT_RETURN_EX(!util::ContainerFind(m_vctModules, pModule), FALSE);
+	ASSERT_RETURN_EX(!util::ContainerFind(m_vctModules, &Module), FALSE);
 
-	m_vctModules.push_back(pModule);
+	m_vctModules.push_back(&Module);
 
 	return TRUE;
 }
@@ -380,7 +400,7 @@ BOOL CMainApp::RegHotkey(const tagHotkeyInfo &HotkeyInfo)
 	{
 		if (HotkeyInfo.bGlobal)
 		{
-			if (!::RegisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), HotkeyInfo.nID, HotkeyInfo.nFlag, HotkeyInfo.nKey))
+			if (!::RegisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), HotkeyInfo.lParam, HotkeyInfo.nFlag, HotkeyInfo.nKey))
 			{
 				return FALSE;
 			}

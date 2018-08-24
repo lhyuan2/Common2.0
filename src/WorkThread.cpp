@@ -15,7 +15,7 @@ DWORD WINAPI CWorkThread::ThreadProc(LPVOID lpThreadParam)
 	tagWorkThreadInfo* pThreadInfo = (tagWorkThreadInfo*)lpThreadParam;
 	ASSERT_RETURN_EX(pThreadInfo, 0);
 
-	pThreadInfo->pThread->WorkThreadProc(pThreadInfo);
+	pThreadInfo->pThread->WorkThreadProc(*pThreadInfo);
 
 	pThreadInfo->hHandle = NULL;
 

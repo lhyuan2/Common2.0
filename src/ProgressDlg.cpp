@@ -47,7 +47,7 @@ END_MESSAGE_MAP()
 
 // CExportor 消息处理程序
 
-void CProgressDlg::WorkThreadProc(tagWorkThreadInfo *pThreadInfo)
+void CProgressDlg::WorkThreadProc(tagWorkThreadInfo& ThreadInfo)
 {
 	ASSERT(FALSE);
 }

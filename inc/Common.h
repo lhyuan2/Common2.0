@@ -1,9 +1,7 @@
 
 #pragma once
 
-
 #include "def.h"
-
 
 #include "App.h"
 

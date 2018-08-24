@@ -33,18 +33,18 @@ BOOL CDragDropMgr::DoDrag(LPVOID pDragData)
 	return TRUE;
 }
 
-BOOL CDragDropMgr::RegDropTarget(CDropTarget *pDropTarget, CWnd *pWnd)
+BOOL CDragDropMgr::RegDropTarget(CDropTarget& DropTarget, CWnd& Wnd)
 {
-	ASSERT_RETURN_EX(pDropTarget && pWnd->GetSafeHwnd(), FALSE);
+	ASSERT_RETURN_EX(Wnd.GetSafeHwnd(), FALSE);
 
-	if (m_mapDropTargets.find(pWnd) != m_mapDropTargets.end())
+	if (m_mapDropTargets.find(&Wnd) != m_mapDropTargets.end())
 	{
 		return TRUE;
 	}
 
-	ASSERT_RETURN_EX((new CDragDropMgr())->Register(pWnd), FALSE);
+	ASSERT_RETURN_EX((new CDragDropMgr())->Register(&Wnd), FALSE);
 
-	m_mapDropTargets[pWnd] = pDropTarget;
+	m_mapDropTargets[&Wnd] = &DropTarget;
 
 	return TRUE;
 }

@@ -175,7 +175,7 @@ public:
 	
 		if (bShowRoot)
 		{
-			(void)InsertObject(m_pRootDir);
+			(void)InsertObject(*m_pRootDir);
 			InsertChilds(m_pRootDir);
 
 			(void)__super::SelectItem(m_pRootDir->m_hTreeItem);
@@ -196,7 +196,7 @@ public:
 		for (TD_PathList::iterator itSubDir = lstSubDirs.begin()
 			; itSubDir != lstSubDirs.end(); ++itSubDir)
 		{
-			(void)InsertObject((CDirObject*)*itSubDir, pDirObject);
+			(void)InsertObject(*(CDirObject*)*itSubDir, pDirObject);
 		}
 	}
 	

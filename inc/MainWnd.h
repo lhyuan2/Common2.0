@@ -43,16 +43,12 @@ public:
 
 	virtual ~CMainWnd()
 	{
-		if (NULL != m_lpPartWidths)
-		{
-			delete[] m_lpPartWidths;
-		}
 	}
 	
 	DECLARE_MESSAGE_MAP()
 
 private:
-	int *m_lpPartWidths = NULL;
+	vector<int> m_vecStatusPartWidth;
 
 	CStatusBarCtrl m_ctlStatusBar;
 
@@ -67,20 +63,20 @@ public:
 
 	virtual void Show();
 
-	BOOL CreateStatusBar(int nParts, ...);
+	BOOL CreateStatusBar(UINT nParts, ...);
 	
 	BOOL SetStatusText(UINT nPart, const CString& cstrText);
 
-	BOOL AddDockView(CPage *pPage, ST_ViewStyle nStyle, UINT nDockSize
+	BOOL AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
 		, UINT uOffset = 0, UINT uTabFontSize=0, UINT uTabHeight = 0);
 
-	BOOL AddUndockView(CPage *pPage, const CRect& rtPos);
+	BOOL AddUndockView(CPage& Page, const CRect& rtPos);
 
-	BOOL AddPage(CPage *pPage, ST_ViewStyle nStyle);
+	BOOL AddPage(CPage& Page, ST_ViewStyle nStyle);
 
-	BOOL ActivePage(CPage *pPage);
+	BOOL ActivePage(CPage& Page);
 
-	BOOL SetPageTitle(CPage *pPage, const CString& cstrTitle);
+	BOOL SetPageTitle(CPage& Page, const CString& cstrTitle);
 	
 	int MsgBox(const CString& cstrText, const CString& cstrTitle=L"", UINT uType=MB_OK);
 	
@@ -118,10 +114,10 @@ private:
 class COMMON_EXT_CLASS CMenuGuide : public CMenu
 {
 public:
-	CMenuGuide(CPage *pPage, UINT nIDMenu);
+	CMenuGuide(CPage& Page, UINT nIDMenu);
 
 private:
-	CPage *m_pPage;
+	CPage& m_Page;
 	UINT m_nIDMenu;
 
 	std::map<UINT, std::pair<BOOL, CString>> m_mapMenuItemInfos;

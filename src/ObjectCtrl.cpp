@@ -171,9 +171,9 @@ BOOL CCheckObjectTree::InitCtrl()
 	return TRUE;
 }
 
-HTREEITEM CCheckObjectTree::InsertObject(CTreeObject *pObject, CTreeObject *pParentObject)
+HTREEITEM CCheckObjectTree::InsertObject(CTreeObject& Object, CTreeObject *pParentObject)
 {
-	HTREEITEM hItem = __super::InsertObject(pObject, pParentObject);
+	HTREEITEM hItem = __super::InsertObject(Object, pParentObject);
 
 	(void)__super::SetItemState(hItem, INDEXTOSTATEIMAGEMASK(CS_Unchecked), TVIS_STATEIMAGEMASK);
 
@@ -347,20 +347,18 @@ CObjectTree::~CObjectTree()
 {
 }
 
-void CObjectTree::SetRootObject(CTreeObject *pObject)
+void CObjectTree::SetRootObject(CTreeObject& Object)
 {
-	ASSERT_RETURN(pObject);
-
 	(void)DeleteAllItems();
 
-	(void)InsertObjectEx(pObject);
+	(void)InsertObjectEx(Object);
 
-	(void)__super::SelectItem(pObject->m_hTreeItem);
-	(void)__super::EnsureVisible(pObject->m_hTreeItem);
-	(void)__super::Expand(pObject->m_hTreeItem, TVE_EXPAND);
+	(void)__super::SelectItem(Object.m_hTreeItem);
+	(void)__super::EnsureVisible(Object.m_hTreeItem);
+	(void)__super::Expand(Object.m_hTreeItem, TVE_EXPAND);
 }
 
-HTREEITEM CObjectTree::InsertObject(CTreeObject *pObject, CTreeObject *pParentObject)
+HTREEITEM CObjectTree::InsertObject(CTreeObject& Object, CTreeObject *pParentObject)
 {
 	HTREEITEM hParentItem = TVI_ROOT;
 	if (pParentObject && pParentObject->m_hTreeItem)
@@ -377,28 +375,25 @@ HTREEITEM CObjectTree::InsertObject(CTreeObject *pObject, CTreeObject *pParentOb
 		}
 	}
 	
-	pObject->m_hTreeItem = __super::InsertItem(hParentItem, pObject->GetTreeText()
-		, (DWORD_PTR)pObject, pObject->GetTreeImage());
-	ASSERT(pObject->m_hTreeItem);
-
-	return pObject->m_hTreeItem;
+	return Object.m_hTreeItem = __super::InsertItem(hParentItem, Object.GetTreeText()
+		, (DWORD_PTR)&Object, Object.GetTreeImage());
 }
 
-HTREEITEM CObjectTree::InsertObjectEx(CTreeObject *pObject, CTreeObject *pParentObject)
+HTREEITEM CObjectTree::InsertObjectEx(CTreeObject& Object, CTreeObject *pParentObject)
 {
-	pObject->m_hTreeItem = InsertObject(pObject, pParentObject);
-	ENSURE_RETURN_EX(pObject->m_hTreeItem, NULL);
+	Object.m_hTreeItem = InsertObject(Object, pParentObject);
+	ENSURE_RETURN_EX(Object.m_hTreeItem, NULL);
 
 	TD_TreeObjectList lstSubObjects;
-	pObject->GetTreeChilds(lstSubObjects);
+	Object.GetTreeChilds(lstSubObjects);
 
 	for (TD_TreeObjectList::iterator itSubObject=lstSubObjects.begin()
 		; itSubObject!=lstSubObjects.end(); ++itSubObject)
 	{
-		(void)InsertObjectEx(*itSubObject, pObject);
+		(void)InsertObjectEx(**itSubObject, &Object);
 	}
 
-	return pObject->m_hTreeItem;
+	return Object.m_hTreeItem;
 }
 
 CTreeObject *CObjectTree::GetSelectedObject()
@@ -417,11 +412,11 @@ CTreeObject *CObjectTree::GetItemObject(HTREEITEM hItem)
 	return (CTreeObject*)__super::GetItemData(hItem);
 }
 
-CTreeObject *CObjectTree::GetParentObject(CTreeObject *pTreeObject)
+CTreeObject *CObjectTree::GetParentObject(CTreeObject& Object)
 {
-	ASSERT_RETURN_EX(pTreeObject->m_hTreeItem, NULL);
+	ASSERT_RETURN_EX(Object.m_hTreeItem, NULL);
 	
-	HTREEITEM hItemParent = __super::GetParentItem(pTreeObject->m_hTreeItem);
+	HTREEITEM hItemParent = __super::GetParentItem(Object.m_hTreeItem);
 	ENSURE_RETURN_EX(hItemParent, NULL);
 
 	return this->GetItemObject(hItemParent);
@@ -560,11 +555,11 @@ void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
 	{
 		if (nItem <= nMaxItem)
 		{
-			SetItemObject(nItem, *itObject);
+			SetItemObject(nItem, **itObject);
 		}
 		else
 		{
-			(void)InsertObject(*itObject, nItem);
+			(void)InsertObject(**itObject, nItem);
 		}
 	}
 	
@@ -576,7 +571,7 @@ void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
 	this->SetRedraw(TRUE);
 }
 
-int CObjectList::InsertObject(CListObject *pObject, int nItem)
+int CObjectList::InsertObject(CListObject& Object, int nItem)
 {
 	if (-1 == nItem)
 	{
@@ -585,7 +580,7 @@ int CObjectList::InsertObject(CListObject *pObject, int nItem)
 
 	nItem = __super::InsertItem(nItem, NULL);
 	
-	this->SetItemObject(nItem, pObject);
+	this->SetItemObject(nItem, Object);
 	
 	return nItem;
 }
@@ -596,18 +591,29 @@ void CObjectList::UpdateObjects()
 
 	for (int nItem = 0; nItem < this->GetItemCount(); ++nItem)
 	{
-		SetItemObject(nItem, (CListObject*)__super::GetItemData(nItem));
+		SetItemObject(nItem, *(CListObject*)__super::GetItemData(nItem));
 	}
 }
 
-void CObjectList::UpdateObject(CListObject *pObject)
+void CObjectList::UpdateObject(CListObject& Object)
 {
 	ENSURE_RETURN(m_hWnd);
 
-	int nItem = this->GetObjectItem(pObject);
+	int nItem = this->GetObjectItem(Object);
 	if (0 <= nItem)
 	{
-		this->SetItemObject(nItem, pObject);
+		this->SetItemObject(nItem, Object);
+	}
+}
+
+void CObjectList::UpdateItem(UINT uItem)
+{
+	ENSURE_RETURN(m_hWnd);
+
+	auto pObject = this->GetItemObject(uItem);
+	if (NULL != pObject)
+	{
+		this->SetItemObject(uItem, *pObject);
 	}
 }
 
@@ -635,21 +641,21 @@ void CObjectList::DeleteObjects(const TD_ListObjectList& lstDeleteObjects)
 	}
 }
 
-BOOL CObjectList::DeleteObject(CListObject* pObject)
+BOOL CObjectList::DeleteObject(CListObject& Object)
 {
-	int nItem = this->GetObjectItem(pObject);
+	int nItem = this->GetObjectItem(Object);
 	ENSURE_RETURN_EX(0 <= nItem, FALSE);
 
 	return this->DeleteItem(nItem);
 }
 
-void CObjectList::SetItemObject(int nItem, CListObject *pObject)
+void CObjectList::SetItemObject(int nItem, CListObject& Object)
 {
 	ASSERT_RETURN(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
-		, pObject->GetListImage(), 0, 0, (LPARAM)pObject));
+		, Object.GetListImage(), 0, 0, (LPARAM)&Object));
 
 	std::list<CString> lstTexts;
-	pObject->GetListText(lstTexts);
+	Object.GetListText(lstTexts);
 
 	CString strText;
 	std::list<CString>::iterator itSubTitle = lstTexts.begin();
@@ -676,11 +682,11 @@ CListObject *CObjectList::GetItemObject(int nItem)
 	return (CListObject*)__super::GetItemData(nItem);
 }
 
-int CObjectList::GetObjectItem(CListObject* pObject)
+int CObjectList::GetObjectItem(CListObject& Object)
 {
 	for (int nItem = 0; nItem < __super::GetItemCount(); ++nItem)
 	{
-		if ((CListObject*)__super::GetItemData(nItem) == pObject)
+		if ((CListObject*)__super::GetItemData(nItem) == &Object)
 		{
 			return nItem;
 		}
@@ -772,9 +778,9 @@ void CObjectList::SelectItem(int nItem, BOOL bSetFocus)
 	(void)this->EnsureVisible(nItem, FALSE);
 }
 
-void CObjectList::SelectObject(CListObject *pObject, BOOL bSetFocus)
+void CObjectList::SelectObject(CListObject& Object, BOOL bSetFocus)
 {
-	int nItem =	this->GetObjectItem(pObject);
+	int nItem =	this->GetObjectItem(Object);
 	if (0 <= nItem)
 	{
 		this->SelectItem(nItem, bSetFocus);

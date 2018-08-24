@@ -56,7 +56,7 @@ public:
 	LRESULT OnEndProgress(WPARAM wParam, LPARAM lParam);
 
 public:
-	virtual void WorkThreadProc(tagWorkThreadInfo *pThreadInfo);
+	virtual void WorkThreadProc(tagWorkThreadInfo& ThreadInfo) override;
 
 public:
 	virtual BOOL OnInitDialog();

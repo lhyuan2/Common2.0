@@ -29,7 +29,7 @@ private:
 public:
 	static BOOL DoDrag(LPVOID pDragData=NULL);
 
-	static BOOL RegDropTarget(CDropTarget *pDropTarget, CWnd *pWnd);
+	static BOOL RegDropTarget(CDropTarget& DropTarget, CWnd& Wnd);
 
 public:
 	virtual DROPEFFECT OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);

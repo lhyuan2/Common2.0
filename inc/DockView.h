@@ -42,12 +42,12 @@ protected:
 	typedef vector<CPage*> PageVector;
 
 public:
-	CDockView(CWnd* pParentWnd, ST_ViewStyle nStyle, UINT nDockSize
+	CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize
 		, UINT uOffset = 0, UINT uTabFontSize=0, UINT uTabHeight=0);
 
-	CDockView(CWnd* pParentWnd, ST_ViewStyle nStyle, const CRect& rtPos);
+	CDockView(CWnd& wndParent, ST_ViewStyle nStyle, const CRect& rtPos);
 
-	virtual ~CDockView();
+	virtual ~CDockView() {}
 
 	DECLARE_MESSAGE_MAP()
 
@@ -71,13 +71,13 @@ private:
 	CImageList m_ImageList;
 
 public:
-	BOOL AddPage(CPage* pPage);
+	BOOL AddPage(CPage& Page);
 
-	BOOL ActivePage(CPage *pPage);
+	BOOL ActivePage(CPage& pPage);
 
-	BOOL SetPageTitle(CPage *pPage, const CString& cstrTitle);
+	BOOL SetPageTitle(CPage& Page, const CString& cstrTitle);
 
-	void Resize(CRect* pRestrictRect);
+	void Resize(CRect& rcRestrict);
 
 private:
 	BOOL Create();
