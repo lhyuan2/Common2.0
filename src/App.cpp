@@ -249,13 +249,10 @@ BOOL CMainApp::HandleCommand(UINT nID)
 bool CMainApp::HandleHotkey(LPARAM lParam, bool bGlobal)
 {
 	static DWORD dwLastTime = 0;
-	if (500 > ::GetTickCount() - dwLastTime)
+	if (100 > ::GetTickCount() - dwLastTime)
 	{
-		dwLastTime = ::GetTickCount();
-		
 		DoEvents();
-
-		return FALSE;
+		return FALSE;		
 	}
 	dwLastTime = ::GetTickCount();
 

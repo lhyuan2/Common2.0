@@ -1,24 +1,24 @@
 ﻿  stdafx.cpp
-  Main.cpp
-  SQLiteDB.cpp
-  DragDrop.cpp
-  fsutil.cpp
-  LogList.cpp
-  ObjectCtrl.cpp
-  PathCtrl.cpp
-  ProFile.cpp
-  ProgressDlg.cpp
-  util.cpp
-  WorkThread.cpp
-  App.cpp
-  DockView.cpp
-  MainWnd.cpp
   Page.cpp
-  shell.c
+  MainWnd.cpp
+  DockView.cpp
+  App.cpp
+  WorkThread.cpp
+  util.cpp
+  ProgressDlg.cpp
+  ProFile.cpp
+  PathCtrl.cpp
+  ObjectCtrl.cpp
+  LogList.cpp
+  fsutil.cpp
+  DragDrop.cpp
+  SQLiteDB.cpp
+  Main.cpp
+  正在生成代码...
   sqlite3.c
-    正在创建库 ../lib/Common.lib 和对象 ../lib/Common.exp
-  正在生成代码
-  All 5113 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  已完成代码的生成
-  Common.vcxproj -> D:\dev\c++\Common2.0\src\../bin/Common.dll
-  Common.vcxproj -> ../build/Common.pdb (Full PDB)
+  shell.c
+  正在生成代码...
+Main.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/SAFESEH”规范)
+    正在创建库 ../lib/Commond.lib 和对象 ../lib/Commond.exp
+  Common.vcxproj -> D:\dev\c++\Common2.0\src\../bin/Commond.dll
+  Common.vcxproj -> ../build/Commond.pdb (Full PDB)
