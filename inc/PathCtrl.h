@@ -84,9 +84,8 @@ public:
 		{
 			lstTitles.push_back(L"");
 		}
-
-		//lstTitles.push_back(CTime(m_createTime).Format(_T("%y-%m-%d %H:%M:%S")));
-		lstTitles.push_back(CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M:%S")));
+		
+		lstTitles.push_back(CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M")));
 	}
 };
 

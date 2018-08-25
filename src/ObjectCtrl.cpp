@@ -922,11 +922,11 @@ BOOL CObjectList::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRES
 void CObjectList::ChangeListCtrlView(short zDelta)
 {
 	ST_ListViewType lpViewType[] = {
-		LVT_Icon
-		//, LVT_SmallIcon
-		//, LVT_List
+		LVT_Tile
 		, LVT_Report
-		, LVT_Tile
+		, LVT_List
+		//, LVT_SmallIcon
+		, LVT_Icon
 	};
 
 	ST_ListViewType nPreViewType = this->GetView();
