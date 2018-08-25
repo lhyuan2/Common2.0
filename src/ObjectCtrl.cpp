@@ -5,8 +5,6 @@
 
 #include "Resource.h"
 
-#define __ColorBlack RGB(0,0,0)
-
 // CBaseTree
 
 CBaseTree::CBaseTree()
@@ -39,11 +37,7 @@ BOOL CBaseTree::InitCtrl(CBitmap *pBitmap, ULONG uFontSize)
 
 	if (pBitmap)
 	{
-		BITMAP bmp;
-		(void)pBitmap->GetBitmap(&bmp);
-		ASSERT_RETURN_EX(m_ImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-		(void)m_ImageList.Add(pBitmap, __ColorBlack);
-
+		ASSERT_RETURN_EX(m_ImageList.CreateEx(*pBitmap), FALSE);
 		(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
 	}
 
@@ -57,12 +51,7 @@ BOOL CBaseTree::InitCtrl(const TD_ICONLIST& lstIcon, UINT uIconSize, ULONG uFont
 		(void)m_fontGuide.setFontSize(*this, uFontSize);
 	}
 
-	ASSERT_RETURN_EX(m_ImageList.Create(uIconSize, uIconSize, ILC_COLOR32, 0, lstIcon.size()), FALSE);
-	for (auto hIcon : lstIcon)
-	{
-		(void)m_ImageList.Add(hIcon);
-	}
-
+	ASSERT_RETURN_EX(m_ImageList.CreateEx(uIconSize, uIconSize, lstIcon), FALSE);
 	(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
 
 	return TRUE;
@@ -469,37 +458,36 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 
 BOOL CObjectList::InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize)
 {
-	if (0 == uSmallSize)
-	{
-		uSmallSize = uSize;
-	}
-
-	ASSERT_RETURN_EX(m_ImageList.Create(uSize, uSize, ILC_COLOR32, 0, lstIcon.size()), FALSE);
-	ASSERT_RETURN_EX(m_ImageListSmall.Create(uSmallSize, uSmallSize, ILC_COLOR32, 0, lstIcon.size()), FALSE);
-	for (auto hIcon : lstIcon)
-	{
-		(void)m_ImageList.Add(hIcon);
-		(void)m_ImageListSmall.Add(hIcon);
-	}
+	ASSERT_RETURN_EX(m_ImageList.CreateEx(uSize, uSize, lstIcon), FALSE);
 	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
-	(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
 
+	if (0 != uSmallSize)
+	{
+		ASSERT_RETURN_EX(m_ImageListSmall.CreateEx(uSmallSize, uSmallSize, lstIcon), FALSE);
+		(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
+	}
+	else
+	{
+		(void)__super::SetImageList(&m_ImageList, LVSIL_SMALL);
+	}
+	
 	return TRUE;
 }
 
-BOOL CObjectList::InitImage(CBitmap& Bitmap)
+BOOL CObjectList::InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall)
 {
-	BITMAP bmp;
-	(void)Bitmap.GetBitmap(&bmp);
-	
-	ASSERT_RETURN_EX(m_ImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-	(void)m_ImageList.Add(&Bitmap, __ColorBlack);
-
-	//ASSERT_RETURN_EX(m_ImageListSmall.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-	//(void)m_ImageListSmall.Add(&Bitmap, __ColorBlack);
-
+	ASSERT_RETURN_EX(m_ImageList.CreateEx(Bitmap), FALSE);
 	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
-	(void)__super::SetImageList(&m_ImageList, LVSIL_SMALL);
+
+	if (NULL != pBitmapSmall)
+	{
+		ASSERT_RETURN_EX(m_ImageListSmall.CreateEx(*pBitmapSmall), FALSE);
+		(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
+	}
+	else
+	{
+		(void)__super::SetImageList(&m_ImageList, LVSIL_SMALL);
+	}
 
 	return TRUE;
 }

@@ -9,7 +9,39 @@
 
 #include "FontGuide.h"
 
+#define __ColorBlack RGB(0,0,0)
+
 using TD_ICONLIST = list<HICON>;
+
+class CImageListEx : public CImageList
+{
+public:
+	CImageListEx()
+	{
+	}
+
+public:
+	BOOL CreateEx(CBitmap& bitmap)
+	{
+		BITMAP bmp;
+		(void)bitmap.GetBitmap(&bmp);
+		ASSERT_RETURN_EX(Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
+		(void)Add(&bitmap, __ColorBlack);
+
+		return TRUE;
+	}
+
+	BOOL CreateEx(UINT cx, UINT cy, const TD_ICONLIST& lstIcon)
+	{
+		ASSERT_RETURN_EX(Create(cx, cy, ILC_COLOR32, 0, lstIcon.size()), FALSE);
+		for (auto hIcon : lstIcon)
+		{
+			(void)Add(hIcon);
+		}
+
+		return TRUE;
+	}
+};
 
 class __CommonPrjExt CBaseTree: public CTreeCtrl
 {
@@ -18,11 +50,11 @@ public:
 
 	virtual ~CBaseTree();
 
+	CImageListEx m_ImageList;
+
 	DECLARE_MESSAGE_MAP()
 
 private:
-	CImageList m_ImageList;
-
 	CFontGuide m_fontGuide;
 
 public:
@@ -220,11 +252,11 @@ public:
 		(void)m_ImageListSmall.DeleteImageList();		
 	}
 
+	CImageListEx m_ImageList;
+	CImageListEx m_ImageListSmall;
+
 private:
 	UINT m_nColumnCount = 1;
-
-	CImageList m_ImageList;
-	CImageList m_ImageListSmall;
 
 	bool m_bChangeView = false;
 
@@ -234,7 +266,7 @@ public:
 	BOOL InitCtrl(UINT uFontSize, const ColumnList &lstColumns = ColumnList());
 
 	BOOL InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
-	BOOL InitImage(CBitmap& Bitmap);
+	BOOL InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
 
 	void SetTileSize(UINT cx, UINT cy);
 

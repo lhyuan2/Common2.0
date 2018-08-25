@@ -28,10 +28,12 @@ public:
 public:
 	IModuleApp& m_Module;
 
-public:
 	CString m_cstrTitle;
 
+private:
 	std::set<HWND> m_setDragableCtrls;
+
+	function<void()> m_AsyncCB;
 
 public:
 	BOOL Active();
@@ -39,6 +41,8 @@ public:
 	BOOL SetTitle(const CString& cstrTitle);
 
 	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
+
+	void Async(const function<void()>& cb, UINT uMsDelay = 0);
 
 protected:
 	BOOL OnSetActive();
@@ -60,6 +64,7 @@ protected:
 		return FALSE;
 	}
 	
-public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+	BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 };

@@ -254,7 +254,7 @@ private:
 public:
 	BOOL InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
 
-	BOOL InitCtrl(UINT uFontSize = 0, CBitmap *pBitmap = NULL);
+	BOOL InitCtrl(UINT uFontSize = 0, CBitmap *pBitmap = NULL, CBitmap *pBitmapSmall = NULL);
 
 	void SetPath(CPathObject* pPath);
 

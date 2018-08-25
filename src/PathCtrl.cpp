@@ -26,7 +26,7 @@ BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize,
 	return TRUE;
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap)
+BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap, CBitmap *pBitmapSmall)
 {
 	ENSURE_RETURN_EX(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
@@ -39,7 +39,7 @@ BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap)
 
 		pBitmap = &Bitmap;
 	}
-	ENSURE_RETURN_EX(__super::InitImage(*pBitmap), FALSE);
+	ENSURE_RETURN_EX(__super::InitImage(*pBitmap, pBitmapSmall), FALSE);
 
 	(void)Bitmap.DeleteObject();
 

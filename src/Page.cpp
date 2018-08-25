@@ -120,3 +120,33 @@ BOOL CPage::PreTranslateMessage(MSG* pMsg)
 
 	return CPropertyPage::PreTranslateMessage(pMsg);
 }
+
+void CPage::Async(const function<void()>& cb, UINT uMsDelay)
+{
+	m_AsyncCB = cb;
+
+	thread thr([&]() {
+		if (0 != uMsDelay)
+		{
+			::Sleep(uMsDelay);
+		}
+
+		this->PostMessage(WM_USER);
+	});
+	thr.detach();
+}
+
+BOOL CPage::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	if (WM_USER == message)
+	{
+		if (m_AsyncCB)
+		{
+			m_AsyncCB();
+		}
+
+		return TRUE;
+	}
+
+	return __super::OnWndMsg(message, wParam, lParam, pResult);
+}

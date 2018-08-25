@@ -3,14 +3,6 @@
 
 #include "def.h"
 
-#include <string>
-
-#include <vector>
-
-#include <map> 
-
-using namespace std;
-
 enum ST_OLEVarType
 {
 	OLEVT_Boolean = VT_BOOL,
