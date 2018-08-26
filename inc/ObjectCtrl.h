@@ -41,6 +41,16 @@ public:
 
 		return TRUE;
 	}
+
+	void AddBitmap(CBitmap& bitmap)
+	{
+		(void)Add(&bitmap, RGB(0, 0, 0));
+	}
+
+	void ReplaceBitmap(UINT uPos, CBitmap& bitmap)
+	{
+		(void)__super::Replace(uPos, &bitmap, NULL);
+	}
 };
 
 class __CommonPrjExt CBaseTree: public CTreeCtrl
@@ -140,6 +150,8 @@ public:
 
 	virtual HTREEITEM InsertObject(CTreeObject& Object, CTreeObject *pParentObject=NULL);
 	HTREEITEM InsertObjectEx(CTreeObject& Object, CTreeObject *pParentObject=NULL);
+
+	void UpdateImage(CTreeObject& Object);
 
 	CTreeObject *GetSelectedObject();
 

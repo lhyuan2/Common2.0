@@ -385,6 +385,12 @@ HTREEITEM CObjectTree::InsertObjectEx(CTreeObject& Object, CTreeObject *pParentO
 	return Object.m_hTreeItem;
 }
 
+void CObjectTree::UpdateImage(CTreeObject& Object)
+{
+	int nImage = Object.GetTreeImage();
+	SetItemImage(Object.m_hTreeItem, nImage, nImage);
+}
+
 CTreeObject *CObjectTree::GetSelectedObject()
 {
 	HTREEITEM hItem = this->GetSelectedItem();
