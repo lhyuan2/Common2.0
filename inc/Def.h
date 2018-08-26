@@ -81,7 +81,7 @@ using namespace std;
 \
 		~_CLASS(); \
 \
-		static _CLASS *Instance() \
+		static _CLASS &Instance() \
 		{ \
 			if (m_pInstance == NULL) \
 			{ \
@@ -89,7 +89,7 @@ using namespace std;
 				atexit(DeleteInstance); \
 			} \
 \
-			return m_pInstance; \
+			return *m_pInstance; \
 		} \
 \
 		static void DeleteInstance() \

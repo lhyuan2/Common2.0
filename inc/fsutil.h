@@ -5,8 +5,6 @@
 
 #include "util.h"
 
-//fsutil
-
 class __CommonPrjExt fsutil
 {
 public:
@@ -77,11 +75,20 @@ public:
 	{
 	}
 
-	CPath(const wstring& strName, bool bDir, CPath *pParentPath)
-		: m_strName(strName)
-		, m_bDir(bDir)
+	CPath(const wstring& strDir)
+		: m_bDir(true)
+		, m_strName(strDir)
+	{
+	}
+
+	CPath(CFileFind& fileFind, CPath *pParentPath)
+		: m_bDir(fileFind.IsDirectory())
+		, m_strName(fileFind.GetFileName())
+		, m_uFileSize(fileFind.GetLength())
 		, m_pParentPath(pParentPath)
 	{
+		//(void)fileFind.GetCreationTime(&m_createTime);
+		(void)fileFind.GetLastWriteTime(&m_modifyTime);
 	}
 
 	CPath(const wstring& strName, const TD_PathList & lstSubPath)
@@ -103,6 +110,10 @@ public:
 	bool m_bDir = false;
 
 	wstring m_strName;
+
+	ULONGLONG m_uFileSize = 0;
+
+	FILETIME m_modifyTime = { 0,0 };
 
 	CPath *m_pParentPath = NULL;
 

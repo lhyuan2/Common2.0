@@ -7,30 +7,10 @@
 
 #include <ObjectCtrl.h>
 
-
-struct tagPathInfo
-{
-	tagPathInfo()
-	{
-	}
-
-	tagPathInfo(CFileFind& FileFind)
-	{
-		m_nSize = FileFind.GetLength();
-		//(void)FileFind.GetCreationTime(&m_createTime);
-		(void)FileFind.GetLastWriteTime(&m_modifyTime);
-	}
-
-	ULONGLONG m_nSize = 0;
-
-	//FILETIME m_createTime = {0,0};
-	FILETIME m_modifyTime = {0,0};
-};
-
 class CPathObject;
 typedef ptrlist<CPathObject*> TD_PathObjectList;
 
-class __CommonPrjExt CPathObject: public CPath, public tagPathInfo, public CListObject
+class __CommonPrjExt CPathObject: public CPath, public CListObject
 {
 public:
 	CPathObject()
@@ -38,7 +18,7 @@ public:
 	}
 
 	CPathObject(const wstring& strDir)
-		: CPath(strDir, true, NULL)
+		: CPath(strDir)
 	{
 	}
 
@@ -48,8 +28,7 @@ public:
 	}
 
 	CPathObject(CFileFind &FindFile, CPath *pParentPath)
-		: CPath((LPCTSTR)FindFile.GetFileName(), FindFile.IsDirectory(), pParentPath)
-		, tagPathInfo(FindFile)
+		: CPath(FindFile, pParentPath)
 	{
 	}
 
@@ -64,28 +43,41 @@ protected:
 	}
 
 public:
+	CString GetFileSize()
+	{
+		if (m_bDir)
+		{
+			return L"";
+		}
+
+		LONG nK = (LONG)(m_uFileSize / 1000);
+
+		int nM = nK / 1000;
+		nK %= 1000;
+
+		CString strFileSize;
+		strFileSize.Format(_T("%3d,%d"), nM, nK);
+		
+		return strFileSize;
+	}
+
+	CString GetFileModifyTime()
+	{
+		if (m_bDir)
+		{
+			return L"";
+		}
+
+		return CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M"));
+	}
+
 	void GetListText(std::list<CString>& lstTitles)
 	{
 		lstTitles.push_back(m_strName.c_str());
-
-		if (!m_bDir)
-		{
-			LONG nK = (LONG)(m_nSize/1000);
-
-			int nM = nK/1000;
-			nK %= 1000;
-
-			CString strSize;
-			strSize.Format(_T("%3d,%d"), nM, nK);
-
-			lstTitles.push_back(strSize);
-		}
-		else
-		{
-			lstTitles.push_back(L"");
-		}
 		
-		lstTitles.push_back(CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M")));
+		lstTitles.push_back(GetFileSize());
+		
+		lstTitles.push_back(GetFileModifyTime());
 	}
 };
 
@@ -238,7 +230,10 @@ public:
 	CPathList(const ColumnList& lstColumns, bool bChangeView = true)
 		: CObjectList(bChangeView)
 	{
-		m_lstColumns.insert(m_lstColumns.end(), lstColumns.begin(), lstColumns.end());
+		if (!lstColumns.empty())
+		{
+			m_lstColumns = lstColumns;
+		}
 	}
 
 private:
