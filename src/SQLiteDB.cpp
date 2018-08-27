@@ -92,11 +92,8 @@ BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, std::wstring& strValue)
 //CSQLiteDB
 
 CSQLiteDB::CSQLiteDB(const string& strDBPath)
+	: m_strDBPath(strDBPath)
 {
-	m_strDBPath = strDBPath;
-	ASSERT(!m_strDBPath.empty());
-
-	m_hDB = NULL;
 }
 
 CSQLiteDB::~CSQLiteDB()

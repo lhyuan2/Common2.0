@@ -78,6 +78,10 @@ CMainApp::CMainApp()
 
 CMainApp::~CMainApp()
 {
+	if (NULL != _pMainWnd)
+	{
+		delete _pMainWnd;
+	}
 }
 
 wstring CMainApp::GetAppPath()
@@ -117,7 +121,7 @@ BOOL CMainApp::InitInstance()
 	CMainWnd *pMainWnd = OnInitMainWnd(MainWndInfo);
 	if (NULL == pMainWnd)
 	{
-		pMainWnd = new CMainWnd();
+		_pMainWnd = pMainWnd = new CMainWnd();
 	}
 
 	ENSURE_RETURN_EX(pMainWnd->Create(MainWndInfo), FALSE);

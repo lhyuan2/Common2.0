@@ -718,7 +718,7 @@ void CPath::GetSubPath(TD_PathList& lstSubPath, BOOL bFindFile, BOOL bSort)
 		ENSURE_RETURN(FindFile() && m_plstSubPath);
 	}
 
-	if (m_plstSubPath)
+	if (NULL != m_plstSubPath)
 	{
 		if (bSort)
 		{
@@ -822,7 +822,7 @@ CPath *CPath::GetSubPath(wstring strSubPath, bool bDir)
 
 void CPath::ClearSubPath()
 {
-	if (m_plstSubPath)
+	if (NULL != m_plstSubPath)
 	{
 		for (TD_PathList::iterator itSubPath = m_plstSubPath->begin()
 			; itSubPath != m_plstSubPath->end(); ++itSubPath)
@@ -856,31 +856,22 @@ void CPath::RemoveSubPath(const TD_PathList& lstDeletePaths)
 
 BOOL CPath::FindFile()
 {
-	if (m_plstSubPath)
+	if (NULL != m_plstSubPath)
 	{
 		return TRUE;
 	}
 
-	CString strFind = this->GetPath().c_str();
-	strFind.Append(L"\\*");
+	CString cstrFind = this->GetPath().c_str();
+	cstrFind.Append(L"\\*");
 	CFileFind fileFind;
-	BOOL bExists = fileFind.FindFile(strFind);
+	BOOL bExists = fileFind.FindFile(cstrFind);
 	if (!bExists)
 	{
-		if (m_plstSubPath)
-		{
-			delete m_plstSubPath;
-			m_plstSubPath = NULL;
-		}
-
 		return FALSE;
 	}
-		
-	if (!m_plstSubPath)
-	{
-		m_plstSubPath = new TD_PathList();
-	}
-
+	
+	m_plstSubPath = new TD_PathList();
+	
 	CPath *pSubPath = NULL;
 
 	while (bExists)
@@ -902,20 +893,19 @@ BOOL CPath::FindFile()
 	return TRUE;
 }
 
-BOOL CPath::ExistsFile()
-{
-	ENSURE_RETURN_EX(this->FindFile(), FALSE);
-		
-	ENSURE_RETURN_EX(m_plstSubPath, FALSE);
-
-	for (TD_PathList::iterator itSubPath = m_plstSubPath->begin()
-		; itSubPath != m_plstSubPath->end(); ++itSubPath)
-	{
-		if (!(*itSubPath)->m_bDir)
-		{
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
+//BOOL CPath::ExistsFile()
+//{
+//	ENSURE_RETURN_EX(this->FindFile(), FALSE);
+//	ENSURE_RETURN_EX(m_plstSubPath, FALSE);
+//
+//	for (TD_PathList::iterator itSubPath = m_plstSubPath->begin()
+//		; itSubPath != m_plstSubPath->end(); ++itSubPath)
+//	{
+//		if (!(*itSubPath)->m_bDir)
+//		{
+//			return TRUE;
+//		}
+//	}
+//
+//	return FALSE;
+//}

@@ -16,6 +16,8 @@
 #include <thread>
 #include <future>
 
+#include <stdlib.h>
+
 using namespace std;
 
 
@@ -72,41 +74,16 @@ using namespace std;
 		break; \
 	}
 
-
-#include <stdlib.h>
-
 #define DECLARE_SINGLETON(_CLASS) \
 	public: \
-		_CLASS(); \
-\
-		~_CLASS(); \
-\
-		static _CLASS &Instance() \
+		static _CLASS& inst() \
 		{ \
-			if (m_pInstance == NULL) \
-			{ \
-				m_pInstance = new _CLASS; \
-				atexit(DeleteInstance); \
-			} \
-\
-			return *m_pInstance; \
-		} \
-\
-		static void DeleteInstance() \
-		{ \
-			if (!m_pInstance) \
-			{ \
-				delete m_pInstance; \
-				m_pInstance = NULL; \
-			} \
+			static _CLASS inst; \
+			return inst; \
 		} \
 \
 	private: \
-		static _CLASS *m_pInstance;
-
-#define IMPLEMENT_SINGLETON(_CLASS) \
-_CLASS *_CLASS::m_pInstance = NULL;
-
+		_CLASS();
 
 #ifdef __CommonPrj
 	#define __CommonPrjExt __declspec(dllexport)

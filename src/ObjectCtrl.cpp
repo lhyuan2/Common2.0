@@ -508,12 +508,16 @@ void CObjectList::SetTileSize(UINT cx, UINT cy)
 	(void)__super::SetTileViewInfo(&LvTileViewInfo);
 }
 
-void CObjectList::SetView(ST_ListViewType nViewType)
+void CObjectList::SetView(ST_ListViewType nViewType, bool bArrange)
 {
 	__super::SetRedraw(FALSE);
 
 	(void)__super::SetView(nViewType);
-	(void)__super::Arrange(0);
+
+	if (bArrange)
+	{
+		(void)Arrange(0);
+	}
 
 	__super::SetRedraw();
 }
@@ -651,22 +655,22 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 	std::list<CString> lstTexts;
 	Object.GetListText(lstTexts);
 
-	CString strText;
+	CString cstrText;
 	std::list<CString>::iterator itSubTitle = lstTexts.begin();
 	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
 	{
 		if (itSubTitle != lstTexts.end())
 		{
-			strText = *itSubTitle;
+			cstrText = *itSubTitle;
 
 			itSubTitle++;
 		}
 		else
 		{
-			strText = "";
+			cstrText = "";
 		}
 
-		(void)__super::SetItemText(nItem, nColumn, strText);
+		(void)__super::SetItemText(nItem, nColumn, cstrText);
 	}
 }
 

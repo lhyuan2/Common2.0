@@ -282,7 +282,7 @@ public:
 
 	void SetTileSize(UINT cx, UINT cy);
 
-	void SetView(ST_ListViewType nViewType);
+	void SetView(ST_ListViewType nViewType, bool bArrange=false);
 	ST_ListViewType GetView();
 	
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);

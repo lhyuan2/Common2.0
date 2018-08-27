@@ -43,6 +43,10 @@ public:
 
 	virtual ~CMainWnd()
 	{
+		for (auto pView : m_vctDockViews)
+		{
+			delete pView;
+		}
 	}
 	
 	DECLARE_MESSAGE_MAP()
@@ -98,12 +102,12 @@ public:
 
 // CWndRedrawGuide
 
-class __CommonPrjExt CRedrawGuide
+class __CommonPrjExt CRedrawLockGuide
 {
 public:
-	CRedrawGuide(CWnd& wndCtrl);
+	CRedrawLockGuide(CWnd& wndCtrl);
 
-	~CRedrawGuide();
+	~CRedrawLockGuide();
 
 	void Unlock();
 

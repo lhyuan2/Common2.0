@@ -56,7 +56,7 @@ public:
 		nK %= 1000;
 
 		CString strFileSize;
-		strFileSize.Format(_T("%3d,%d"), nM, nK);
+		strFileSize.Format(_T("% 3d,%03d"), nM, nK);
 		
 		return strFileSize;
 	}

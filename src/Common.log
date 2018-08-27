@@ -1,20 +1,10 @@
-﻿  App.cpp
-  DockView.cpp
-  DragDrop.cpp
-  LogList.cpp
-  MainWnd.cpp
-  ObjectCtrl.cpp
-  Page.cpp
-  PathCtrl.cpp
-  ProFile.cpp
+﻿  PathCtrl.cpp
   ProgressDlg.cpp
-  SQLiteDB.cpp
-  WorkThread.cpp
-  fsutil.cpp
-  util.cpp
     正在创建库 ../lib/Common.lib 和对象 ../lib/Common.exp
   正在生成代码
-  All 5210 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  1 of 5345 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Common.vcxproj -> D:\dev\c++\Common2.0\src\../bin/Common.dll
   Common.vcxproj -> ../build/Common.pdb (Full PDB)

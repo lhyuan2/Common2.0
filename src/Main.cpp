@@ -13,11 +13,6 @@
 //			#include <afxdllx.h>
 #endif
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
 static AFX_EXTENSION_MODULE ControlDLL = { NULL, NULL };
 
 #ifdef _MANAGED

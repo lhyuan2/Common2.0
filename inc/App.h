@@ -57,6 +57,8 @@ class CMainWnd;
 // IModuleApp
 class __CommonPrjExt IModuleApp: public CWinApp
 {
+friend class CMainApp;
+
 public:
 	IModuleApp();
 
@@ -67,15 +69,16 @@ public:
 	
 	HANDLE GetResource(ST_ResourceType nRCType, UINT nID);
 	
-	virtual BOOL OnReady(CMainWnd& MainWnd) { return TRUE; }
-
-	virtual BOOL OnQuit();
-
 	virtual BOOL OnCommand(UINT nID);
 
 	virtual LRESULT OnMessage(UINT nMsg, WPARAM wParam, LPARAM lParam);
 
+protected:
+	virtual BOOL OnReady(CMainWnd& MainWnd) { return TRUE; }
+
 	virtual BOOL OnHotkey(const tagHotkeyInfo& HotkeyInfo);
+
+	virtual BOOL OnQuit();
 };
 
 class CModuleApp : public IModuleApp {};
@@ -121,6 +124,8 @@ public:
 	}
 
 private:
+	class CMainWnd *_pMainWnd = NULL;
+
 	static ModuleVector m_vctModules;
 
 	static map<UINT, LPVOID> m_mapInterfaces;

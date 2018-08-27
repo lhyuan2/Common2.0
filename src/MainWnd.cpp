@@ -407,20 +407,20 @@ BOOL CMainWnd::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pRe
 }
 
 
-// CRedrawGuide
+// CRedrawLockGuide
 
-CRedrawGuide::CRedrawGuide(CWnd& wndCtrl)
+CRedrawLockGuide::CRedrawLockGuide(CWnd& wndCtrl)
 	: m_wndCtrl(wndCtrl)
 {
 	m_wndCtrl.SetRedraw(FALSE);
 }
 
-CRedrawGuide::~CRedrawGuide()
+CRedrawLockGuide::~CRedrawLockGuide()
 {
 	this->Unlock();
 }
 
-void CRedrawGuide::Unlock()
+void CRedrawLockGuide::Unlock()
 {
 	m_wndCtrl.SetRedraw(TRUE);
 }

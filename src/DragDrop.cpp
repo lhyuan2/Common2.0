@@ -7,8 +7,8 @@
 
 #define __InnerClipboardFormat ((UINT)-1)
 
-LPVOID CDragDropMgr::m_pCurrDragData = NULL;
-std::map<CWnd*, CDropTarget*> CDragDropMgr::m_mapDropTargets;
+static LPVOID m_pCurrDragData = NULL;
+static std::map<CWnd*, IDropTargetEx*> m_mapDropTargets;
 
 BOOL CDragDropMgr::DoDrag(LPVOID pDragData)
 {
@@ -33,7 +33,9 @@ BOOL CDragDropMgr::DoDrag(LPVOID pDragData)
 	return TRUE;
 }
 
-BOOL CDragDropMgr::RegDropTarget(CDropTarget& DropTarget, CWnd& Wnd)
+static list<CDragDropMgr> g_lstDragDropMgr;
+
+BOOL CDragDropMgr::RegDropTarget(IDropTargetEx& DropTarget, CWnd& Wnd)
 {
 	ASSERT_RETURN_EX(Wnd.GetSafeHwnd(), FALSE);
 
@@ -42,7 +44,8 @@ BOOL CDragDropMgr::RegDropTarget(CDropTarget& DropTarget, CWnd& Wnd)
 		return TRUE;
 	}
 
-	ASSERT_RETURN_EX((new CDragDropMgr())->Register(&Wnd), FALSE);
+	g_lstDragDropMgr.push_back(CDragDropMgr());
+	ASSERT_RETURN_EX(g_lstDragDropMgr.back().Register(&Wnd), FALSE);
 
 	m_mapDropTargets[&Wnd] = &DropTarget;
 

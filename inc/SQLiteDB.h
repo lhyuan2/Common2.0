@@ -43,7 +43,7 @@ public:
 private:
 	string m_strDBPath;
 	
-	HANDLE m_hDB;
+	HANDLE m_hDB = NULL;
 
 public:
 	int GetStatus();

@@ -5,9 +5,8 @@
 #include <afxole.h>
 
 
-class CDropTarget
+interface IDropTargetEx
 {
-public:
 	virtual DROPEFFECT OnDragOver(CWnd *pWnd, LPVOID pDragData, DWORD dwKeyState, CPoint point, BOOL bFirstTime=FALSE) = 0;
 
 	virtual BOOL OnDrop(CWnd *pWnd, LPVOID pDragData, DROPEFFECT dropEffect, CPoint point) = 0;
@@ -15,21 +14,23 @@ public:
 	virtual void OnDragLeave(CWnd *pWnd, LPVOID pDragData) = 0;
 };
 
-class __CommonPrjExt CDragDropMgr : private COleDropTarget
+class __CommonPrjExt CDragDropMgr : public COleDropTarget
 {
 public:
 	CDragDropMgr()
 	{
 	}
-
-private:
-	static LPVOID m_pCurrDragData;
-	static std::map<CWnd*, CDropTarget*> m_mapDropTargets;
-
+	
+	CDragDropMgr(const CDragDropMgr &)
+	{
+		if (0)
+		return;
+	}
+	
 public:
 	static BOOL DoDrag(LPVOID pDragData=NULL);
 
-	static BOOL RegDropTarget(CDropTarget& DropTarget, CWnd& Wnd);
+	static BOOL RegDropTarget(IDropTargetEx& DropTarget, CWnd& Wnd);
 
 public:
 	virtual DROPEFFECT OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);

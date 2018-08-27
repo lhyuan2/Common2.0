@@ -102,8 +102,6 @@ public:
 	virtual ~CPath()
 	{
 		ClearSubPath();
-
-		delete m_plstSubPath;
 	}
 
 public:
@@ -127,6 +125,16 @@ protected:
 	//}
 
 public:
+	UINT GetChildCount()
+	{
+		if (NULL == m_plstSubPath)
+		{
+			return 0;
+		}
+
+		return m_plstSubPath->size();
+	}
+
 	virtual wstring GetPath();
 
 	void GetSubPath(TD_PathList& lstSubPath, BOOL bFindFile=TRUE, BOOL bSort=FALSE);
@@ -140,8 +148,6 @@ public:
 	void RemoveSubPath(const TD_PathList& lstDeletePaths);
 
 	BOOL FindFile();
-
-	BOOL ExistsFile();
 };
 
 //CCFolderDlg

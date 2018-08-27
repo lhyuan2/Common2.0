@@ -43,8 +43,9 @@ string util::WStrToStr(const wstring&str, UINT CodePage)
 		0,
 		NULL,
 		NULL);
-	char* pBuff = new char[buffSize + 1];
-	memset((void*)pBuff, 0, sizeof(pBuff[0]) * (buffSize + 1));
+	vector<char> vecBuff(buffSize + 1);
+	char* pBuff = &vecBuff.front();// new char[buffSize + 1];
+	memset((void*)pBuff, 0, vecBuff.size());
 	::WideCharToMultiByte(CodePage,
 		0,
 		str.c_str(),
@@ -54,7 +55,7 @@ string util::WStrToStr(const wstring&str, UINT CodePage)
 		NULL,
 		NULL);
 	string strRet = pBuff;
-	delete[] pBuff;
+	//delete[] pBuff;
 	return strRet;
 }
 
@@ -71,8 +72,9 @@ wstring util::StrToWStr(const string&str, UINT CodePage)
 		-1,
 		NULL,
 		0);
-	wchar_t * pBuff;
-	pBuff = new wchar_t[buffSize + 1];
+
+	vector<wchar_t> vecBuff(buffSize + 1);
+	wchar_t * pBuff = &vecBuff.front();// new wchar_t[buffSize + 1];
 	memset(pBuff, 0, sizeof(pBuff[0]) * (buffSize + 1));
 	::MultiByteToWideChar(CodePage,
 		0,
@@ -81,7 +83,7 @@ wstring util::StrToWStr(const string&str, UINT CodePage)
 		(LPWSTR)pBuff,
 		buffSize);
 	wstring strRet = (wchar_t*)pBuff;
-	delete pBuff;
+	//delete pBuff;
 	return strRet;
 }
 
