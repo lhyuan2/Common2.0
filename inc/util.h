@@ -19,7 +19,9 @@ public:
 	static int StrToInt(string x);
 	static string DblToStr(double x);
 	static double StrToDbl(const string& x);
-	
+
+	static bool IsUTF8Str(const string& strText);
+
 	template <class _C, class _V>
 	static BOOL ContainerFind(_C& container, _V value)
 	{
