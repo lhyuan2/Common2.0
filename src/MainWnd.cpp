@@ -428,7 +428,7 @@ void CRedrawLockGuide::Unlock()
 
 CMenuGuide::CMenuGuide(CPage& Page, UINT nIDMenu)
 	: m_Page(Page)
-	, m_nIDMenu(nIDMenu)
+	, m_uIDMenu(nIDMenu)
 {
 }
 
@@ -450,7 +450,7 @@ BOOL CMenuGuide::Popup()
 	{
 		CResourceLock ResourceLock(m_Page.m_Module);
 
-		ASSERT_RETURN_EX(__super::LoadMenu(m_nIDMenu), FALSE);
+		ASSERT_RETURN_EX(__super::LoadMenu(m_uIDMenu), FALSE);
 	}
 
 	CMenu *pSubMenu = __super::GetSubMenu(0);

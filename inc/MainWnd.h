@@ -122,7 +122,7 @@ public:
 
 private:
 	CPage& m_Page;
-	UINT m_nIDMenu;
+	UINT m_uIDMenu;
 
 	std::map<UINT, std::pair<BOOL, CString>> m_mapMenuItemInfos;
 

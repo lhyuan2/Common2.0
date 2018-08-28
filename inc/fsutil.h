@@ -135,7 +135,7 @@ public:
 		return m_plstSubPath->size();
 	}
 
-	virtual wstring GetPath();
+	wstring GetPath();
 
 	void GetSubPath(TD_PathList& lstSubPath, BOOL bFindFile=TRUE, BOOL bSort=FALSE);
 	
