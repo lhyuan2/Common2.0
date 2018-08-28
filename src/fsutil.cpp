@@ -103,20 +103,21 @@ wstring fsutil::GetParentPath(const wstring& strPath)
 
 BOOL fsutil::CheckPathInside(const wstring& strSubPath, const wstring& strPath)
 {
-	ENSURE_RETURN_EX(!strSubPath.empty() && !strPath.empty(), FALSE);
-
+	ENSURE_RETURN_EX(!strPath.empty(), FALSE);
 	wstring strTempPath = strPath;
 	if (*strTempPath.rbegin() != '\\')
 	{
 		strTempPath += '\\';
 	}
 	
+	ENSURE_RETURN_EX(strSubPath.size() > strTempPath.size(), FALSE);
+
 	return 0 == util::StrFind(strSubPath, strTempPath);
 }
 
 wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePath)
 {
-	if (strPath.size() <= strBasePath.size())
+	if (!CheckPathInside(strPath, strBasePath))
 	{
 		return L"";
 	}
@@ -264,19 +265,27 @@ BOOL fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 
 void fsutil::ExplorePath(const list<wstring>& lstPath)
 {
-	wstringstream wss;
-	wss << L"/select,";
-	for (auto& itr = lstPath.begin(); itr != lstPath.end(); itr++)
+	wstring strExplore;
+	for (auto& strPath : lstPath)
 	{
-		if (itr != lstPath.begin())
+		if (!ExistsPath(strPath))
 		{
-			wss << ',';
+			continue;
 		}
 
-		wss << L'\"' << *itr << L'\"';
+		if (!strExplore.empty())
+		{
+			strExplore.append(L",");
+		}
+
+		strExplore .append(L'\"' + strPath + L'\"');
+	}
+	if (strExplore.empty())
+	{
+		return;
 	}
 
-	(void)::ShellExecute(NULL, L"open", L"explorer.exe", wss.str().c_str(), NULL, SW_MAXIMIZE);
+	(void)::ShellExecute(NULL, L"open", L"explorer.exe", (L"/select," + strExplore).c_str(), NULL, SW_MAXIMIZE);
 }
 
 BOOL fsutil::CreateDir(const wstring& strDir)
@@ -317,7 +326,7 @@ BOOL fsutil::ExistsFile(const wstring& strFile)
 	return (INVALID_HANDLE_VALUE != FindFirstFile(strFile.c_str(), &ffd));
 }
 
-BOOL fsutil::CheckPath(const wstring& strDir)
+BOOL fsutil::ExistsPath(const wstring& strDir)
 {
 	return (-1 != ::GetFileAttributes(strDir.c_str()));
 }
@@ -572,7 +581,7 @@ int CFolderDlg::BrowseFolderCallBack(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM
 				TCHAR pszPath[512];
 				if (SHGetPathFromIDList((LPITEMIDLIST)lParam, pszPath))
 				{
-					if (!fsutil::CheckPath(pszPath))
+					if (!fsutil::ExistsPath(pszPath))
 					{
 						pWndOkButton->EnableWindow(FALSE);
 					}

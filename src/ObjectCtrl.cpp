@@ -389,6 +389,7 @@ void CObjectTree::UpdateImage(CTreeObject& Object)
 {
 	int nImage = Object.GetTreeImage();
 	SetItemImage(Object.m_hTreeItem, nImage, nImage);
+	this->Invalidate();
 }
 
 CTreeObject *CObjectTree::GetSelectedObject()

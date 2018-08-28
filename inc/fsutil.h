@@ -37,7 +37,7 @@ public:
 	static void FindFile(const wstring& strPath, std::list<wstring>& lstResult);
 
 	static BOOL ExistsFile(const wstring& strFile);
-	static BOOL CheckPath(const wstring& strDir);
+	static BOOL ExistsPath(const wstring& strDir);
 
 	// 获取文件夹图标
 	static HICON getFolderIcon();
