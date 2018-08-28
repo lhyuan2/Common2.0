@@ -20,7 +20,7 @@ public:
 
 	static wstring GetParentPath(const wstring& strPath);
 
-	static BOOL CheckSubPath(const wstring& strSubPath, const wstring& strPath);
+	static BOOL CheckPathInside(const wstring& strSubPath, const wstring& strPath);
 
 	static wstring GetRelativePath(const wstring& strPath, const wstring strBasePath);
 

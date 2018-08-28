@@ -101,19 +101,17 @@ wstring fsutil::GetParentPath(const wstring& strPath)
 	return strNewPath.substr(0, nPos);
 }
 
-BOOL fsutil::CheckSubPath(const wstring& strPath, const wstring& strParentPath)
+BOOL fsutil::CheckPathInside(const wstring& strSubPath, const wstring& strPath)
 {
-	ENSURE_RETURN_EX(!strPath.empty() && !strParentPath.empty(), FALSE);
+	ENSURE_RETURN_EX(!strSubPath.empty() && !strPath.empty(), FALSE);
 
-	wstring strTempPath = strParentPath;
-	ASSERT_RETURN_EX(!strTempPath.empty(), FALSE);
-
+	wstring strTempPath = strPath;
 	if (*strTempPath.rbegin() != '\\')
 	{
 		strTempPath += '\\';
 	}
 	
-	return 0 == util::StrFind(strPath, strTempPath);
+	return 0 == util::StrFind(strSubPath, strTempPath);
 }
 
 wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePath)

@@ -8,10 +8,10 @@ BOOL util::StrCompare(const wstring& str1, const wstring& str2)
 	return 0 == _wcsicmp(str1.c_str(), str2.c_str());
 }
 
-int util::StrFind(const wstring& str1, const wstring& str2)
+int util::StrFind(const wstring& str, const wstring& strToFind)
 {
-	ENSURE_RETURN_EX(str1.size() >= str2.size(), -1);
-	wstring::size_type pos = StrLowerCase(str1).find(StrLowerCase(str2));
+	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
+	wstring::size_type pos = StrLowerCase(str).find(StrLowerCase(strToFind));
 	if (wstring::npos == pos)
 	{
 		return -1;

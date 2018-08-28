@@ -9,7 +9,7 @@ class __CommonPrjExt util
 public:
 	static BOOL StrCompare(const wstring& str1, const wstring& str2);
 
-	static int StrFind(const wstring& str1, const wstring& str2);
+	static int StrFind(const wstring& str, const wstring& strToFind);
 
 	static wstring StrLowerCase(const wstring& str);
 
@@ -26,6 +26,21 @@ public:
 	static BOOL ContainerFind(_C& container, _V value)
 	{
 		return std::find(container.begin(), container.end(), value) != container.end();
+	}
+
+	template <class _C, class _V>
+	static auto ContainerFindRef(_C& container, _V& value)
+	{
+		auto itr = container.begin();
+		for (; itr != container.end(); itr++)
+		{
+			if ((void*)&*itr == &value)
+			{
+				break;
+			}
+		}
+	
+		return itr;
 	}
 
 	template <class _C>
