@@ -23,22 +23,23 @@ struct tagHotkeyInfo
 {
 	tagHotkeyInfo(UINT t_nKey, ST_HotkeyFlag eHotkeyFlag = ST_HotkeyFlag::HKF_Null, bool t_bGlobal=FALSE, UINT t_nIDMenuItem = 0)
 		: nKey(t_nKey)
-		, nFlag((UINT)eHotkeyFlag)
-		, lParam(MAKELPARAM(nFlag, nKey))
+		, eFlag(eHotkeyFlag)
+		, lParam(MAKELPARAM(eHotkeyFlag, nKey))
 		, bGlobal(t_bGlobal)
 		, nIDMenuItem(t_nIDMenuItem)
 	{
+		bHandling = false;
 	}
 
-	UINT nKey = 0;
-	UINT nFlag = 0;
-	LPARAM lParam = 0;
+	UINT nKey;
+	ST_HotkeyFlag eFlag;
+	LPARAM lParam;
 
-	bool bGlobal = false;
+	bool bGlobal;
 
-	UINT nIDMenuItem = 0;
+	UINT nIDMenuItem;
 
-	bool bHandling = false;
+	bool bHandling;
 
 	bool operator ==(const tagHotkeyInfo &HotkeyInfo)
 	{

@@ -182,7 +182,7 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 		for (std::vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
 			; itrHotkeyInfo != m_vctHotkeyInfos.end(); ++itrHotkeyInfo)
 		{
-			if (MOD_ALT == itrHotkeyInfo->nFlag && ::GetKeyState(itrHotkeyInfo->nKey)&0x8000)
+			if (MOD_ALT == (UINT)itrHotkeyInfo->eFlag && ::GetKeyState(itrHotkeyInfo->nKey)&0x8000)
 			{
 				UINT uFlag = MOD_ALT;
 
@@ -401,7 +401,7 @@ BOOL CMainApp::RegHotkey(const tagHotkeyInfo &HotkeyInfo)
 	{
 		if (HotkeyInfo.bGlobal)
 		{
-			if (!::RegisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), HotkeyInfo.lParam, HotkeyInfo.nFlag, HotkeyInfo.nKey))
+			if (!::RegisterHotKey(CMainApp::GetMainWnd()->GetSafeHwnd(), HotkeyInfo.lParam, (UINT)HotkeyInfo.eFlag, HotkeyInfo.nKey))
 			{
 				return FALSE;
 			}

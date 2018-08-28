@@ -117,6 +117,11 @@ BOOL fsutil::CheckPathInside(const wstring& strSubPath, const wstring& strPath)
 
 wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePath)
 {
+	if (strBasePath.empty())
+	{
+		return strPath;
+	}
+	
 	if (!CheckPathInside(strPath, strBasePath))
 	{
 		return L"";
