@@ -87,24 +87,6 @@ wstring util::StrToWStr(const string&str, UINT CodePage)
 	return strRet;
 }
 
-int util::StrToInt(string x)
-{
-	return ::atoi(x.c_str());
-}
-
-string util::DblToStr(double x)
-{
-	char lpBuffer[16];
-	sprintf_s(lpBuffer, "%f", x);
-	
-	return string(lpBuffer);		
-}
-
-double util::StrToDbl(const string& x)
-{
-	return ::atof(x.c_str());
-}
-
 bool util::IsUTF8Str(const string& strText)
 {
 	if (strText.empty())
@@ -114,10 +96,10 @@ bool util::IsUTF8Str(const string& strText)
 
 	const char* str = strText.c_str();
 
-	unsigned int nBytes = 0;//UFT8可用1-6个字节编码,ASCII用一个字节
+	UINT nBytes = 0;//UFT8可用1-6个字节编码,ASCII用一个字节
 	unsigned char chr = *str;
 	bool bAllAscii = true;
-	for (unsigned int i = 0; str[i] != '\0'; ++i) {
+	for (UINT i = 0; str[i] != '\0'; ++i) {
 		chr = *(str + i);
 		//判断是否ASCII编码,如果不是,说明有可能是UTF8,ASCII用7位编码,最高位标记为0,0xxxxxxx
 		if (nBytes == 0 && (chr & 0x80) != 0) {

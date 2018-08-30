@@ -49,7 +49,7 @@ BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, int& nValue)
 	string strValue;
 	ENSURE_RETURN_EX(_GetData(nRow, nColumn, strValue), FALSE);
 
-	nValue = util::StrToInt(strValue.c_str());
+	nValue = atoi(strValue.c_str());
 
 	return TRUE;
 }
@@ -59,7 +59,7 @@ BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, double& dbValue)
 	string strValue;
 	ENSURE_RETURN_EX(_GetData(nRow, nColumn, strValue), FALSE);
 
-	dbValue = util::StrToDbl(strValue.c_str());
+	dbValue = atof(strValue.c_str());
 
 	return TRUE;
 }
@@ -80,7 +80,7 @@ BOOL CSQLiteDBResult::_GetData(UINT nRow, UINT nColumn, string& strValue)
 	return TRUE;
 }
 
-BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, std::wstring& strValue)
+BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, wstring& strValue)
 {
 	string strData;
 	ENSURE_RETURN_EX(_GetData(nRow, nColumn, strData), FALSE);
@@ -127,7 +127,7 @@ BOOL CSQLiteDB::Disconnect()
 	return TRUE;
 }
 
-BOOL CSQLiteDB::Execute(const std::wstring& strSql, string& strError)
+BOOL CSQLiteDB::Execute(const wstring& strSql, string& strError)
 {
 	ASSERT_RETURN_EX(m_hDB, FALSE);
 	
@@ -141,7 +141,7 @@ BOOL CSQLiteDB::Execute(const std::wstring& strSql, string& strError)
 	return TRUE;
 }
 
-IDBResult* CSQLiteDB::Query(const std::wstring& strSql, string& strError)
+IDBResult* CSQLiteDB::Query(const wstring& strSql, string& strError)
 {
 	ASSERT_RETURN_EX(m_hDB, NULL);
 

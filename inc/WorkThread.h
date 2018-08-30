@@ -22,7 +22,7 @@ public:
 	virtual ~CWorkThread();
 
 public:
-	std::list<tagWorkThreadInfo> m_lstThreadInfos;
+	list<tagWorkThreadInfo> m_lstThreadInfos;
 
 private:
 	HANDLE m_hExitEvent;

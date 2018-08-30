@@ -459,7 +459,7 @@ BOOL CMenuGuide::Popup()
 	UINT nIDItem = 0;
 	BOOL bEnable = FALSE;
 	CString *pcstrText = NULL;
-	for (std::map<UINT, std::pair<BOOL, CString>>::iterator itrMenuItemInfo = m_mapMenuItemInfos.begin()
+	for (map<UINT, pair<BOOL, CString>>::iterator itrMenuItemInfo = m_mapMenuItemInfos.begin()
 		; itrMenuItemInfo != m_mapMenuItemInfos.end(); ++itrMenuItemInfo)
 	{
 		nIDItem = itrMenuItemInfo->first;

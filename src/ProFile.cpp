@@ -35,18 +35,18 @@ BOOL CProFile::ReadInt(const string& strSection, const string& strKey, int& nVal
 
 	ENSURE_RETURN_EX(this->ReadString(strSection, strKey, strValue), FALSE);
 
-	nValue = util::StrToInt(strValue);
+	nValue = atoi(strValue.c_str());
 	
 	return TRUE;
 }
 
 double CProFile::ReadDouble(const string& strSection, const string& strKey, double& dblValue)
 {
-	string strValue = util::DblToStr(dblValue);
+	string strValue = std::to_string(dblValue);
 
 	ENSURE_RETURN_EX(this->ReadString(strSection, strKey, strValue), FALSE);
 
-	dblValue = util::StrToDbl(strValue);
+	dblValue = atof(strValue.c_str());
 	
 	return TRUE;
 }
@@ -64,5 +64,5 @@ BOOL CProFile::WriteInt(const string& strSection, const string& strKey, const in
 
 BOOL CProFile::WriteDouble(const string& strSection, const string& strKey, const double dblValue)
 {
-	return this->WriteString(strSection, strKey, util::DblToStr(dblValue));
+	return this->WriteString(strSection, strKey, std::to_string(dblValue));
 }

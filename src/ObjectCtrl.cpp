@@ -72,7 +72,7 @@ HTREEITEM CBaseTree::InsertItem(HTREEITEM hParentItem, LPCTSTR lpszItem, DWORD_P
 	return hItem;
 }
 
-void CBaseTree::GetAllItems(std::list<HTREEITEM>& lstItems)
+void CBaseTree::GetAllItems(list<HTREEITEM>& lstItems)
 {
 	HTREEITEM hRootItem = this->GetRootItem();
 	while (hRootItem)
@@ -85,7 +85,7 @@ void CBaseTree::GetAllItems(std::list<HTREEITEM>& lstItems)
 	}
 }
 
-void CBaseTree::GetChildItems(HTREEITEM hItem, std::list<HTREEITEM>& lstItems)
+void CBaseTree::GetChildItems(HTREEITEM hItem, list<HTREEITEM>& lstItems)
 {
 	HTREEITEM hChildItem = this->GetChildItem(hItem);
 	while (hChildItem)
@@ -185,10 +185,10 @@ ST_CheckState CCheckObjectTree::GetItemCheckState(HTREEITEM hItem)
 
 void CCheckObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects)
 {
-	std::list<HTREEITEM> lstItems;
+	list<HTREEITEM> lstItems;
 	__super::GetAllItems(lstItems);
 
-	for (std::list<HTREEITEM>::iterator itItem = lstItems.begin()
+	for (list<HTREEITEM>::iterator itItem = lstItems.begin()
 		; itItem != lstItems.end(); ++itItem)
 	{
 		lstObjects.push_back(__super::GetItemObject(*itItem));
@@ -389,7 +389,7 @@ void CObjectTree::UpdateImage(CTreeObject& Object)
 {
 	int nImage = Object.GetTreeImage();
 	SetItemImage(Object.m_hTreeItem, nImage, nImage);
-	this->Invalidate();
+	this->Invalidate(FALSE);
 }
 
 CTreeObject *CObjectTree::GetSelectedObject()
@@ -420,10 +420,10 @@ CTreeObject *CObjectTree::GetParentObject(CTreeObject& Object)
 
 void CObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects)
 {
-	std::list<HTREEITEM> lstItems;
+	list<HTREEITEM> lstItems;
 	__super::GetAllItems(lstItems);
 
-	for (std::list<HTREEITEM>::iterator itItem = lstItems.begin()
+	for (list<HTREEITEM>::iterator itItem = lstItems.begin()
 		; itItem != lstItems.end(); ++itItem)
 	{
 		lstObjects.push_back(this->GetItemObject(*itItem));
@@ -520,7 +520,7 @@ void CObjectList::SetView(ST_ListViewType nViewType, bool bArrange)
 		(void)Arrange(0);
 	}
 
-	__super::SetRedraw();
+	__super::SetRedraw(TRUE);
 }
 
 ST_ListViewType CObjectList::GetView()
@@ -653,11 +653,11 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 	ASSERT_RETURN(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
 		, Object.GetListImage(), 0, 0, (LPARAM)&Object));
 
-	std::list<CString> lstTexts;
+	list<CString> lstTexts;
 	Object.GetListText(lstTexts);
 
 	CString cstrText;
-	std::list<CString>::iterator itSubTitle = lstTexts.begin();
+	list<CString>::iterator itSubTitle = lstTexts.begin();
 	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
 	{
 		if (itSubTitle != lstTexts.end())
@@ -718,7 +718,7 @@ CListObject *CObjectList::GetSingleSelectedObject()
 	return this->GetItemObject(nItem);
 }
 
-void CObjectList::GetMultiSelectedItems(std::list<int>& lstItems)
+void CObjectList::GetMultiSelectedItems(list<int>& lstItems)
 {
 	int nItem = 0;
 
@@ -729,12 +729,12 @@ void CObjectList::GetMultiSelectedItems(std::list<int>& lstItems)
 	}
 }
 
-void CObjectList::GetMultiSelectedObjects(std::map<int, CListObject*>& mapObjects)
+void CObjectList::GetMultiSelectedObjects(map<int, CListObject*>& mapObjects)
 {
-	std::list<int> lstItems;
+	list<int> lstItems;
 	this->GetMultiSelectedItems(lstItems);
 
-	for (std::list<int>::iterator itrItem = lstItems.begin()
+	for (list<int>::iterator itrItem = lstItems.begin()
 		; itrItem != lstItems.end(); ++itrItem)
 	{
 		mapObjects[*itrItem] = this->GetItemObject(*itrItem);
@@ -743,10 +743,10 @@ void CObjectList::GetMultiSelectedObjects(std::map<int, CListObject*>& mapObject
 
 void CObjectList::GetMultiSelectedObjects(TD_ListObjectList& lstObjects)
 {
-	std::list<int> lstItems;
+	list<int> lstItems;
 	this->GetMultiSelectedItems(lstItems);
 
-	for (std::list<int>::iterator itrItem = lstItems.begin()
+	for (list<int>::iterator itrItem = lstItems.begin()
 		; itrItem != lstItems.end(); ++itrItem)
 	{
 		lstObjects.push_back(this->GetItemObject(*itrItem));
@@ -806,7 +806,7 @@ void CObjectList::SelectAllItems()
 		(void)__super::SetItemState(nItem, LVIS_SELECTED, LVIS_SELECTED);
 	}
 
-	this->SetRedraw();
+	this->SetRedraw(TRUE);
 }
 
 void CObjectList::DeselectAllItems()
@@ -947,5 +947,5 @@ void CObjectList::ChangeListCtrlView(short zDelta)
 		}
 	}
 
-	(void)this->RedrawWindow();
+	//(void)this->RedrawWindow();
 }

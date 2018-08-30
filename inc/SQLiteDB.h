@@ -29,7 +29,7 @@ public:
 	BOOL GetData(UINT nRow, UINT nColumn, double& dbValue);
 
 	BOOL _GetData(UINT nRow, UINT nColumn, string& strValue);
-	BOOL GetData(UINT nRow, UINT nColumn, std::wstring& strValue);
+	BOOL GetData(UINT nRow, UINT nColumn, wstring& strValue);
 };
 
 
@@ -52,7 +52,7 @@ public:
 
 	BOOL Disconnect();
 
-	BOOL Execute(const std::wstring& strSql, string& strError);
+	BOOL Execute(const wstring& strSql, string& strError);
 
-	IDBResult* Query(const std::wstring& strSql, string& strError);
+	IDBResult* Query(const wstring& strSql, string& strError);
 };

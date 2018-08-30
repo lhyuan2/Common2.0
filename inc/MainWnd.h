@@ -124,7 +124,7 @@ private:
 	CPage& m_Page;
 	UINT m_uIDMenu;
 
-	std::map<UINT, std::pair<BOOL, CString>> m_mapMenuItemInfos;
+	map<UINT, pair<BOOL, CString>> m_mapMenuItemInfos;
 
 public:
 	void EnableItem(UINT nIDItem, BOOL bEnable);

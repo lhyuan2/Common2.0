@@ -71,12 +71,12 @@ public:
 	BOOL InitCtrl(CBitmap *pBitmap = NULL, ULONG uFontSize = 0);
 	BOOL InitCtrl(const TD_ICONLIST& lstIcon, UINT uIconSize, ULONG uFontSize=0);
 
-	void GetAllItems(std::list<HTREEITEM>& lstItems);
+	void GetAllItems(list<HTREEITEM>& lstItems);
 	
 protected:
 	virtual HTREEITEM InsertItem(HTREEITEM hParentItem, LPCTSTR lpszItem, DWORD_PTR dwData, int nImage=0);
 
-	void GetChildItems(HTREEITEM hItem, std::list<HTREEITEM>& lstItems);
+	void GetChildItems(HTREEITEM hItem, list<HTREEITEM>& lstItems);
 
 public:
 	virtual void PreSubclassWindow() override;
@@ -216,13 +216,13 @@ public:
 		return 0;
 	}
 	
-	virtual void GetListText(std::list<CString>& lstTexts)
+	virtual void GetListText(list<CString>& lstTexts)
 	{
 	};
 
 	virtual CString GetRenameText()
 	{
-		std::list<CString> lstTexts;
+		list<CString> lstTexts;
 		GetListText(lstTexts);
 		ENSURE_RETURN_EX(!lstTexts.empty(), _T(""));
 
@@ -250,9 +250,8 @@ enum ST_ListViewType
 class __CommonPrjExt CObjectList : public CListCtrl
 {
 public:
-	typedef std::list<std::pair<CString, int>> ColumnList;
+	typedef list<pair<CString, int>> ColumnList;
 
-public:
 	CObjectList(bool bChangeView=false)
 		: m_bChangeView(bChangeView)
 	{
@@ -306,8 +305,8 @@ public:
 	int GetSingleSelectedItem();
 	CListObject *GetSingleSelectedObject();
 
-	void GetMultiSelectedItems(std::list<int>& lstItems);
-	void GetMultiSelectedObjects(std::map<int, CListObject*>& mapObjects);
+	void GetMultiSelectedItems(list<int>& lstItems);
+	void GetMultiSelectedObjects(map<int, CListObject*>& mapObjects);
 	void GetMultiSelectedObjects(TD_ListObjectList& lstObjects);
 
 	BOOL SelectFirstItem();
@@ -317,7 +316,7 @@ public:
 	void SelectAllItems();
 	void DeselectAllItems();
 
-public:
+protected:
 	virtual void PreSubclassWindow() override;
 
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);

@@ -24,7 +24,7 @@ public:
 
 	static wstring GetRelativePath(const wstring& strPath, const wstring strBasePath);
 
-	static void GetSysDrivers(std::list<wstring>& lstDrivers);
+	static void GetSysDrivers(list<wstring>& lstDrivers);
 	
 	static BOOL DeletePath(const wstring& strPath, CWnd *pwndParent=NULL, const wstring& strTitle=L"");
 
@@ -34,7 +34,7 @@ public:
 
 	static BOOL CreateDir(const wstring& strDir);
 
-	static void FindFile(const wstring& strPath, std::list<wstring>& lstResult);
+	static void FindFile(const wstring& strPath, list<wstring>& lstResult);
 
 	static BOOL ExistsFile(const wstring& strFile);
 	static BOOL ExistsPath(const wstring& strDir);
@@ -42,7 +42,7 @@ public:
 	// 获取文件夹图标
 	static HICON getFolderIcon();
 	// 获取文件图标
-	static HICON getFileIcon(const std::wstring& extention);
+	static HICON getFileIcon(const wstring& extention);
 };
 
 

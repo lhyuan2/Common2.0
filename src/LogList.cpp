@@ -22,7 +22,7 @@ BEGIN_MESSAGE_MAP(CLogList, CListCtrl)
 END_MESSAGE_MAP()
 
 
-void CLogList::InitCtrl(const std::vector<std::pair<CString, LONG>>& vctColumns)
+void CLogList::InitCtrl(const vector<pair<CString, LONG>>& vctColumns)
 {
 	CListCtrl::SetView(LVS_REPORT);
 
@@ -31,21 +31,21 @@ void CLogList::InitCtrl(const std::vector<std::pair<CString, LONG>>& vctColumns)
 	CListCtrl::SetExtendedStyle(LVS_EX_GRIDLINES| LVS_EX_FULLROWSELECT);
 
 	UINT nColumn = 0;
-	for (std::vector<std::pair<CString, LONG>>::const_iterator itColumn=vctColumns.begin()
+	for (vector<pair<CString, LONG>>::const_iterator itColumn=vctColumns.begin()
 		; itColumn!=vctColumns.end(); ++itColumn, ++nColumn)
 	{
 		(void)CListCtrl::InsertColumn(nColumn, itColumn->first, LVCFMT_LEFT, itColumn->second);
 	}
 }
 
-void CLogList::AddLog(const std::vector<CString>& vctLogTexts)
+void CLogList::AddLog(const vector<CString>& vctLogTexts)
 {
 	int nItem = CListCtrl::GetItemCount();
 
 	(void)CListCtrl::InsertItem(nItem,NULL);
 
 	UINT nSubItem = 0;
-	for (std::vector<CString>::const_iterator itLogText=vctLogTexts.begin()
+	for (vector<CString>::const_iterator itLogText=vctLogTexts.begin()
 		; itLogText!=vctLogTexts.end(); ++itLogText, ++nSubItem)
 	{
 		(void)CListCtrl::SetItemText(nItem, nSubItem, *itLogText);

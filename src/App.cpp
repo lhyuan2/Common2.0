@@ -68,9 +68,9 @@ ModuleVector CMainApp::m_vctModules;
 
 map<UINT, LPVOID> CMainApp::m_mapInterfaces;
 
-std::map<char, LPVOID> CMainApp::m_mapHotkeyInfos;
+map<char, LPVOID> CMainApp::m_mapHotkeyInfos;
 
-std::vector<tagHotkeyInfo> CMainApp::m_vctHotkeyInfos;
+vector<tagHotkeyInfo> CMainApp::m_vctHotkeyInfos;
 
 CMainApp::CMainApp()
 {
@@ -179,7 +179,7 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 	
 	if (WM_SYSKEYDOWN == pMsg->message)
 	{
-		for (std::vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
+		for (vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
 			; itrHotkeyInfo != m_vctHotkeyInfos.end(); ++itrHotkeyInfo)
 		{
 			if (MOD_ALT == (UINT)itrHotkeyInfo->eFlag && ::GetKeyState(itrHotkeyInfo->nKey)&0x8000)
@@ -317,7 +317,7 @@ BOOL CMainApp::Quit()
 		ENSURE_RETURN_EX((*itModule)->OnQuit(), FALSE);
 	}
 
-	for (std::vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
+	for (vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
 		; itrHotkeyInfo != m_vctHotkeyInfos.end(); ++itrHotkeyInfo)
 	{
 		if (itrHotkeyInfo->bGlobal)

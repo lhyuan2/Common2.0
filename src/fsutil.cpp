@@ -130,7 +130,7 @@ wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePat
 	return strPath.substr(strBasePath.size());
 }
 
-void fsutil::GetSysDrivers(std::list<wstring>& lstDrivers)
+void fsutil::GetSysDrivers(list<wstring>& lstDrivers)
 {
 	#define MAX_DRIVE (_MAX_DRIVE + 1)
 
@@ -194,8 +194,8 @@ BOOL fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 
 	size_t nReadedSize = 0;
 
-	std::ifstream srcStream;
-	std::ofstream snkStream;
+	ifstream srcStream;
+	ofstream snkStream;
 
 	try
 	{
@@ -308,7 +308,7 @@ BOOL fsutil::CreateDir(const wstring& strDir)
 	return CreateDir(strDir);
 }
 
-void fsutil::FindFile(const wstring& strPath, std::list<wstring>& lstResult)
+void fsutil::FindFile(const wstring& strPath, list<wstring>& lstResult)
 {
 	CFileFind fileFind;
 	BOOL bExists = fileFind.FindFile(strPath.c_str());
@@ -337,7 +337,7 @@ BOOL fsutil::ExistsPath(const wstring& strDir)
 }
 
 // 获取文件夹类型
-static std::wstring getFolderType()
+static wstring getFolderType()
 {
 	SHFILEINFO info;
 	if (SHGetFileInfo(L"folder",
@@ -353,7 +353,7 @@ static std::wstring getFolderType()
 }
 
 // 获取文件类型
-static std::wstring getFileType(const std::wstring& extention)
+static wstring getFileType(const wstring& extention)
 {
 	if (!extention.empty())
 	{
@@ -388,7 +388,7 @@ HICON fsutil::getFolderIcon()
 }
 
 // 获取文件图标
-HICON fsutil::getFileIcon(const std::wstring& extention)
+HICON fsutil::getFileIcon(const wstring& extention)
 {
 	if (!extention.empty())
 	{
@@ -773,7 +773,7 @@ void CPath::GetSubPath(TD_PathList *plstSubDir, TD_PathList *plstSubFile)
 	
 CPath *CPath::GetSubPath(wstring strSubPath, bool bDir)
 {
-	std::list<wstring> lstSubDirs;
+	list<wstring> lstSubDirs;
 	while (!strSubPath.empty())
 	{
 		wstring strName;

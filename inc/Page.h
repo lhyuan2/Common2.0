@@ -31,7 +31,7 @@ public:
 	CString m_cstrTitle;
 
 private:
-	std::set<HWND> m_setDragableCtrls;
+	set<HWND> m_setDragableCtrls;
 
 	function<void()> m_AsyncCB;
 
@@ -43,6 +43,7 @@ public:
 	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
 
 	void Async(const function<void()>& cb, UINT uMsDelay = 0);
+	void AsyncEx(const function<bool()>& cb, UINT uMsDelay);
 
 protected:
 	BOOL OnSetActive();

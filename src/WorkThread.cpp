@@ -35,7 +35,7 @@ CWorkThread::~CWorkThread()
 
 BOOL CWorkThread::RunWorkThread(UINT nThreadCount)
 {
-	for (std::list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
+	for (list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
 		; itThreadInfo != m_lstThreadInfos.end(); ++itThreadInfo)
 	{
 		if (itThreadInfo->hHandle)
@@ -76,7 +76,7 @@ BOOL CWorkThread::RunWorkThread(UINT nThreadCount)
 
 void CWorkThread::Pause(BOOL bPause)
 {
-	for (std::list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
+	for (list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
 		; itThreadInfo != m_lstThreadInfos.end(); ++itThreadInfo)
 	{
 		if (bPause)
@@ -111,7 +111,7 @@ void CWorkThread::WaitForExit()
 
 		BOOL bExit = TRUE;
 
-		for (std::list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
+		for (list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
 			; itThreadInfo != m_lstThreadInfos.end(); ++itThreadInfo)
 		{
 			if (itThreadInfo->hHandle)
@@ -136,7 +136,7 @@ int CWorkThread::GetWorkThreadCount()
 {
 	int nResult = 0;
 
-	for (std::list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
+	for (list<tagWorkThreadInfo>::iterator itThreadInfo = m_lstThreadInfos.begin()
 		; itThreadInfo != m_lstThreadInfos.end(); ++itThreadInfo)
 	{
 		if (itThreadInfo->hHandle)

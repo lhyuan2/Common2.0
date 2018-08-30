@@ -8,7 +8,7 @@
 #define __InnerClipboardFormat ((UINT)-1)
 
 static LPVOID m_pCurrDragData = NULL;
-static std::map<CWnd*, IDropTargetEx*> m_mapDropTargets;
+static map<CWnd*, IDropTargetEx*> m_mapDropTargets;
 
 BOOL CDragDropMgr::DoDrag(LPVOID pDragData)
 {

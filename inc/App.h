@@ -131,9 +131,9 @@ private:
 
 	static map<UINT, LPVOID> m_mapInterfaces;
 
-	static std::map<char, LPVOID> m_mapHotkeyInfos;
+	static map<char, LPVOID> m_mapHotkeyInfos;
 
-	static std::vector<tagHotkeyInfo> m_vctHotkeyInfos;
+	static vector<tagHotkeyInfo> m_vctHotkeyInfos;
 
 protected:
 	virtual BOOL InitInstance();

@@ -18,9 +18,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	void InitCtrl(const std::vector<std::pair<CString, LONG>>& vctColumns);
+	void InitCtrl(const vector<pair<CString, LONG>>& vctColumns);
 
-	void AddLog(const std::vector<CString>& vctLogTexts);
+	void AddLog(const vector<CString>& vctLogTexts);
 
 	void ClearLogs();
 };

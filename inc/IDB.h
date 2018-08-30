@@ -10,7 +10,7 @@ interface IDBResult
 
 	virtual BOOL GetData(UINT nRow, UINT nColumn, int& nValue) = 0;
 	virtual BOOL GetData(UINT nRow, UINT nColumn, double& dbValue) = 0;
-	virtual BOOL GetData(UINT nRow, UINT nColumn, std::wstring& strValue) = 0;
+	virtual BOOL GetData(UINT nRow, UINT nColumn, wstring& strValue) = 0;
 };
 
 interface IDB
@@ -20,6 +20,6 @@ interface IDB
 	virtual BOOL Connect() = 0;
 	virtual BOOL Disconnect() = 0;
 
-	virtual BOOL Execute(const std::wstring& strSql, string& strError) = 0;
-	virtual IDBResult* Query(const std::wstring& strSql, string& strError) = 0;
+	virtual BOOL Execute(const wstring& strSql, string& strError) = 0;
+	virtual IDBResult* Query(const wstring& strSql, string& strError) = 0;
 };

@@ -71,7 +71,7 @@ public:
 		return CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M"));
 	}
 
-	void GetListText(std::list<CString>& lstTitles)
+	void GetListText(list<CString>& lstTitles)
 	{
 		lstTitles.push_back(m_strName.c_str());
 		

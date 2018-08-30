@@ -135,7 +135,6 @@
     <ClInclude Include="..\inc\util.h">
       <Filter>inc\class</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="..\inc\fsutil.h">
       <Filter>inc\class</Filter>
     </ClInclude>

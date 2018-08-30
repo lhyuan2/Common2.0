@@ -125,15 +125,35 @@ void CPage::Async(const function<void()>& cb, UINT uMsDelay)
 {
 	m_AsyncCB = cb;
 
-	thread thr([&]() {
-		if (0 != uMsDelay)
-		{
+	if (0 == uMsDelay)
+	{
+		this->PostMessage(WM_USER);
+	}
+	else
+	{
+		thread thr([&]() {
 			::Sleep(uMsDelay);
+			this->PostMessage(WM_USER);
+		});
+		thr.detach();
+	}
+}
+
+void CPage::AsyncEx(const function<bool()>& cb, UINT uMsDelay)
+{
+	if (0 == uMsDelay)
+	{
+		return;
+	}
+
+	Async([=]() {
+		if (!cb())
+		{
+			return;
 		}
 
-		this->PostMessage(WM_USER);
-	});
-	thr.detach();
+		AsyncEx(cb, uMsDelay);
+	}, uMsDelay);
 }
 
 BOOL CPage::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
