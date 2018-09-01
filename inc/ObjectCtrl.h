@@ -163,7 +163,7 @@ public:
 };
 
 
-enum ST_CheckState
+enum E_CheckState
 {
 	CS_Nocheck = 0
 	, CS_Unchecked
@@ -189,13 +189,13 @@ protected:
 public:
 	HTREEITEM InsertObject(CTreeObject& Object, CTreeObject *pParentObject=NULL);
 
-	ST_CheckState GetItemCheckState(HTREEITEM hItem);
+	E_CheckState GetItemCheckState(HTREEITEM hItem);
 
-	void SetItemCheckState(HTREEITEM hItem, ST_CheckState nState);
+	void SetItemCheckState(HTREEITEM hItem, E_CheckState eCheckState);
 	
 	void GetAllObjects(TD_TreeObjectList& lstObjects);
 
-	void GetAllObjects(TD_TreeObjectList& lstObjects, ST_CheckState nType);
+	void GetAllObjects(TD_TreeObjectList& lstObjects, E_CheckState eCheckState);
 	
 	void GetCheckedObjects(TD_TreeObjectList& lstObjects);
 
@@ -238,7 +238,7 @@ typedef ptrlist<CListObject*> TD_ListObjectList;
 
 // CObjectList
 
-enum ST_ListViewType
+enum E_ListViewType
 {
 	LVT_Tile = LV_VIEW_TILE,
 	LVT_Icon = LVS_ICON,
@@ -281,8 +281,8 @@ public:
 
 	void SetTileSize(UINT cx, UINT cy);
 
-	void SetView(ST_ListViewType nViewType, bool bArrange=false);
-	ST_ListViewType GetView();
+	void SetView(E_ListViewType eViewType, bool bArrange=false);
+	E_ListViewType GetView();
 	
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);
 

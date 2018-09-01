@@ -12,6 +12,9 @@ class IModuleApp;
 
 class CMainWnd;
 
+using FN_AsyncCB = function<void()>;
+using FN_AsyncLoopCB = function<bool()>;
+
 class __CommonPrjExt CPage: public CPropertyPage
 {
 	DECLARE_DYNAMIC(CPage);
@@ -33,7 +36,7 @@ public:
 private:
 	set<HWND> m_setDragableCtrls;
 
-	function<void()> m_AsyncCB;
+	FN_AsyncCB m_AsyncCB;
 
 public:
 	BOOL Active();
@@ -42,8 +45,9 @@ public:
 
 	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
 
-	void Async(const function<void()>& cb, UINT uMsDelay = 0);
-	void AsyncEx(const function<bool()>& cb, UINT uMsDelay);
+	void Async(const FN_AsyncCB& cb);
+	void Async(const FN_AsyncCB& cb, UINT uDelayTime);
+	void AsyncLoop(const FN_AsyncLoopCB& cb, UINT uDelayTime);
 
 protected:
 	BOOL OnSetActive();

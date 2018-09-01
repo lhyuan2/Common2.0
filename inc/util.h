@@ -7,11 +7,12 @@
 class __CommonPrjExt util
 {
 public:
-	static BOOL StrCompare(const wstring& str1, const wstring& str2);
+	static BOOL StrCompareIgnoreCase(const wstring& str1, const wstring& str2);
 
-	static int StrFind(const wstring& str, const wstring& strToFind);
+	static int StrFind(const wstring& str, const wstring& strToFind, bool bIgnoreCase=false);
 
 	static wstring StrLowerCase(const wstring& str);
+	static wstring StrUpperCase(const wstring& str);
 
 	static string WStrToStr(const wstring&str, UINT CodePage = CP_ACP);
 	static wstring StrToWStr(const string&str, UINT CodePage = CP_ACP);

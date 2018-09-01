@@ -3,27 +3,77 @@
 
 #include <util.h>
 
-BOOL util::StrCompare(const wstring& str1, const wstring& str2)
+BOOL util::StrCompareIgnoreCase(const wstring& str1, const wstring& str2)
 {
 	return 0 == _wcsicmp(str1.c_str(), str2.c_str());
 }
 
-int util::StrFind(const wstring& str, const wstring& strToFind)
+int util::StrFind(const wstring& str, const wstring& strToFind, bool bIgnoreCase)
 {
 	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
-	wstring::size_type pos = StrLowerCase(str).find(StrLowerCase(strToFind));
-	if (wstring::npos == pos)
+
+	if (bIgnoreCase)
 	{
-		return -1;
+		wstring::size_type pos = StrLowerCase(str).find(StrLowerCase(strToFind));
+		if (wstring::npos == pos)
+		{
+			return -1;
+		}
+
+		return pos;
 	}
-	return pos;
+	else
+	{
+		wstring::size_type pos = str.find(strToFind);
+		if (wstring::npos == pos)
+		{
+			return -1;
+		}
+
+		return pos;
+	}
 }
+
+//int util::StrLowercaseFind(const wstring& str, const wstring& strToFind)
+//{
+//	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
+//
+//	wstring::size_type pos = StrLowerCase(str).find(strToFind);
+//	if (wstring::npos == pos)
+//	{
+//		return -1;
+//	}
+//
+//	return pos;
+//}
+//
+//int util::StrUppercaseFind(const wstring& str, const wstring& strToFind)
+//{
+//	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
+//
+//	wstring::size_type pos = StrUpperCase(str).find(strToFind);
+//	if (wstring::npos == pos)
+//	{
+//		return -1;
+//	}
+//
+//	return pos;
+//}
 
 wstring util::StrLowerCase(const wstring& str)
 {
 	wstring strTemp = str;
 	
 	(void)::_wcslwr_s((TCHAR *)strTemp.c_str(), strTemp.size() + 1);
+
+	return strTemp;
+}
+
+wstring util::StrUpperCase(const wstring& str)
+{
+	wstring strTemp = str;
+
+	(void)::_wcsupr_s((TCHAR *)strTemp.c_str(), strTemp.size() + 1);
 
 	return strTemp;
 }

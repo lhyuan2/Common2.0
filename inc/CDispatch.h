@@ -3,7 +3,7 @@
 
 #include "def.h"
 
-enum ST_OLEVarType
+enum E_OLEVarType
 {
 	OLEVT_Boolean = VT_BOOL,
 	OLEVT_Integer = VT_I2,

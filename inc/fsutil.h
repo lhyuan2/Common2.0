@@ -20,24 +20,24 @@ public:
 
 	static wstring GetParentPath(const wstring& strPath);
 
-	static BOOL CheckPathInside(const wstring& strSubPath, const wstring& strPath);
+	static bool CheckSubPath(const wstring& strPath, const wstring& strSubPath);
 
 	static wstring GetRelativePath(const wstring& strPath, const wstring strBasePath);
 
 	static void GetSysDrivers(list<wstring>& lstDrivers);
 	
-	static BOOL DeletePath(const wstring& strPath, CWnd *pwndParent=NULL, const wstring& strTitle=L"");
+	static bool DeletePath(const wstring& strPath, CWnd *pwndParent=NULL, const wstring& strTitle=L"");
 
-	static BOOL CopyFile(const wstring& strSrcFile, const wstring& strSnkFile);
+	static bool CopyFile(const wstring& strSrcFile, const wstring& strSnkFile);
 
 	static void ExplorePath(const list<wstring>& lstPath);
 
-	static BOOL CreateDir(const wstring& strDir);
+	static bool CreateDir(const wstring& strDir);
 
 	static void FindFile(const wstring& strPath, list<wstring>& lstResult);
 
-	static BOOL ExistsFile(const wstring& strFile);
-	static BOOL ExistsPath(const wstring& strDir);
+	static bool ExistsFile(const wstring& strFile);
+	static bool ExistsPath(const wstring& strDir);
 
 	// 获取文件夹图标
 	static HICON getFolderIcon();
@@ -137,7 +137,7 @@ public:
 
 	wstring GetPath();
 
-	void GetSubPath(TD_PathList& lstSubPath, BOOL bFindFile=TRUE, BOOL bSort=FALSE);
+	void GetSubPath(TD_PathList& lstSubPath, bool bFindFile=false, bool bSort=false);
 	
 	void GetSubPath(TD_PathList *plstSubDir, TD_PathList *plstSubFile=NULL);
 	
@@ -147,7 +147,7 @@ public:
 
 	void RemoveSubPath(const TD_PathList& lstDeletePaths);
 
-	BOOL FindFile();
+	bool FindFile();
 };
 
 //CCFolderDlg

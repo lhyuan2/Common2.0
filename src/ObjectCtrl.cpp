@@ -169,18 +169,18 @@ HTREEITEM CCheckObjectTree::InsertObject(CTreeObject& Object, CTreeObject *pPare
 	return hItem;
 }
 
-void CCheckObjectTree::SetItemCheckState(HTREEITEM hItem, ST_CheckState nState)
+void CCheckObjectTree::SetItemCheckState(HTREEITEM hItem, E_CheckState eCheckState)
 {
-	(void)__super::SetItemState(hItem, INDEXTOSTATEIMAGEMASK(nState), TVIS_STATEIMAGEMASK);
+	(void)__super::SetItemState(hItem, INDEXTOSTATEIMAGEMASK(eCheckState), TVIS_STATEIMAGEMASK);
 
 	this->SetChildItemsImageState(hItem);
 
 	this->SetParentItemsImageState(hItem);
 }
 
-ST_CheckState CCheckObjectTree::GetItemCheckState(HTREEITEM hItem)
+E_CheckState CCheckObjectTree::GetItemCheckState(HTREEITEM hItem)
 {
-	return (ST_CheckState)(__super::GetItemState(hItem, TVIS_STATEIMAGEMASK) >>12);
+	return (E_CheckState)(__super::GetItemState(hItem, TVIS_STATEIMAGEMASK) >>12);
 }
 
 void CCheckObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects)
@@ -195,7 +195,7 @@ void CCheckObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects)
 	}
 }
 
-void CCheckObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects, ST_CheckState nType)
+void CCheckObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects, E_CheckState eCheckState)
 {
 	TD_TreeObjectList lstItemObjects;
 	__super::GetAllObjects(lstItemObjects);
@@ -203,7 +203,7 @@ void CCheckObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects, ST_CheckStat
 	for (TD_TreeObjectList::iterator itObject = lstItemObjects.begin()
 		; itObject != lstItemObjects.end(); ++itObject)
 	{
-		if (nType == this->GetItemCheckState((*itObject)->m_hTreeItem))
+		if (eCheckState == this->GetItemCheckState((*itObject)->m_hTreeItem))
 		{
 			lstObjects.push_back(*itObject);
 		}
@@ -452,7 +452,7 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 
 	if (!lstColumns.empty())
 	{
-		m_nColumnCount = lstColumns.size();
+		m_nColumnCount = 0;
 		for (ColumnList::const_iterator itColumn = lstColumns.begin(); itColumn != lstColumns.end()
 			; ++itColumn, ++m_nColumnCount)
 		{
@@ -509,23 +509,23 @@ void CObjectList::SetTileSize(UINT cx, UINT cy)
 	(void)__super::SetTileViewInfo(&LvTileViewInfo);
 }
 
-void CObjectList::SetView(ST_ListViewType nViewType, bool bArrange)
+void CObjectList::SetView(E_ListViewType eViewType, bool bArrange)
 {
-	__super::SetRedraw(FALSE);
+	this->SetRedraw(FALSE);
 
-	(void)__super::SetView(nViewType);
+	(void)__super::SetView(eViewType);
 
 	if (bArrange)
 	{
 		(void)Arrange(0);
 	}
 
-	__super::SetRedraw(TRUE);
+	this->SetRedraw(TRUE);
 }
 
-ST_ListViewType CObjectList::GetView()
+E_ListViewType CObjectList::GetView()
 {
-	return (ST_ListViewType)__super::GetView();
+	return (E_ListViewType)__super::GetView();
 }
 
 void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
@@ -920,7 +920,7 @@ BOOL CObjectList::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRES
 
 void CObjectList::ChangeListCtrlView(short zDelta)
 {
-	ST_ListViewType lpViewType[] = {
+	E_ListViewType lpViewType[] = {
 		LVT_Tile
 		, LVT_Report
 		, LVT_List
@@ -928,15 +928,15 @@ void CObjectList::ChangeListCtrlView(short zDelta)
 		, LVT_Icon
 	};
 
-	ST_ListViewType nPreViewType = this->GetView();
+	E_ListViewType nPreViewType = this->GetView();
 
-	for (UINT nIndex = 0; nIndex < sizeof(lpViewType)/sizeof(ST_ListViewType); ++nIndex)
+	for (UINT nIndex = 0; nIndex < sizeof(lpViewType)/sizeof(E_ListViewType); ++nIndex)
 	{
 		if (lpViewType[nIndex] == nPreViewType)
 		{
 			nIndex++;
 				
-			if (sizeof(lpViewType)/sizeof(ST_ListViewType) <= nIndex)
+			if (sizeof(lpViewType)/sizeof(E_ListViewType) <= nIndex)
 			{
 				nIndex = 0;
 			}

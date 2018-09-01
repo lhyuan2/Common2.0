@@ -101,18 +101,17 @@ wstring fsutil::GetParentPath(const wstring& strPath)
 	return strNewPath.substr(0, nPos);
 }
 
-BOOL fsutil::CheckPathInside(const wstring& strSubPath, const wstring& strPath)
+bool fsutil::CheckSubPath(const wstring& strPath, const wstring& strSubPath)
 {
-	ENSURE_RETURN_EX(!strPath.empty(), FALSE);
-	wstring strTempPath = strPath;
-	if (*strTempPath.rbegin() != '\\')
-	{
-		strTempPath += '\\';
-	}
-	
-	ENSURE_RETURN_EX(strSubPath.size() > strTempPath.size(), FALSE);
+	auto size = strPath.size();
+	ENSURE_RETURN_EX(size > 0, FALSE);
+	ENSURE_RETURN_EX(size < strSubPath.size(), FALSE);
 
-	return 0 == util::StrFind(strSubPath, strTempPath);
+	ENSURE_RETURN_EX(0 == wcsncmp(strPath.c_str(), strSubPath.c_str(), size), FALSE);
+
+	ENSURE_RETURN_EX(L'\\' == *strPath.rbegin() || L'\\' == strSubPath[size], FALSE);
+
+	return TRUE;
 }
 
 wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePath)
@@ -122,7 +121,7 @@ wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePat
 		return strPath;
 	}
 	
-	if (!CheckPathInside(strPath, strBasePath))
+	if (!CheckSubPath(strBasePath, strPath))
 	{
 		return L"";
 	}
@@ -155,7 +154,7 @@ void fsutil::GetSysDrivers(list<wstring>& lstDrivers)
 	}
 }
 
-BOOL fsutil::DeletePath(const wstring& strPath, CWnd *pwndParent, const wstring& strTitle)
+bool fsutil::DeletePath(const wstring& strPath, CWnd *pwndParent, const wstring& strTitle)
 {
 	SHFILEOPSTRUCT FileOp;
 	ZeroMemory(&FileOp, sizeof(FileOp));
@@ -187,7 +186,7 @@ BOOL fsutil::DeletePath(const wstring& strPath, CWnd *pwndParent, const wstring&
 	return FALSE;
 }
 #include <fstream>
-BOOL fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
+bool fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 {
 #define MAX_BUFFER 1024
 	char lpBuffer[MAX_BUFFER];
@@ -228,7 +227,7 @@ BOOL fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 		return FALSE;
 	}
 
-	BOOL bResult = TRUE;
+	bool bResult = TRUE;
 	try
 	{
 		while (true)
@@ -293,7 +292,7 @@ void fsutil::ExplorePath(const list<wstring>& lstPath)
 	(void)::ShellExecute(NULL, L"open", L"explorer.exe", (L"/select," + strExplore).c_str(), NULL, SW_MAXIMIZE);
 }
 
-BOOL fsutil::CreateDir(const wstring& strDir)
+bool fsutil::CreateDir(const wstring& strDir)
 {
 	if (::CreateDirectory(strDir.c_str(), NULL) || ERROR_ALREADY_EXISTS == ::GetLastError())
 	{
@@ -311,7 +310,7 @@ BOOL fsutil::CreateDir(const wstring& strDir)
 void fsutil::FindFile(const wstring& strPath, list<wstring>& lstResult)
 {
 	CFileFind fileFind;
-	BOOL bExists = fileFind.FindFile(strPath.c_str());
+	bool bExists = fileFind.FindFile(strPath.c_str());
 	while (bExists)
 	{
 		bExists = fileFind.FindNextFile();
@@ -325,13 +324,13 @@ void fsutil::FindFile(const wstring& strPath, list<wstring>& lstResult)
 	}
 }
 
-BOOL fsutil::ExistsFile(const wstring& strFile)
+bool fsutil::ExistsFile(const wstring& strFile)
 {
 	WIN32_FIND_DATA ffd;
 	return (INVALID_HANDLE_VALUE != FindFirstFile(strFile.c_str(), &ffd));
 }
 
-BOOL fsutil::ExistsPath(const wstring& strDir)
+bool fsutil::ExistsPath(const wstring& strDir)
 {
 	return (-1 != ::GetFileAttributes(strDir.c_str()));
 }
@@ -472,7 +471,7 @@ CString CFolderDlg::Show(CWnd& WndOwner, LPCTSTR lpszInitDir, LPCTSTR lpszTitle,
 		}
 	}
 
-	DoEvents();
+	::DoEvents();
 
 	return (LPCTSTR)NULL;
 }
@@ -662,7 +661,7 @@ CFileDlg::CFileDlg(const wstring& strTitle, const wstring& strFilter
 
 wstring CFileDlg::Show()
 {
-	BOOL bResult = ::GetOpenFileName(&m_ofn);
+	bool bResult = ::GetOpenFileName(&m_ofn);
 
 	(void)::EnableWindow(m_ofn.hwndOwner, TRUE);
 
@@ -677,7 +676,7 @@ void CFileDlg::ShowMultiSel(list<wstring>& lstFiles)
 {
 	m_ofn.Flags |= OFN_ALLOWMULTISELECT;
 
-	BOOL bResult = ::GetOpenFileName(&m_ofn);
+	bool bResult = ::GetOpenFileName(&m_ofn);
 
 	(void)::EnableWindow(m_ofn.hwndOwner, TRUE);
 
@@ -721,7 +720,7 @@ wstring CPath::GetPath()
 	return m_strName;
 }
 
-void CPath::GetSubPath(TD_PathList& lstSubPath, BOOL bFindFile, BOOL bSort)
+void CPath::GetSubPath(TD_PathList& lstSubPath, bool bFindFile, bool bSort)
 {
 	ENSURE_RETURN(m_bDir);
 
@@ -821,7 +820,7 @@ CPath *CPath::GetSubPath(wstring strSubPath, bool bDir)
 				}
 			}
 
-			if (util::StrCompare((*itSubPath)->m_strName, strName))
+			if (util::StrCompareIgnoreCase((*itSubPath)->m_strName, strName))
 			{
 				pPath = *itSubPath;
 				break;
@@ -866,7 +865,7 @@ void CPath::RemoveSubPath(const TD_PathList& lstDeletePaths)
 	}
 }
 
-BOOL CPath::FindFile()
+bool CPath::FindFile()
 {
 	if (NULL != m_plstSubPath)
 	{
@@ -876,7 +875,7 @@ BOOL CPath::FindFile()
 	CString cstrFind = this->GetPath().c_str();
 	cstrFind.Append(L"\\*");
 	CFileFind fileFind;
-	BOOL bExists = fileFind.FindFile(cstrFind);
+	bool bExists = fileFind.FindFile(cstrFind);
 	if (!bExists)
 	{
 		return FALSE;
@@ -905,7 +904,7 @@ BOOL CPath::FindFile()
 	return TRUE;
 }
 
-//BOOL CPath::ExistsFile()
+//bool CPath::ExistsFile()
 //{
 //	ENSURE_RETURN_EX(this->FindFile(), FALSE);
 //	ENSURE_RETURN_EX(m_plstSubPath, FALSE);

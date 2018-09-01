@@ -24,11 +24,11 @@ void IModuleApp::ActivateResource()
 	AfxSetResourceHandle(m_hInstance);
 }
 
-HANDLE IModuleApp::GetResource(ST_ResourceType nRCType, UINT nID)
+HANDLE IModuleApp::GetResource(E_ResourceType eResourceType, UINT nID)
 {
-	CResourceLock ResourceLock(*this);
+	ActivateResource();
 
-	switch (nRCType)
+	switch (eResourceType)
 	{
 	case RCT_Icon:
 		return ::LoadIcon(m_hInstance, MAKEINTRESOURCE(nID));
@@ -40,27 +40,6 @@ HANDLE IModuleApp::GetResource(ST_ResourceType nRCType, UINT nID)
 
 	return NULL;
 }
-
-BOOL IModuleApp::OnQuit()
-{
-	return TRUE;
-}
-
-BOOL IModuleApp::OnCommand(UINT nID)
-{
-	return FALSE;
-}
-
-LRESULT IModuleApp::OnMessage(UINT nMsg, WPARAM wParam, LPARAM lParam)
-{
-	return 0;
-}
-
-BOOL IModuleApp::OnHotkey(const tagHotkeyInfo& HotkeyInfo)
-{
-	return FALSE;
-}
-
 
 // CMainApp
 
@@ -237,11 +216,11 @@ BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
 	return __super::PreTranslateMessage(pMsg);
 }
 
-BOOL CMainApp::HandleCommand(UINT nID)
+BOOL CMainApp::OnCommand(UINT nID)
 {
 	for (ModuleVector::iterator itModule=m_vctModules.begin(); itModule!=m_vctModules.end(); ++itModule)
 	{
-		if ((*itModule)->OnCommand(nID))
+		if ((*itModule)->HandleCommand(nID))
 		{
 			return TRUE;
 		}
@@ -291,14 +270,14 @@ bool CMainApp::HandleHotkey(tagHotkeyInfo &HotkeyInfo)
 
 	if (0 != HotkeyInfo.nIDMenuItem)
 	{
-		HandleCommand(HotkeyInfo.nIDMenuItem);
+		OnCommand(HotkeyInfo.nIDMenuItem);
 		bResult = true;
 	}
 	else
 	{
 		for (ModuleVector::iterator itModule=m_vctModules.begin(); itModule!=m_vctModules.end(); ++itModule)
 		{
-			if ((*itModule)->OnHotkey(HotkeyInfo))
+			if ((*itModule)->HandleHotkey(HotkeyInfo))
 			{
 				bResult = true;
 			}
@@ -351,7 +330,7 @@ LRESULT CMainApp::SendMessage(UINT nMsg, WPARAM wParam, LPARAM lParam)
 
 	for (ModuleVector::iterator itModule=m_vctModules.begin(); itModule!=m_vctModules.end(); ++itModule)
 	{
-		LRESULT lResult = (*itModule)->OnMessage(nMsg, wParam, lParam);
+		LRESULT lResult = (*itModule)->HandleMessage(nMsg, wParam, lParam);
 		if (lResult)
 		{
 			return lResult;
@@ -367,7 +346,7 @@ void CMainApp::SendMessageEx(UINT nMsg, WPARAM wParam, LPARAM lParam)
 
 	for (ModuleVector::iterator itModule=m_vctModules.begin(); itModule!=m_vctModules.end(); ++itModule)
 	{
-		(void)(*itModule)->OnMessage(nMsg, wParam, lParam);
+		(void)(*itModule)->HandleMessage(nMsg, wParam, lParam);
 	}
 }
 

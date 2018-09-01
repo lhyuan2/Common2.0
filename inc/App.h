@@ -5,7 +5,7 @@
 
 
 // Hotkey
-enum class ST_HotkeyFlag
+enum class E_HotkeyFlag
 {
 	HKF_Null = 0
 
@@ -21,7 +21,7 @@ enum class ST_HotkeyFlag
 
 struct tagHotkeyInfo
 {
-	tagHotkeyInfo(UINT t_nKey, ST_HotkeyFlag eHotkeyFlag = ST_HotkeyFlag::HKF_Null, bool t_bGlobal=FALSE, UINT t_nIDMenuItem = 0)
+	tagHotkeyInfo(UINT t_nKey, E_HotkeyFlag eHotkeyFlag = E_HotkeyFlag::HKF_Null, bool t_bGlobal=FALSE, UINT t_nIDMenuItem = 0)
 		: nKey(t_nKey)
 		, eFlag(eHotkeyFlag)
 		, lParam(MAKELPARAM(eHotkeyFlag, nKey))
@@ -32,7 +32,7 @@ struct tagHotkeyInfo
 	}
 
 	UINT nKey;
-	ST_HotkeyFlag eFlag;
+	E_HotkeyFlag eFlag;
 	LPARAM lParam;
 
 	bool bGlobal;
@@ -47,7 +47,7 @@ struct tagHotkeyInfo
 	}
 };
 
-enum ST_ResourceType
+enum E_ResourceType
 {
 	RCT_Icon
 	, RCT_Menu
@@ -68,18 +68,18 @@ public:
 public:
 	void ActivateResource();
 	
-	HANDLE GetResource(ST_ResourceType nRCType, UINT nID);
+	HANDLE GetResource(E_ResourceType eResourceType, UINT nID);
 	
-	virtual BOOL OnCommand(UINT nID);
+	virtual BOOL HandleCommand(UINT nID) { return FALSE; }
 
-	virtual LRESULT OnMessage(UINT nMsg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT HandleMessage(UINT nMsg, WPARAM wParam, LPARAM lParam) { return 0; }
 
 protected:
 	virtual BOOL OnReady(CMainWnd& MainWnd) { return TRUE; }
 
-	virtual BOOL OnHotkey(const tagHotkeyInfo& HotkeyInfo);
+	virtual BOOL HandleHotkey(const tagHotkeyInfo& HotkeyInfo) { return FALSE; }
 
-	virtual BOOL OnQuit();
+	virtual BOOL OnQuit() { return TRUE; }
 };
 
 class CModuleApp : public IModuleApp {};
@@ -136,17 +136,17 @@ private:
 	static vector<tagHotkeyInfo> m_vctHotkeyInfos;
 
 protected:
-	virtual BOOL InitInstance();
+	virtual BOOL InitInstance() override;
 	
 	virtual CMainWnd* OnInitMainWnd(tagMainWndInfo& MainWndInfo)=0;
 	
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual BOOL PreTranslateMessage(MSG* pMsg) override;
 
 private:
 	static bool HandleHotkey(LPARAM lParam, bool bGlobal);
 	static bool HandleHotkey(tagHotkeyInfo &HotkeyInfo);
 
-	static BOOL HandleCommand(UINT nID);
+	static BOOL OnCommand(UINT nID);
 
 public:
 	static wstring GetAppPath();
@@ -157,8 +157,20 @@ public:
 
 	static BOOL AddModule(IModuleApp& Module);
 
-	static LRESULT SendMessage(UINT nMsg, WPARAM wParam=NULL, LPARAM lParam=NULL);
-	static void SendMessageEx(UINT nMsg, WPARAM wParam=NULL, LPARAM lParam=NULL);
+	static LRESULT SendMessage(UINT nMsg, WPARAM wParam=0, LPARAM lParam=0);
+
+	static LRESULT SendMessage(UINT nMsg, LPVOID pPara)
+	{
+		return CMainApp::SendMessage(nMsg, (WPARAM)pPara);
+	}
+
+	template <typename _T1, typename _T2>
+	static LRESULT SendMessage(UINT nMsg, _T1 para1, _T2 para2)
+	{
+		return CMainApp::SendMessage(nMsg, (WPARAM)para1, (LPARAM)para2);
+	}
+
+	static void SendMessageEx(UINT nMsg, WPARAM wParam=0, LPARAM lParam=0);
 	
 	static BOOL RegisterInterface(UINT nIndex, LPVOID lpInterface);
 	static LPVOID GetInterface(UINT nIndex);
