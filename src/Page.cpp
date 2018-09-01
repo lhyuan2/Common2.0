@@ -7,6 +7,11 @@
 
 #include "MainWnd.h"
 
+#define WM_Async WM_USER+1
+
+
+#define WM_AsyncEx WM_USER+2
+
 
 //CPage
 
@@ -128,9 +133,19 @@ void CPage::Async(const FN_AsyncCB& cb)
 		return;
 	}
 
-	m_AsyncCB = cb;
+	auto oldCB = m_AsyncCB;
+	m_AsyncCB = [=]() {
+		if (oldCB)
+		{
+			oldCB();
+		}
+		
+		cb();
+	};
 
-	this->PostMessage(WM_USER, (WPARAM)&m_AsyncCB);
+	CMainApp::DoEvents();
+
+	this->PostMessage(WM_Async);
 }
 
 void CPage::Async(const FN_AsyncCB& cb, UINT uDelayTime)
@@ -142,9 +157,9 @@ void CPage::Async(const FN_AsyncCB& cb, UINT uDelayTime)
 	}
 
 	thread thr([=]() {
-		FN_AsyncCB AsyncCB = cb;
 		::Sleep(uDelayTime);
-		this->SendMessage(WM_USER, (WPARAM)&AsyncCB);
+		FN_AsyncCB AsyncCB = cb;
+		this->SendMessage(WM_AsyncEx, (WPARAM)&AsyncCB);
 	});
 	thr.detach();
 }
@@ -153,7 +168,7 @@ void CPage::AsyncLoop(const FN_AsyncLoopCB& cb, UINT uDelayTime)
 {
 	if (0 == uDelayTime)
 	{
-		return;
+		uDelayTime = 1;
 	}
 
 	Async([=]() {
@@ -168,7 +183,18 @@ void CPage::AsyncLoop(const FN_AsyncLoopCB& cb, UINT uDelayTime)
 
 BOOL CPage::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	if (WM_USER == message)
+	if (WM_Async == message)
+	{
+		if (m_AsyncCB)
+		{
+			FN_AsyncCB cb = m_AsyncCB;
+			m_AsyncCB = NULL;
+			cb();
+		}
+
+		return TRUE;
+	}
+	else if (WM_AsyncEx == message)
 	{
 		FN_AsyncCB *pcb = (FN_AsyncCB*)wParam;
 		if (NULL != pcb)
