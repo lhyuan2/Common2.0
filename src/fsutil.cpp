@@ -114,7 +114,7 @@ bool fsutil::CheckSubPath(const wstring& strPath, const wstring& strSubPath)
 	return TRUE;
 }
 
-wstring fsutil::GetRelativePath(const wstring& strPath, const wstring strBasePath)
+wstring fsutil::GetOppPath(const wstring& strPath, const wstring strBasePath)
 {
 	if (strBasePath.empty())
 	{

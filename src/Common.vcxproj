@@ -181,6 +181,7 @@
     <ClInclude Include="..\inc\SQLiteDB.h" />
     <ClInclude Include="..\inc\util.h" />
     <ClInclude Include="..\inc\WorkThread.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="sqlite\sqlite3.h" />
     <ClInclude Include="sqlite\sqlite3ext.h" />
   </ItemGroup>

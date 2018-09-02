@@ -63,7 +63,7 @@ public:
 template <class _PtrType>
 class ptrlist : public list<_PtrType>
 {
-public:	
+public:
 	ptrlist()
 	{
 	}
@@ -100,6 +100,57 @@ public:
 		}
 	}
 	
+	template <typename _RefType>
+	void Insert(const list<_RefType>& container)
+	{
+		for (list<_RefType>::const_iterator it = container.begin(); it != container.end(); ++it)
+		{
+			push_back((_PtrType)(_RefType*)&*it);
+		}
+	}
+};
+
+
+template <class _PtrType>
+class ptrvector : public vector<_PtrType>
+{
+public:
+	ptrvector()
+	{
+	}
+
+	ptrvector(_PtrType ptr)
+	{
+		Insert(ptr);
+	}
+
+	template <typename _RefType>
+	ptrvector(const list<_RefType*>& container)
+	{
+		Insert(container);
+	}
+
+	template <typename _RefType>
+	ptrvector(const list<_RefType>& container)
+	{
+		Insert(container);
+	}
+
+public:
+	void Insert(_PtrType ptr)
+	{
+		push_back(ptr);
+	}
+
+	template <typename _RefType>
+	void Insert(const list<_RefType*>& container)
+	{
+		for (list<_RefType*>::const_iterator it = container.begin(); it != container.end(); ++it)
+		{
+			push_back((_PtrType)*it);
+		}
+	}
+
 	template <typename _RefType>
 	void Insert(const list<_RefType>& container)
 	{

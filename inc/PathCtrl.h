@@ -71,13 +71,13 @@ public:
 		return CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M"));
 	}
 
-	void GetListText(list<CString>& lstTitles)
+	void GetListText(list<wstring>& lstTexts) override
 	{
-		lstTitles.push_back(m_strName.c_str());
+		lstTexts.push_back(m_strName);
 		
-		lstTitles.push_back(GetFileSize());
+		lstTexts.push_back((LPCTSTR)GetFileSize());
 		
-		lstTitles.push_back(GetFileModifyTime());
+		lstTexts.push_back((LPCTSTR)GetFileModifyTime());
 	}
 };
 

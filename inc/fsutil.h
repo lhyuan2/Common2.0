@@ -22,7 +22,7 @@ public:
 
 	static bool CheckSubPath(const wstring& strPath, const wstring& strSubPath);
 
-	static wstring GetRelativePath(const wstring& strPath, const wstring strBasePath);
+	static wstring GetOppPath(const wstring& strPath, const wstring strBasePath);
 
 	static void GetSysDrivers(list<wstring>& lstDrivers);
 	

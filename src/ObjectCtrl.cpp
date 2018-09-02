@@ -633,7 +633,7 @@ void CObjectList::UpdateObject(CListObject& Object)
 {
 	ENSURE_RETURN(m_hWnd);
 
-	int nItem = this->GetObjectItem(Object);
+	int nItem = this->GetObjectItem(&Object);
 	if (0 <= nItem)
 	{
 		this->SetItemObject(nItem, Object);
@@ -675,9 +675,9 @@ void CObjectList::DeleteObjects(const TD_ListObjectList& lstDeleteObjects)
 	}
 }
 
-BOOL CObjectList::DeleteObject(CListObject& Object)
+BOOL CObjectList::DeleteObject(const CListObject *pObject)
 {
-	int nItem = this->GetObjectItem(Object);
+	int nItem = this->GetObjectItem(pObject);
 	ENSURE_RETURN_EX(0 <= nItem, FALSE);
 
 	return this->DeleteItem(nItem);
@@ -688,25 +688,21 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 	ASSERT_RETURN(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
 		, Object.GetListImage(), 0, 0, (LPARAM)&Object));
 
-	list<CString> lstTexts;
+	list<wstring> lstTexts;
 	Object.GetListText(lstTexts);
 
-	CString cstrText;
-	list<CString>::iterator itSubTitle = lstTexts.begin();
+	list<wstring>::iterator itSubTitle = lstTexts.begin();
 	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
 	{
+		wstring strText;
 		if (itSubTitle != lstTexts.end())
 		{
-			cstrText = *itSubTitle;
+			strText = *itSubTitle;
 
 			itSubTitle++;
 		}
-		else
-		{
-			cstrText = "";
-		}
 
-		(void)__super::SetItemText(nItem, nColumn, cstrText);
+		(void)__super::SetItemText(nItem, nColumn, strText.c_str());
 	}
 }
 
@@ -716,11 +712,11 @@ CListObject *CObjectList::GetItemObject(int nItem)
 	return (CListObject*)__super::GetItemData(nItem);
 }
 
-int CObjectList::GetObjectItem(CListObject& Object)
+int CObjectList::GetObjectItem(const CListObject *pObject)
 {
 	for (int nItem = 0; nItem < __super::GetItemCount(); ++nItem)
 	{
-		if ((CListObject*)__super::GetItemData(nItem) == &Object)
+		if ((CListObject*)__super::GetItemData(nItem) == pObject)
 		{
 			return nItem;
 		}
@@ -812,9 +808,9 @@ void CObjectList::SelectItem(int nItem, BOOL bSetFocus)
 	(void)this->EnsureVisible(nItem, FALSE);
 }
 
-void CObjectList::SelectObject(CListObject& Object, BOOL bSetFocus)
+void CObjectList::SelectObject(const CListObject *pObject, BOOL bSetFocus)
 {
-	int nItem =	this->GetObjectItem(Object);
+	int nItem =	this->GetObjectItem(pObject);
 	if (0 <= nItem)
 	{
 		this->SelectItem(nItem, bSetFocus);

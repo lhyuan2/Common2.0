@@ -141,6 +141,7 @@
     <ClInclude Include="..\inc\FontGuide.h">
       <Filter>inc\class</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Common.rc" />

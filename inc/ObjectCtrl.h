@@ -205,17 +205,17 @@ public:
 		return 0;
 	}
 	
-	virtual void GetListText(list<CString>& lstTexts)
+	virtual void GetListText(list<wstring>& lstTexts)
 	{
 	};
 
 	virtual CString GetRenameText()
 	{
-		list<CString> lstTexts;
+		list<wstring> lstTexts;
 		GetListText(lstTexts);
 		ENSURE_RETURN_EX(!lstTexts.empty(), _T(""));
 
-		return lstTexts.front();
+		return lstTexts.front().c_str();
 	};
 
 	virtual bool OnListItemRename(const wstring& strNewName)
@@ -284,12 +284,12 @@ public:
 
 	void DeleteObjects(const TD_ListObjectList& lstDeleteObjects);
 
-	BOOL DeleteObject(CListObject& Object);
+	BOOL DeleteObject(const CListObject *pObject);
 
 public:
 	void SetItemObject(int nItem, CListObject& Object);
 	CListObject *GetItemObject(int nItem);
-	int GetObjectItem(CListObject& Object);
+	int GetObjectItem(const CListObject *pObject);
 	void GetAllObjects(TD_ListObjectList& lstListObjects);
 
 	int GetSingleSelectedItem();
@@ -301,7 +301,7 @@ public:
 
 	BOOL SelectFirstItem();
 	void SelectItem(int nItem, BOOL bSetFocus=TRUE);
-	void SelectObject(CListObject& Object, BOOL bSetFocus=TRUE);
+	void SelectObject(const CListObject *pObject, BOOL bSetFocus=TRUE);
 	void SelectItems(int nItem, int nSelectCount);
 	void SelectAllItems();
 	void DeselectAllItems();
