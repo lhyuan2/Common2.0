@@ -81,26 +81,12 @@ protected:
 public:
 	virtual void PreSubclassWindow() override;
 
-	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-		
-	BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
-	{
-		if (WM_NOTIFY == message)
-		{
-			BOOL bResult = FALSE;
-			OnNMNotify((NMHDR*)lParam, &bResult);
-			if (bResult)
-			{
-				return TRUE;
-			}
-		}
+	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 
-		return __super::OnChildNotify(message, wParam, lParam, pResult);
-	}
-	
-	virtual void OnNMNotify(NMHDR* pNMHDR, BOOL* pResult)
-	{
-	}
+	virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
+
+protected:
+	virtual BOOL handleNMNotify(NMHDR& NMHDR) { return FALSE; }
 };
 
 
@@ -160,6 +146,9 @@ public:
 	CTreeObject *GetParentObject(CTreeObject& Object);
 	
 	void GetAllObjects(TD_TreeObjectList& lstObjects);
+
+private:
+	virtual BOOL handleNMNotify(NMHDR& NMHDR) override;
 };
 
 
@@ -229,8 +218,9 @@ public:
 		return lstTexts.front();
 	};
 
-	virtual void OnListItemRename(const wstring& strNewName, CWnd& wndListCtrl)
+	virtual bool OnListItemRename(const wstring& strNewName)
 	{
+		return false;
 	}
 };
 
@@ -319,16 +309,12 @@ public:
 protected:
 	virtual void PreSubclassWindow() override;
 
-	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 	
-	virtual void OnNMNotify(NMHDR* pNMHDR, BOOL* pResult);
+	virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 
-	virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+protected:
+	virtual BOOL handleNMNotify(NMHDR& NMHDR);
 
-	void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
-
-	//void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
-
-private:
 	void ChangeListCtrlView(short zDelta=0);
 };

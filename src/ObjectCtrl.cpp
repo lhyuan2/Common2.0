@@ -117,6 +117,23 @@ BOOL CBaseTree::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pR
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
 }
 
+BOOL CBaseTree::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	if (WM_NOTIFY == message)
+	{
+		NMHDR *pNMHDR = (NMHDR*)lParam;
+		if (NULL != pNMHDR)
+		{
+			if (handleNMNotify(*pNMHDR))
+			{
+				return TRUE;
+			}
+		}
+	}
+
+	return __super::OnChildNotify(message, wParam, lParam, pResult);
+}
+
 
 // CCheckObjectTree
 
@@ -430,6 +447,24 @@ void CObjectTree::GetAllObjects(TD_TreeObjectList& lstObjects)
 	}
 }
 
+BOOL CObjectTree::handleNMNotify(NMHDR& NMHDR)
+{
+	if (TVN_ENDLABELEDIT == NMHDR.code)
+	{
+		NMTVDISPINFO *pTVDispInfo = reinterpret_cast<NMTVDISPINFO*>(&NMHDR);
+
+		CString cstrNewName(pTVDispInfo->item.pszText);
+		(void)cstrNewName.Trim();
+		ENSURE_RETURN_EX(!cstrNewName.IsEmpty(), TRUE);
+
+		CTreeObject *pObject = GetItemObject(pTVDispInfo->item.hItem);
+		ASSERT_RETURN_EX(pObject, TRUE);
+
+		ENSURE_RETURN_EX(cstrNewName != pObject->GetTreeText(), TRUE);
+	}
+
+	return __super::handleNMNotify(NMHDR);
+}
 
 // CObjectList
 
@@ -850,68 +885,83 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
 }
 
-void CObjectList::OnNMNotify(NMHDR* pNMHDR, BOOL* pResult)
+BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 {
-	switch (pNMHDR->code)
+	switch (NMHDR.code)
 	{
 	case LVN_BEGINLABELEDIT:
 		{
-			NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+			NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(&NMHDR);
 			CListObject *pObject = this->GetItemObject(pLVDispInfo->item.iItem);
-			ENSURE_RETURN(pObject);
+			ENSURE_BREAK(pObject);
 
 			CEdit *pwndEdit = this->GetEditControl();
-			ASSERT_RETURN(pwndEdit);
+			ASSERT_BREAK(pwndEdit);
 
 			CString cstrRenameText = pObject->GetRenameText();
 			pwndEdit->SetWindowText(cstrRenameText);
 			pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
+	
+			//return TRUE;
 		}
 
 		break;
 	case LVN_ENDLABELEDIT:
 		{
-			NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
-
-			int nItem = pLVDispInfo->item.iItem;
-			CListObject *pObject = GetItemObject(nItem);
-			ASSERT_RETURN(pObject);
+			NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(&NMHDR);
 
 			CString cstrNewName(pLVDispInfo->item.pszText);
 			(void)cstrNewName.Trim();
-			ENSURE_RETURN(!cstrNewName.IsEmpty());
-			
-			CWaitCursor WaitCursor;
-			pObject->OnListItemRename((LPCTSTR)cstrNewName, *this);
+			ENSURE_RETURN_EX(!cstrNewName.IsEmpty(), TRUE);
+
+			int nItem = pLVDispInfo->item.iItem;
+			CListObject *pObject = GetItemObject(nItem);
+			ASSERT_RETURN_EX(pObject, TRUE);
+
+			ENSURE_RETURN_EX(cstrNewName != pObject->GetRenameText(), TRUE);
+
+			if (pObject->OnListItemRename((LPCTSTR)cstrNewName))
+			{
+				this->UpdateItem(pLVDispInfo->item.iItem);
+			}
 		}
 
 		break;
 	case LVN_KEYDOWN:
 		{
-			LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
+			LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(&NMHDR);
 
 			if ('A' == pLVKeyDow->wVKey && (0x80 & ::GetKeyState(VK_CONTROL)))
 			{
-				
 				if (0 == (this->GetStyle() & LVS_SINGLESEL))
 				{
 					this->DeselectAllItems();
 					this->SelectAllItems();
 				}
 			}
+
+			return TRUE;
 		}
+
+		break;
+	default:
+		break;
 	}
+
+	return FALSE;
 }
 
 BOOL CObjectList::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	if (WM_NOTIFY == message)
 	{
-		BOOL bResult = FALSE;
-		OnNMNotify((NMHDR*)lParam, &bResult);
-		if (bResult)
+		NMHDR *pNMHDR = (NMHDR*)lParam;
+		if (NULL != pNMHDR)
 		{
-			return TRUE;
+			if (handleNMNotify(*pNMHDR))
+			{
+				return TRUE;
+			}
 		}
 	}
 

@@ -191,22 +191,25 @@ public:
 		}
 	}
 	
-	virtual void OnNMNotify(NMHDR* pNMHDR, BOOL* pResult)
+	virtual BOOL handleNMNotify(NMHDR& NMHDR) override
 	{
-		if (TVN_ITEMEXPANDING == pNMHDR->code)
+		if (TVN_ITEMEXPANDING == NMHDR.code)
 		{
-			*pResult = 0;
-			LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+			LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(&NMHDR);
 	
 			if (TVE_EXPAND == pNMTreeView->action)
 			{
 				CWaitCursor WaitCursor;
 
 				CDirObject* pDirObject = (CDirObject*)__super::GetItemObject(pNMTreeView->itemNew.hItem);
-				ASSERT_RETURN(pDirObject);
+				ASSERT_RETURN_EX(pDirObject, FALSE);
 				InsertChildsEx(pDirObject);
+
+				//return TRUE;
 			}
 		}
+
+		return FALSE;
 	}
 
 private:
