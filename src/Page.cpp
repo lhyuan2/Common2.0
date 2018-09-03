@@ -10,7 +10,7 @@
 #define WM_Async WM_USER+1
 
 
-#define WM_AsyncEx WM_USER+2
+//#define WM_AsyncEx WM_USER+2
 
 
 //CPage
@@ -126,29 +126,20 @@ BOOL CPage::PreTranslateMessage(MSG* pMsg)
 	return CPropertyPage::PreTranslateMessage(pMsg);
 }
 
-void CPage::Async(const FN_AsyncCB& cb)
+void CPage::Async(const CB_Async& cb)
 {
 	if (!cb)
 	{
 		return;
 	}
 
-	auto oldCB = m_AsyncCB;
-	m_AsyncCB = [=]() {
-		if (oldCB)
-		{
-			oldCB();
-		}
-		
-		cb();
-	};
+	m_cbAsync = cb;
 
 	CMainApp::DoEvents();
-
 	this->PostMessage(WM_Async);
 }
 
-void CPage::Async(const FN_AsyncCB& cb, UINT uDelayTime)
+void CPage::Async(const CB_Async& cb, UINT uDelayTime)
 {
 	if (0 == uDelayTime)
 	{
@@ -156,28 +147,46 @@ void CPage::Async(const FN_AsyncCB& cb, UINT uDelayTime)
 		return;
 	}
 
+	m_cbAsync = cb;
+
 	thread thr([=]() {
 		::Sleep(uDelayTime);
-		FN_AsyncCB AsyncCB = cb;
-		this->SendMessage(WM_AsyncEx, (WPARAM)&AsyncCB);
+		this->PostMessage(WM_Async);
 	});
 	thr.detach();
 }
 
-void CPage::AsyncLoop(const FN_AsyncLoopCB& cb, UINT uDelayTime)
+void CPage::AsyncLoop(const CB_AsyncLoop& cb, UINT uDelayTime)
 {
 	if (0 == uDelayTime)
 	{
-		uDelayTime = 1;
+		return;
 	}
 
+	if (!cb)
+	{
+		return;
+	}
+
+	m_cbAsyncLoop = cb;
+
+	_AsyncLoop(uDelayTime);
+}
+
+void CPage::_AsyncLoop(UINT uDelayTime)
+{
 	Async([=]() {
-		if (!cb())
+		if (!m_cbAsyncLoop)
 		{
 			return;
 		}
 
-		AsyncLoop(cb, uDelayTime);
+		if (!m_cbAsyncLoop())
+		{
+			return;
+		}
+
+		_AsyncLoop(uDelayTime);
 	}, uDelayTime);
 }
 
@@ -185,21 +194,19 @@ BOOL CPage::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResul
 {
 	if (WM_Async == message)
 	{
-		if (m_AsyncCB)
+		if (m_cbAsync)
 		{
-			FN_AsyncCB cb = m_AsyncCB;
-			m_AsyncCB = NULL;
-			cb();
+			m_cbAsync();
 		}
 
 		return TRUE;
 	}
-	else if (WM_AsyncEx == message)
+	/*else if (WM_AsyncEx == message)
 	{
-		FN_AsyncCB *pcb = (FN_AsyncCB*)wParam;
+		CB_Async *pcb = (CB_Async*)wParam;
 		if (NULL != pcb)
 		{
-			FN_AsyncCB& cb = *pcb;
+			CB_Async& cb = *pcb;
 			if (cb)
 			{
 				cb();
@@ -207,7 +214,7 @@ BOOL CPage::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResul
 		}
 
 		return TRUE;
-	}
+	}*/
 
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
 }

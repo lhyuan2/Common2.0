@@ -548,6 +548,7 @@ void CObjectList::SetView(E_ListViewType eViewType, bool bArrange)
 {
 	this->SetRedraw(FALSE);
 
+	m_eViewType = eViewType;
 	(void)__super::SetView(eViewType);
 
 	if (bArrange)
@@ -560,7 +561,14 @@ void CObjectList::SetView(E_ListViewType eViewType, bool bArrange)
 
 E_ListViewType CObjectList::GetView()
 {
-	return (E_ListViewType)__super::GetView();
+	if ((E_ListViewType)-1 != m_eViewType)
+	{
+		return m_eViewType;
+	}
+
+	m_eViewType = (E_ListViewType)__super::GetView();
+
+	return m_eViewType;
 }
 
 void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
@@ -855,7 +863,7 @@ void CObjectList::DeselectAllItems()
 
 BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	if (m_bChangeView)
+	if (m_bAutoChange)
 	{
 		if (WM_MOUSEWHEEL == message)
 		{
@@ -891,55 +899,55 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 			CListObject *pObject = this->GetItemObject(pLVDispInfo->item.iItem);
 			ENSURE_BREAK(pObject);
 
-			CEdit *pwndEdit = this->GetEditControl();
-			ASSERT_BREAK(pwndEdit);
+CEdit *pwndEdit = this->GetEditControl();
+ASSERT_BREAK(pwndEdit);
 
-			CString cstrRenameText = pObject->GetRenameText();
-			pwndEdit->SetWindowText(cstrRenameText);
-			pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
-	
-			//return TRUE;
+CString cstrRenameText = pObject->GetRenameText();
+pwndEdit->SetWindowText(cstrRenameText);
+pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
+
+//return TRUE;
 		}
 
 		break;
 	case LVN_ENDLABELEDIT:
+	{
+		NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(&NMHDR);
+
+		CString cstrNewName(pLVDispInfo->item.pszText);
+		(void)cstrNewName.Trim();
+		ENSURE_RETURN_EX(!cstrNewName.IsEmpty(), TRUE);
+
+		int nItem = pLVDispInfo->item.iItem;
+		CListObject *pObject = GetItemObject(nItem);
+		ASSERT_RETURN_EX(pObject, TRUE);
+
+		ENSURE_RETURN_EX(cstrNewName != pObject->GetRenameText(), TRUE);
+
+		if (pObject->OnListItemRename((LPCTSTR)cstrNewName))
 		{
-			NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(&NMHDR);
-
-			CString cstrNewName(pLVDispInfo->item.pszText);
-			(void)cstrNewName.Trim();
-			ENSURE_RETURN_EX(!cstrNewName.IsEmpty(), TRUE);
-
-			int nItem = pLVDispInfo->item.iItem;
-			CListObject *pObject = GetItemObject(nItem);
-			ASSERT_RETURN_EX(pObject, TRUE);
-
-			ENSURE_RETURN_EX(cstrNewName != pObject->GetRenameText(), TRUE);
-
-			if (pObject->OnListItemRename((LPCTSTR)cstrNewName))
-			{
-				this->UpdateItem(pLVDispInfo->item.iItem);
-			}
+			this->UpdateItem(pLVDispInfo->item.iItem);
 		}
+	}
 
-		break;
+	break;
 	case LVN_KEYDOWN:
+	{
+		LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(&NMHDR);
+
+		if ('A' == pLVKeyDow->wVKey && (0x80 & ::GetKeyState(VK_CONTROL)))
 		{
-			LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(&NMHDR);
-
-			if ('A' == pLVKeyDow->wVKey && (0x80 & ::GetKeyState(VK_CONTROL)))
+			if (0 == (this->GetStyle() & LVS_SINGLESEL))
 			{
-				if (0 == (this->GetStyle() & LVS_SINGLESEL))
-				{
-					this->DeselectAllItems();
-					this->SelectAllItems();
-				}
+				this->DeselectAllItems();
+				this->SelectAllItems();
 			}
-
-			return TRUE;
 		}
 
-		break;
+		return TRUE;
+	}
+
+	break;
 	default:
 		break;
 	}
@@ -976,19 +984,25 @@ void CObjectList::ChangeListCtrlView(short zDelta)
 
 	E_ListViewType nPreViewType = this->GetView();
 
-	for (UINT nIndex = 0; nIndex < sizeof(lpViewType)/sizeof(E_ListViewType); ++nIndex)
+	for (UINT nIndex = 0; nIndex < sizeof(lpViewType) / sizeof(E_ListViewType); ++nIndex)
 	{
 		if (lpViewType[nIndex] == nPreViewType)
 		{
 			nIndex++;
-				
-			if (sizeof(lpViewType)/sizeof(E_ListViewType) <= nIndex)
+
+			if (sizeof(lpViewType) / sizeof(E_ListViewType) <= nIndex)
 			{
 				nIndex = 0;
 			}
-
-			this->SetView(lpViewType[nIndex]);
 			
+			m_eViewType = lpViewType[nIndex];
+			this->SetView(m_eViewType);
+
+			if (m_cbViewChanged)
+			{
+				m_cbViewChanged(m_eViewType);
+			}
+
 			break;
 		}
 	}

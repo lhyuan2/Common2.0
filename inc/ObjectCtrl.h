@@ -240,10 +240,11 @@ enum E_ListViewType
 class __CommonPrjExt CObjectList : public CListCtrl
 {
 public:
-	typedef list<pair<CString, int>> ColumnList;
+	using ColumnList = list<pair<CString, int>>;
 
-	CObjectList(bool bChangeView=false)
-		: m_bChangeView(bChangeView)
+	using CB_ListViewChanged = function<void(E_ListViewType)>;
+
+	CObjectList()
 	{
 	}
 
@@ -257,17 +258,26 @@ public:
 	CImageListEx m_ImageListSmall;
 
 private:
+	CFontGuide m_fontGuide;
+
 	UINT m_nColumnCount = 1;
 
-	bool m_bChangeView = false;
+	E_ListViewType m_eViewType = (E_ListViewType)-1;
 
-	CFontGuide m_fontGuide;
+	bool m_bAutoChange = false;
+	CB_ListViewChanged m_cbViewChanged;
 
 public:
 	BOOL InitCtrl(UINT uFontSize, const ColumnList &lstColumns = ColumnList());
 
 	BOOL InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
 	BOOL InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
+
+	void SetViewAutoChange(const CB_ListViewChanged& cb=NULL)
+	{
+		m_bAutoChange = true;
+		m_cbViewChanged = cb;
+	}
 
 	void SetTileSize(UINT cx, UINT cy);
 

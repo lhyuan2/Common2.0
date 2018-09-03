@@ -230,8 +230,7 @@ private:
 class __CommonPrjExt CPathList: public CObjectList
 {
 public:
-	CPathList(const ColumnList& lstColumns, bool bChangeView = true)
-		: CObjectList(bChangeView)
+	CPathList(const ColumnList& lstColumns)
 	{
 		if (!lstColumns.empty())
 		{
