@@ -310,7 +310,7 @@ BOOL CMainApp::Quit()
 	return TRUE;
 }
 
-void CMainApp::DoEvents()
+void CMainApp::DoEvents(bool bOnce)
 {
 	::DoEvents();
 }

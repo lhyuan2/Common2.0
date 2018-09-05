@@ -49,8 +49,7 @@ public:
 
 	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
 
-	void Async(const CB_Async& cb);
-	void Async(const CB_Async& cb, UINT uDelayTime);
+	void Async(const CB_Async& cb, UINT uDelayTime=0);
 	void AsyncLoop(const CB_AsyncLoop& cb, UINT uDelayTime);
 
 protected:

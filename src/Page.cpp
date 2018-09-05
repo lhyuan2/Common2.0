@@ -9,10 +9,6 @@
 
 #define WM_Async WM_USER+1
 
-
-//#define WM_AsyncEx WM_USER+2
-
-
 //CPage
 
 IMPLEMENT_DYNAMIC(CPage, CPropertyPage);
@@ -126,34 +122,36 @@ BOOL CPage::PreTranslateMessage(MSG* pMsg)
 	return CPropertyPage::PreTranslateMessage(pMsg);
 }
 
-void CPage::Async(const CB_Async& cb)
+void CPage::Async(const CB_Async& cb, UINT uDelayTime)
 {
 	if (!cb)
 	{
 		return;
 	}
 
-	m_cbAsync = cb;
+	CB_Async cbPrev = m_cbAsync;
+	m_cbAsync = [=]()
+	{
+		if (cbPrev)
+		{
+			cbPrev();
+		}
 
-	CMainApp::DoEvents();
-	this->PostMessage(WM_Async);
-}
+		cb();
+	};
 
-void CPage::Async(const CB_Async& cb, UINT uDelayTime)
-{
 	if (0 == uDelayTime)
 	{
-		Async(cb);
-		return;
-	}
-
-	m_cbAsync = cb;
-
-	thread thr([=]() {
-		::Sleep(uDelayTime);
 		this->PostMessage(WM_Async);
-	});
-	thr.detach();
+	}
+	else
+	{
+		thread thr([=]() {
+			::Sleep(uDelayTime);
+			this->PostMessage(WM_Async);
+		});
+		thr.detach();
+	}
 }
 
 void CPage::AsyncLoop(const CB_AsyncLoop& cb, UINT uDelayTime)
@@ -196,25 +194,13 @@ BOOL CPage::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResul
 	{
 		if (m_cbAsync)
 		{
-			m_cbAsync();
+			CB_Async cbAsync = m_cbAsync;
+			m_cbAsync = NULL;
+			cbAsync();
 		}
 
 		return TRUE;
 	}
-	/*else if (WM_AsyncEx == message)
-	{
-		CB_Async *pcb = (CB_Async*)wParam;
-		if (NULL != pcb)
-		{
-			CB_Async& cb = *pcb;
-			if (cb)
-			{
-				cb();
-			}
-		}
-
-		return TRUE;
-	}*/
 
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
 }

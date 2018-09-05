@@ -153,7 +153,7 @@ public:
 
 	static BOOL Quit();
 
-	static void DoEvents();
+	static void DoEvents(bool bOnce=false);
 
 	static BOOL AddModule(IModuleApp& Module);
 

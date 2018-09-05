@@ -55,4 +55,4 @@
 
 extern HINSTANCE g_hInstance;
 
-extern void DoEvents();
+extern void DoEvents(bool bOnce = false);
