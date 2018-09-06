@@ -60,7 +60,7 @@ protected:
 
 	BOOL RegDragableCtrl(CWnd& wndCtrl)
 	{
-		ASSERT_RETURN_EX(wndCtrl.GetSafeHwnd(), FALSE);
+		__AssertReturn(wndCtrl.GetSafeHwnd(), FALSE);
 
 		m_setDragableCtrls.insert(wndCtrl.GetSafeHwnd());
 		

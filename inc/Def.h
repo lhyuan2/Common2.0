@@ -21,26 +21,26 @@
 using namespace std;
 
 
-#define ENSURE_RETURN(x) \
+#define __Ensure(x) \
 	if (!(x)) \
 	{ \
 		return; \
 	}
 
-#define ASSERT_RETURN(x) \
+#define __Assert(x) \
 	if (!(x)) \
 	{ \
 		ASSERT(FALSE); \
 		return; \
 	}
 
-#define ENSURE_RETURN_EX(x, y) \
+#define __EnsureReturn(x, y) \
 	if (!(x)) \
 	{ \
 		return y; \
 	}
 
-#define ASSERT_RETURN_EX(x, y) \
+#define __AssertReturn(x, y) \
 	if (!(x)) \
 	{ \
 		ASSERT(FALSE); \
@@ -48,26 +48,26 @@ using namespace std;
 	}
 
 
-#define ENSURE_CONTINUE(x) \
+#define __EnsureContinue(x) \
 	if (!(x)) \
 	{ \
 		continue; \
 	}
 
-#define ASSERT_CONTINUE(x) \
+#define __AssertContinue(x) \
 	if (!(x)) \
 	{ \
 		ASSERT(FALSE); \
 		continue; \
 	}
 
-#define ENSURE_BREAK(x) \
+#define __EnsureBreak(x) \
 	if (!(x)) \
 	{ \
 		break; \
 	}
 
-#define ASSERT_BREAK(x) \
+#define __AssertBreak(x) \
 	if (!(x)) \
 	{ \
 		ASSERT(FALSE); \

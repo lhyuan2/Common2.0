@@ -37,7 +37,7 @@ BOOL CBaseTree::InitCtrl(CBitmap *pBitmap, ULONG uFontSize)
 
 	if (pBitmap)
 	{
-		ASSERT_RETURN_EX(m_ImageList.CreateEx(*pBitmap), FALSE);
+		__AssertReturn(m_ImageList.CreateEx(*pBitmap), FALSE);
 		(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
 	}
 
@@ -51,7 +51,7 @@ BOOL CBaseTree::InitCtrl(const TD_ICONLIST& lstIcon, UINT uIconSize, ULONG uFont
 		(void)m_fontGuide.setFontSize(*this, uFontSize);
 	}
 
-	ASSERT_RETURN_EX(m_ImageList.CreateEx(uIconSize, uIconSize, lstIcon), FALSE);
+	__AssertReturn(m_ImageList.CreateEx(uIconSize, uIconSize, lstIcon), FALSE);
 	(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
 
 	return TRUE;
@@ -153,11 +153,11 @@ END_MESSAGE_MAP()
 
 BOOL CCheckObjectTree::InitCtrl()
 {
-	ENSURE_RETURN_EX(__super::InitCtrl(), FALSE);
+	__EnsureReturn(__super::InitCtrl(), FALSE);
 
 
 	HBITMAP hStateBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_CHECKTREE_STATE));
-	ASSERT_RETURN_EX(hStateBitmap, FALSE);
+	__AssertReturn(hStateBitmap, FALSE);
 
 	CBitmap StateBitmap;
 	StateBitmap.Attach(hStateBitmap);
@@ -165,7 +165,7 @@ BOOL CCheckObjectTree::InitCtrl()
 	BITMAP bmp;
 	(void)StateBitmap.GetBitmap(&bmp);
 
-	ASSERT_RETURN_EX(m_StateImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
+	__AssertReturn(m_StateImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
 	(void)m_StateImageList.Add(&StateBitmap, __ColorBlack);
 	
 	(void)StateBitmap.DeleteObject();
@@ -388,7 +388,7 @@ HTREEITEM CObjectTree::InsertObject(CTreeObject& Object, CTreeObject *pParentObj
 HTREEITEM CObjectTree::InsertObjectEx(CTreeObject& Object, CTreeObject *pParentObject)
 {
 	Object.m_hTreeItem = InsertObject(Object, pParentObject);
-	ENSURE_RETURN_EX(Object.m_hTreeItem, NULL);
+	__EnsureReturn(Object.m_hTreeItem, NULL);
 
 	TD_TreeObjectList lstSubObjects;
 	Object.GetTreeChilds(lstSubObjects);
@@ -427,10 +427,10 @@ CTreeObject *CObjectTree::GetItemObject(HTREEITEM hItem)
 
 CTreeObject *CObjectTree::GetParentObject(CTreeObject& Object)
 {
-	ASSERT_RETURN_EX(Object.m_hTreeItem, NULL);
+	__AssertReturn(Object.m_hTreeItem, NULL);
 	
 	HTREEITEM hItemParent = __super::GetParentItem(Object.m_hTreeItem);
-	ENSURE_RETURN_EX(hItemParent, NULL);
+	__EnsureReturn(hItemParent, NULL);
 
 	return this->GetItemObject(hItemParent);
 }
@@ -455,12 +455,12 @@ BOOL CObjectTree::handleNMNotify(NMHDR& NMHDR)
 
 		CString cstrNewName(pTVDispInfo->item.pszText);
 		(void)cstrNewName.Trim();
-		ENSURE_RETURN_EX(!cstrNewName.IsEmpty(), TRUE);
+		__EnsureReturn(!cstrNewName.IsEmpty(), TRUE);
 
 		CTreeObject *pObject = GetItemObject(pTVDispInfo->item.hItem);
-		ASSERT_RETURN_EX(pObject, TRUE);
+		__AssertReturn(pObject, TRUE);
 
-		ENSURE_RETURN_EX(cstrNewName != pObject->GetTreeText(), TRUE);
+		__EnsureReturn(cstrNewName != pObject->GetTreeText(), TRUE);
 	}
 
 	return __super::handleNMNotify(NMHDR);
@@ -478,7 +478,7 @@ void CObjectList::PreSubclassWindow()
 		| LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_LABELTIP);
 }
 
-BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
+BOOL CObjectList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
 {
 	if (0 < uFontSize)
 	{
@@ -488,10 +488,12 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 	if (!lstColumns.empty())
 	{
 		m_nColumnCount = 0;
-		for (ColumnList::const_iterator itColumn = lstColumns.begin(); itColumn != lstColumns.end()
-			; ++itColumn, ++m_nColumnCount)
+		for (auto& column : lstColumns)
 		{
-			(void)__super::InsertColumn(m_nColumnCount, L' ' + itColumn->first, 0, itColumn->second);
+			(void)__super::InsertColumn(m_nColumnCount, (0 == column.uFlag) ? L' ' + column.cstrText
+				: column.cstrText, column.uFlag, column.uWidth);
+			
+			m_nColumnCount++;
 		}
 	}
 
@@ -500,12 +502,12 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const ColumnList &lstColumns)
 
 BOOL CObjectList::InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize)
 {
-	ASSERT_RETURN_EX(m_ImageList.CreateEx(uSize, uSize, lstIcon), FALSE);
+	__AssertReturn(m_ImageList.CreateEx(uSize, uSize, lstIcon), FALSE);
 	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
 
 	if (0 != uSmallSize)
 	{
-		ASSERT_RETURN_EX(m_ImageListSmall.CreateEx(uSmallSize, uSmallSize, lstIcon), FALSE);
+		__AssertReturn(m_ImageListSmall.CreateEx(uSmallSize, uSmallSize, lstIcon), FALSE);
 		(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
 	}
 	else
@@ -518,12 +520,12 @@ BOOL CObjectList::InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallS
 
 BOOL CObjectList::InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall)
 {
-	ASSERT_RETURN_EX(m_ImageList.CreateEx(Bitmap), FALSE);
+	__AssertReturn(m_ImageList.CreateEx(Bitmap), FALSE);
 	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
 
 	if (NULL != pBitmapSmall)
 	{
-		ASSERT_RETURN_EX(m_ImageListSmall.CreateEx(*pBitmapSmall), FALSE);
+		__AssertReturn(m_ImageListSmall.CreateEx(*pBitmapSmall), FALSE);
 		(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
 	}
 	else
@@ -583,7 +585,7 @@ void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
 		return;
 	}
 	
-	ASSERT_RETURN(nPos <= GetItemCount());
+	__Assert(nPos <= GetItemCount());
 
 	int nMaxItem = GetItemCount()-1;
 
@@ -629,7 +631,7 @@ int CObjectList::InsertObject(CListObject& Object, int nItem)
 
 void CObjectList::UpdateObjects()
 {
-	ENSURE_RETURN(m_hWnd);
+	__Ensure(m_hWnd);
 
 	for (int nItem = 0; nItem < this->GetItemCount(); ++nItem)
 	{
@@ -639,7 +641,7 @@ void CObjectList::UpdateObjects()
 
 void CObjectList::UpdateObject(CListObject& Object)
 {
-	ENSURE_RETURN(m_hWnd);
+	__Ensure(m_hWnd);
 
 	int nItem = this->GetObjectItem(&Object);
 	if (0 <= nItem)
@@ -650,7 +652,7 @@ void CObjectList::UpdateObject(CListObject& Object)
 
 void CObjectList::UpdateItem(UINT uItem)
 {
-	ENSURE_RETURN(m_hWnd);
+	__Ensure(m_hWnd);
 
 	auto pObject = this->GetItemObject(uItem);
 	if (NULL != pObject)
@@ -661,7 +663,7 @@ void CObjectList::UpdateItem(UINT uItem)
 
 void CObjectList::DeleteObjects(const TD_ListObjectList& lstDeleteObjects)
 {
-	ENSURE_RETURN(m_hWnd);
+	__Ensure(m_hWnd);
 
 	CListObject *pObject = NULL;
 
@@ -686,14 +688,14 @@ void CObjectList::DeleteObjects(const TD_ListObjectList& lstDeleteObjects)
 BOOL CObjectList::DeleteObject(const CListObject *pObject)
 {
 	int nItem = this->GetObjectItem(pObject);
-	ENSURE_RETURN_EX(0 <= nItem, FALSE);
+	__EnsureReturn(0 <= nItem, FALSE);
 
 	return this->DeleteItem(nItem);
 }
 
 void CObjectList::SetItemObject(int nItem, CListObject& Object)
 {
-	ASSERT_RETURN(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
+	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
 		, Object.GetListImage(), 0, 0, (LPARAM)&Object));
 
 	list<wstring> lstTexts;
@@ -716,7 +718,7 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 
 CListObject *CObjectList::GetItemObject(int nItem)
 {
-	ENSURE_RETURN_EX(0 <= nItem && nItem < GetItemCount(), NULL);
+	__EnsureReturn(0 <= nItem && nItem < GetItemCount(), NULL);
 	return (CListObject*)__super::GetItemData(nItem);
 }
 
@@ -744,7 +746,7 @@ void CObjectList::GetAllObjects(TD_ListObjectList& lstListObjects)
 int CObjectList::GetSingleSelectedItem()
 {
 	POSITION lpPos = __super::GetFirstSelectedItemPosition();
-	ENSURE_RETURN_EX(lpPos, -1);
+	__EnsureReturn(lpPos, -1);
 
 	return __super::GetNextSelectedItem(lpPos);
 }
@@ -752,7 +754,7 @@ int CObjectList::GetSingleSelectedItem()
 CListObject *CObjectList::GetSingleSelectedObject()
 {
 	int nItem = this->GetSingleSelectedItem();
-	ENSURE_RETURN_EX(0 <= nItem, NULL);
+	__EnsureReturn(0 <= nItem, NULL);
 
 	return this->GetItemObject(nItem);
 }
@@ -794,7 +796,7 @@ void CObjectList::GetMultiSelectedObjects(TD_ListObjectList& lstObjects)
 
 BOOL CObjectList::SelectFirstItem()
 {
-	ENSURE_RETURN_EX(0 < this->GetItemCount(), FALSE);
+	__EnsureReturn(0 < this->GetItemCount(), FALSE);
 	
 	this->SelectItem(0, TRUE);
 
@@ -885,7 +887,7 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 			}
 		}
 	}
-
+	
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
 }
 
@@ -897,10 +899,10 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 		{
 			NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(&NMHDR);
 			CListObject *pObject = this->GetItemObject(pLVDispInfo->item.iItem);
-			ENSURE_BREAK(pObject);
+			__EnsureBreak(pObject);
 
 CEdit *pwndEdit = this->GetEditControl();
-ASSERT_BREAK(pwndEdit);
+__AssertBreak(pwndEdit);
 
 CString cstrRenameText = pObject->GetRenameText();
 pwndEdit->SetWindowText(cstrRenameText);
@@ -916,13 +918,13 @@ pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
 
 		CString cstrNewName(pLVDispInfo->item.pszText);
 		(void)cstrNewName.Trim();
-		ENSURE_RETURN_EX(!cstrNewName.IsEmpty(), TRUE);
+		__EnsureReturn(!cstrNewName.IsEmpty(), TRUE);
 
 		int nItem = pLVDispInfo->item.iItem;
 		CListObject *pObject = GetItemObject(nItem);
-		ASSERT_RETURN_EX(pObject, TRUE);
+		__AssertReturn(pObject, TRUE);
 
-		ENSURE_RETURN_EX(cstrNewName != pObject->GetRenameText(), TRUE);
+		__EnsureReturn(cstrNewName != pObject->GetRenameText(), TRUE);
 
 		if (pObject->OnListItemRename((LPCTSTR)cstrNewName))
 		{

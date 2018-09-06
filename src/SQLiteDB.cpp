@@ -20,7 +20,7 @@ CSQLiteDBResult::CSQLiteDBResult()
 
 CSQLiteDBResult::~CSQLiteDBResult()
 {
-	ENSURE_RETURN(this);
+	__Ensure(this);
 
 	if (m_pData)
 	{
@@ -32,14 +32,14 @@ CSQLiteDBResult::~CSQLiteDBResult()
 
 UINT CSQLiteDBResult::GetColumnCount()
 {
-	ASSERT_RETURN_EX(this, 0);
+	__AssertReturn(this, 0);
 
 	return m_nColumnCount;
 }
 
 UINT CSQLiteDBResult::GetRowCount()
 {
-	ASSERT_RETURN_EX(this, 0);
+	__AssertReturn(this, 0);
 
 	return m_nRowCount;
 }
@@ -47,7 +47,7 @@ UINT CSQLiteDBResult::GetRowCount()
 BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, int& nValue)
 {
 	string strValue;
-	ENSURE_RETURN_EX(_GetData(nRow, nColumn, strValue), FALSE);
+	__EnsureReturn(_GetData(nRow, nColumn, strValue), FALSE);
 
 	nValue = atoi(strValue.c_str());
 
@@ -57,7 +57,7 @@ BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, int& nValue)
 BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, double& dbValue)
 {
 	string strValue;
-	ENSURE_RETURN_EX(_GetData(nRow, nColumn, strValue), FALSE);
+	__EnsureReturn(_GetData(nRow, nColumn, strValue), FALSE);
 
 	dbValue = atof(strValue.c_str());
 
@@ -66,10 +66,10 @@ BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, double& dbValue)
 
 BOOL CSQLiteDBResult::_GetData(UINT nRow, UINT nColumn, string& strValue)
 {
-	ASSERT_RETURN_EX(this, NULL);
-	ASSERT_RETURN_EX(m_nRowCount && m_nColumnCount, NULL);
-	ASSERT_RETURN_EX(nRow < m_nRowCount && nColumn < m_nColumnCount, NULL);
-	ASSERT_RETURN_EX(m_pData, FALSE);
+	__AssertReturn(this, NULL);
+	__AssertReturn(m_nRowCount && m_nColumnCount, NULL);
+	__AssertReturn(nRow < m_nRowCount && nColumn < m_nColumnCount, NULL);
+	__AssertReturn(m_pData, FALSE);
 
 	char* pszValue = m_pData[(nRow + 1) * m_nColumnCount + nColumn];
 	if (NULL != pszValue)
@@ -83,7 +83,7 @@ BOOL CSQLiteDBResult::_GetData(UINT nRow, UINT nColumn, string& strValue)
 BOOL CSQLiteDBResult::GetData(UINT nRow, UINT nColumn, wstring& strValue)
 {
 	string strData;
-	ENSURE_RETURN_EX(_GetData(nRow, nColumn, strData), FALSE);
+	__EnsureReturn(_GetData(nRow, nColumn, strData), FALSE);
 	strValue = util::StrToWStr(strData, CP_UTF8);
 	return TRUE;
 }
@@ -108,19 +108,19 @@ int CSQLiteDB::GetStatus()
 
 BOOL CSQLiteDB::Connect()
 {
-	ASSERT_RETURN_EX(!m_hDB, FALSE);
+	__AssertReturn(!m_hDB, FALSE);
 
-	ASSERT_RETURN_EX(SQLITE_OK == sqlite3_open(m_strDBPath.c_str(), (sqlite3**)&m_hDB), FALSE);
-	ASSERT_RETURN_EX(m_hDB, FALSE);
+	__AssertReturn(SQLITE_OK == sqlite3_open(m_strDBPath.c_str(), (sqlite3**)&m_hDB), FALSE);
+	__AssertReturn(m_hDB, FALSE);
 
 	return TRUE;
 }
 
 BOOL CSQLiteDB::Disconnect()
 {
-	ENSURE_RETURN_EX(m_hDB, FALSE);
+	__EnsureReturn(m_hDB, FALSE);
 
-	ENSURE_RETURN_EX(SQLITE_OK == sqlite3_close((sqlite3*)m_hDB), FALSE);
+	__EnsureReturn(SQLITE_OK == sqlite3_close((sqlite3*)m_hDB), FALSE);
 
 	m_hDB = NULL;
 
@@ -129,7 +129,7 @@ BOOL CSQLiteDB::Disconnect()
 
 BOOL CSQLiteDB::Execute(const wstring& strSql, string& strError)
 {
-	ASSERT_RETURN_EX(m_hDB, FALSE);
+	__AssertReturn(m_hDB, FALSE);
 	
 	char *pszError = NULL;
 	if (SQLITE_OK != sqlite3_exec((sqlite3*)m_hDB, util::WStrToStr(strSql, CP_UTF8).c_str(), 0, 0, &pszError))
@@ -143,7 +143,7 @@ BOOL CSQLiteDB::Execute(const wstring& strSql, string& strError)
 
 IDBResult* CSQLiteDB::Query(const wstring& strSql, string& strError)
 {
-	ASSERT_RETURN_EX(m_hDB, NULL);
+	__AssertReturn(m_hDB, NULL);
 
 	char ** pData = NULL;
 
@@ -159,7 +159,7 @@ IDBResult* CSQLiteDB::Query(const wstring& strSql, string& strError)
 		strError = pszError;
 	}
 
-	ASSERT_RETURN_EX(SQLITE_OK == nResult && pData, NULL);
+	__AssertReturn(SQLITE_OK == nResult && pData, NULL);
 	
 	CSQLiteDBResult* pSQLiteDBResult = new CSQLiteDBResult;
 

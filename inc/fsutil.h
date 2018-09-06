@@ -5,6 +5,8 @@
 
 #include "util.h"
 
+#define	__BackSlant L'\\'
+
 class __CommonPrjExt fsutil
 {
 public:

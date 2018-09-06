@@ -111,7 +111,7 @@ public:
 protected:
 	virtual CPath *NewSubPath(CFileFind &FindFile, CPath *pParentPath)
 	{
-		ENSURE_RETURN_EX(FindFile.IsDirectory(), NULL);
+		__EnsureReturn(FindFile.IsDirectory(), NULL);
 
 		return new CDirObject(FindFile, pParentPath);
 	}
@@ -202,7 +202,7 @@ public:
 				CWaitCursor WaitCursor;
 
 				CDirObject* pDirObject = (CDirObject*)__super::GetItemObject(pNMTreeView->itemNew.hItem);
-				ASSERT_RETURN_EX(pDirObject, FALSE);
+				__AssertReturn(pDirObject, FALSE);
 				InsertChildsEx(pDirObject);
 
 				//return TRUE;
@@ -230,7 +230,7 @@ private:
 class __CommonPrjExt CPathList: public CObjectList
 {
 public:
-	CPathList(const ColumnList& lstColumns)
+	CPathList(const TD_ListColumn& lstColumns)
 	{
 		if (!lstColumns.empty())
 		{
@@ -239,7 +239,7 @@ public:
 	}
 
 private:
-	ColumnList m_lstColumns = {
+	TD_ListColumn m_lstColumns = {
 		{_T("名称"), 400}
 		, {_T("大小"), 80}
 		, {_T("修改日期"), 150}

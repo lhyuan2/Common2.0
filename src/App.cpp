@@ -79,7 +79,7 @@ wstring CMainApp::GetAppPath()
 
 BOOL CMainApp::InitInstance()
 {
-	ASSERT_RETURN_EX(__super::InitInstance(), FALSE);
+	__AssertReturn(__super::InitInstance(), FALSE);
 	
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
@@ -94,7 +94,7 @@ BOOL CMainApp::InitInstance()
 
 	srand(GetTickCount());
 
-	ASSERT_RETURN_EX(::SetCurrentDirectory(this->GetAppPath().c_str()), FALSE);
+	__AssertReturn(::SetCurrentDirectory(this->GetAppPath().c_str()), FALSE);
 
 	tagMainWndInfo MainWndInfo;
 	CMainWnd *pMainWnd = OnInitMainWnd(MainWndInfo);
@@ -103,7 +103,7 @@ BOOL CMainApp::InitInstance()
 		_pMainWnd = pMainWnd = new CMainWnd();
 	}
 
-	ENSURE_RETURN_EX(pMainWnd->Create(MainWndInfo), FALSE);
+	__EnsureReturn(pMainWnd->Create(MainWndInfo), FALSE);
 	m_pMainWnd = pMainWnd;
 
 	for (ModuleVector::iterator itModule = m_vctModules.begin(); itModule != m_vctModules.end(); ++itModule)
@@ -293,7 +293,7 @@ BOOL CMainApp::Quit()
 {
 	for (ModuleVector::iterator itModule=m_vctModules.begin(); itModule!=m_vctModules.end(); ++itModule)
 	{
-		ENSURE_RETURN_EX((*itModule)->OnQuit(), FALSE);
+		__EnsureReturn((*itModule)->OnQuit(), FALSE);
 	}
 
 	for (vector<tagHotkeyInfo>::iterator itrHotkeyInfo = m_vctHotkeyInfos.begin()
@@ -317,7 +317,7 @@ void CMainApp::DoEvents(bool bOnce)
 
 BOOL CMainApp::AddModule(IModuleApp& Module)
 {
-	ASSERT_RETURN_EX(!util::ContainerFind(m_vctModules, &Module), FALSE);
+	__AssertReturn(!util::ContainerFind(m_vctModules, &Module), FALSE);
 
 	m_vctModules.push_back(&Module);
 

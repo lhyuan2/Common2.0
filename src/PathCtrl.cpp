@@ -19,27 +19,27 @@ void CPathList::PreSubclassWindow()
 
 BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize)
 {
-	ENSURE_RETURN_EX(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
+	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
-	ENSURE_RETURN_EX(__super::InitImage(lstIcon, uSize, uSmallSize), FALSE);
+	__EnsureReturn(__super::InitImage(lstIcon, uSize, uSmallSize), FALSE);
 
 	return TRUE;
 }
 
 BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap, CBitmap *pBitmapSmall)
 {
-	ENSURE_RETURN_EX(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
+	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
 	CBitmap Bitmap;
 	if (NULL == pBitmap)
 	{
 		HBITMAP hBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_PATHCTRL_NORMAL));
-		ASSERT_RETURN_EX(hBitmap, FALSE);
+		__AssertReturn(hBitmap, FALSE);
 		Bitmap.Attach(hBitmap);
 
 		pBitmap = &Bitmap;
 	}
-	ENSURE_RETURN_EX(__super::InitImage(*pBitmap, pBitmapSmall), FALSE);
+	__EnsureReturn(__super::InitImage(*pBitmap, pBitmapSmall), FALSE);
 
 	(void)Bitmap.DeleteObject();
 
@@ -48,25 +48,32 @@ BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap, CBitmap *pBitmapSmall
 
 void CPathList::SetPath(CPathObject* pPath)
 {
-	TD_ListObjectList lstObjects;
-
 	if (pPath)
 	{
 		TD_PathList lstSubPaths;
 		pPath->GetSubPath(lstSubPaths, TRUE, TRUE);
-		
-		lstObjects.Insert(TD_PathObjectList(lstSubPaths));
-	}
 
-	__super::SetObjects(lstObjects);
+		this->SetRedraw(FALSE);
+		DeleteAllItems();
+
+		TD_ListObjectList lstObjects;
+		lstObjects.Insert(TD_PathObjectList(lstSubPaths));
+		__super::SetObjects(lstObjects);
+
+		this->SetRedraw(TRUE);
+	}
+	else
+	{
+		DeleteAllItems();
+	}
 }
 
 BOOL CPathList::IsFileItem(int nItem)
 {
-	ENSURE_RETURN_EX(0 <= nItem, FALSE);
+	__EnsureReturn(0 <= nItem, FALSE);
 
 	CPathObject *pPath = (CPathObject*)GetItemObject(nItem);
-	ENSURE_RETURN_EX(pPath, FALSE);
+	__EnsureReturn(pPath, FALSE);
 		
 	return !pPath->m_bDir;
 }

@@ -37,10 +37,10 @@ BOOL CDockView::Create()
 		dwStyle |= WS_BORDER;
 	}
 
-	ASSERT_RETURN_EX(__super::Create(m_pParentWnd, dwStyle, WS_EX_CONTROLPARENT), FALSE);
+	__AssertReturn(__super::Create(m_pParentWnd, dwStyle, WS_EX_CONTROLPARENT), FALSE);
 
 	CTabCtrl *pTabCtrl = this->GetTabControl();
-	ASSERT_RETURN_EX(pTabCtrl, FALSE);
+	__AssertReturn(pTabCtrl, FALSE);
 
 	if (__TabStyle(m_nStyle))
 	{
@@ -70,7 +70,7 @@ BOOL CDockView::Create()
 
 BOOL CDockView::AddPage(CPage& Page)
 {
-	ASSERT_RETURN_EX(!util::ContainerFind(m_vctPages, &Page), FALSE);
+	__AssertReturn(!util::ContainerFind(m_vctPages, &Page), FALSE);
 
 	m_vctPages.push_back(&Page);
 
@@ -78,7 +78,7 @@ BOOL CDockView::AddPage(CPage& Page)
 
 	if (!m_hWnd)
 	{
-		ASSERT_RETURN_EX(this->Create(), FALSE);
+		__AssertReturn(this->Create(), FALSE);
 	}
 
 	//pPage->MoveWindow(m_rtPos);
@@ -101,7 +101,7 @@ BOOL CDockView::ActivePage(CPage& Page)
 	int nActivePage = __super::GetActiveIndex();
 
 	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(), &Page);
-	ENSURE_RETURN_EX(itPage != m_vctPages.end(), FALSE);
+	__EnsureReturn(itPage != m_vctPages.end(), FALSE);
 
 	if (itPage - m_vctPages.begin() != nActivePage)
 	{
@@ -116,12 +116,12 @@ BOOL CDockView::ActivePage(CPage& Page)
 BOOL CDockView::SetPageTitle(CPage& Page, const CString& cstrTitle)
 {
 	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(),& Page);
-	ENSURE_RETURN_EX(itPage != m_vctPages.end(), FALSE);
+	__EnsureReturn(itPage != m_vctPages.end(), FALSE);
 
 	int nPage = (int)(itPage - m_vctPages.begin());
 	
 	CTabCtrl *pTabCtrl = this->GetTabControl();
-	ASSERT_RETURN_EX(pTabCtrl->GetItemCount() > nPage, TRUE);
+	__AssertReturn(pTabCtrl->GetItemCount() > nPage, TRUE);
 
 	Page.m_cstrTitle = cstrTitle;
 
@@ -193,7 +193,7 @@ void CDockView::Resize(CRect& rcRestrict)
 
 void CDockView::OnSize(UINT nType, int, int)
 {
-	ENSURE_RETURN(SIZE_MINIMIZED != nType);
+	__Ensure(SIZE_MINIMIZED != nType);
 
 	this->OnSize();
 }
@@ -204,13 +204,13 @@ void CDockView::OnSize()
 	this->GetClientRect(&rcClient);
 
 	CTabCtrl* pTabCtrl = this->GetTabControl();
-	ENSURE_RETURN(pTabCtrl);
+	__Ensure(pTabCtrl);
 	
 	int nPage = __super::GetActiveIndex();
-	ASSERT_RETURN(nPage < (int)m_vctPages.size());
+	__Assert(nPage < (int)m_vctPages.size());
 
 	CPage* pPage = m_vctPages[nPage];
-	ENSURE_RETURN(pPage->m_hWnd);
+	__Ensure(pPage->m_hWnd);
 
 	if (!__TabStyle(m_nStyle))
 	{

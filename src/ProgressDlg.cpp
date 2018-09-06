@@ -14,10 +14,10 @@ CProgressDlg::CProgressDlg(const CString& cstrTitle, const CString& cstrStatusTe
 	m_cstrTitle = cstrTitle;
 	m_cstrStatusText = cstrStatusText;
 
-	ASSERT_RETURN(0 != nMaxProgress);
+	__Assert(0 != nMaxProgress);
 	m_nMaxProgress = nMaxProgress;
 
-	ASSERT_RETURN(0 != nWorkThreadCount);
+	__Assert(0 != nWorkThreadCount);
 	m_nWorkThreadCount = nWorkThreadCount;
 
 	m_nProgress = 0;
@@ -55,16 +55,16 @@ void CProgressDlg::WorkThreadProc(tagWorkThreadInfo& ThreadInfo)
 INT_PTR CProgressDlg::DoModal()
 {
 	m_hMutex = ::CreateMutex(NULL, FALSE, NULL);
-	ASSERT_RETURN_EX(m_hMutex, -1);
+	__AssertReturn(m_hMutex, -1);
 
 	HRSRC hResource = ::FindResource(g_hInstance, MAKEINTRESOURCE(IDD_DLG_PROGRESS), RT_DIALOG);
 	
 	HGLOBAL hDialogTemplate = LoadResource(g_hInstance, hResource);
 	
 	LPCDLGTEMPLATE lpDialogTemplate = (LPCDLGTEMPLATE)LockResource(hDialogTemplate);
-	ASSERT_RETURN_EX(lpDialogTemplate, -1);
+	__AssertReturn(lpDialogTemplate, -1);
 
-	ASSERT_RETURN_EX(this->InitModalIndirect(lpDialogTemplate), -1);
+	__AssertReturn(this->InitModalIndirect(lpDialogTemplate), -1);
 
 	INT_PTR nResult = __super::DoModal();
 
@@ -178,7 +178,7 @@ LRESULT CProgressDlg::OnEndProgress(WPARAM wParam, LPARAM lParam)
 
 void CProgressDlg::OnCancel()
 {
-	ENSURE_RETURN(this->IsWindowVisible());
+	__Ensure(this->IsWindowVisible());
 
 	if (m_bFinished)
 	{

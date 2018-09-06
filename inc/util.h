@@ -50,7 +50,7 @@ public:
 			strmResult << *it;
 			
 			it++;
-			ENSURE_BREAK(it != container.end());
+			__EnsureBreak(it != container.end());
 
 			strmResult << strSplitor;
 		}

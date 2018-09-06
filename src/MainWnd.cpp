@@ -31,14 +31,14 @@ BOOL CMainWnd::Create(tagMainWndInfo& MainWndInfo)
 
 	LPCTSTR lpszClassName = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS
 		, 0, ::GetSysColorBrush(CTLCOLOR_DLG), m_WndInfo.hIcon);
-	ASSERT_RETURN_EX(lpszClassName, FALSE);
+	__AssertReturn(lpszClassName, FALSE);
 
 	DWORD dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME;
 	//if (0 == m_WndInfo.uWidth || 0 == m_WndInfo.uHeight)
 	//{
 	//	dwStyle |= WS_MAXIMIZE;
 	//}
-	ASSERT_RETURN_EX(
+	__AssertReturn(
 		this->CreateEx(WS_EX_OVERLAPPEDWINDOW, lpszClassName
 			, m_WndInfo.strText.c_str(), dwStyle, 0, 0
 			, m_WndInfo.uWidth, m_WndInfo.uHeight, NULL, m_WndInfo.hMenu)
@@ -156,7 +156,7 @@ BOOL CMainWnd::CreateStatusBar(UINT nParts, ...)
 
 BOOL CMainWnd::SetStatusText(UINT nPart, const CString& cstrText)
 {
-	ASSERT_RETURN_EX(m_ctlStatusBar.m_hWnd, FALSE)
+	__AssertReturn(m_ctlStatusBar.m_hWnd, FALSE)
 	
 	return m_ctlStatusBar.SetText(cstrText, (int)nPart, 0);
 }
@@ -166,7 +166,7 @@ BOOL CMainWnd::AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
 {
 	CDockView *pView = new CDockView(*this, nStyle, nDockSize, uOffset, uTabFontSize, uTabHeight);
 
-	ASSERT_RETURN_EX(pView->AddPage(Page), FALSE);
+	__AssertReturn(pView->AddPage(Page), FALSE);
 
 	m_vctDockViews.push_back(pView);
 
@@ -179,7 +179,7 @@ BOOL CMainWnd::AddUndockView(CPage& Page, const CRect& rtPos)
 {
 	CDockView *pView = new CDockView(*this, VS_Undock, rtPos);
 
-	ASSERT_RETURN_EX(pView->AddPage(Page), FALSE);
+	__AssertReturn(pView->AddPage(Page), FALSE);
 
 	m_vctDockViews.push_back(pView);
 
@@ -364,7 +364,7 @@ BOOL CMainWnd::HandleResizeViewMessage(UINT message, WPARAM wParam, LPARAM lPara
 			}
 
 			CDockView* pView = GetDockView(ptPos);
-			ENSURE_BREAK(pView);
+			__EnsureBreak(pView);
 						
 			if (pView->m_nStyle & VS_FixSize)
 			{
@@ -450,11 +450,11 @@ BOOL CMenuGuide::Popup()
 	{
 		CResourceLock ResourceLock(m_Page.m_Module);
 
-		ASSERT_RETURN_EX(__super::LoadMenu(m_uIDMenu), FALSE);
+		__AssertReturn(__super::LoadMenu(m_uIDMenu), FALSE);
 	}
 
 	CMenu *pSubMenu = __super::GetSubMenu(0);
-	ASSERT_RETURN_EX(pSubMenu, FALSE);
+	__AssertReturn(pSubMenu, FALSE);
 
 	UINT nIDItem = 0;
 	BOOL bEnable = FALSE;
@@ -468,7 +468,7 @@ BOOL CMenuGuide::Popup()
 		
 		if (!pcstrText->IsEmpty())
 		{
-			ASSERT_RETURN_EX(pSubMenu->ModifyMenu(nIDItem, MF_BYCOMMAND|MF_STRING, nIDItem, *pcstrText), FALSE);
+			__AssertReturn(pSubMenu->ModifyMenu(nIDItem, MF_BYCOMMAND|MF_STRING, nIDItem, *pcstrText), FALSE);
 		}
 	
 		(void)pSubMenu->EnableMenuItem(nIDItem, bEnable?MF_ENABLED:MF_GRAYED);

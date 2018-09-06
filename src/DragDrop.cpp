@@ -16,7 +16,7 @@ BOOL CDragDropMgr::DoDrag(LPVOID pDragData)
 	HGLOBAL hGlobal = ::GlobalAlloc(GHND|GMEM_SHARE, sizeof(LPVOID));
 	LPVOID *ppData = (LPVOID*)::GlobalLock(hGlobal);
 	*ppData = pData;
-	ENSURE_RETURN_EX(::GlobalUnlock(hGlobal), FALSE);
+	__EnsureReturn(::GlobalUnlock(hGlobal), FALSE);
 
 	COleDataSource DataSource;
 	DataSource.CacheGlobalData(__InnerClipboardFormat, hGlobal);
@@ -37,7 +37,7 @@ static list<CDragDropMgr> g_lstDragDropMgr;
 
 BOOL CDragDropMgr::RegDropTarget(IDropTargetEx& DropTarget, CWnd& Wnd)
 {
-	ASSERT_RETURN_EX(Wnd.GetSafeHwnd(), FALSE);
+	__AssertReturn(Wnd.GetSafeHwnd(), FALSE);
 
 	if (m_mapDropTargets.find(&Wnd) != m_mapDropTargets.end())
 	{
@@ -45,7 +45,7 @@ BOOL CDragDropMgr::RegDropTarget(IDropTargetEx& DropTarget, CWnd& Wnd)
 	}
 
 	g_lstDragDropMgr.push_back(CDragDropMgr());
-	ASSERT_RETURN_EX(g_lstDragDropMgr.back().Register(&Wnd), FALSE);
+	__AssertReturn(g_lstDragDropMgr.back().Register(&Wnd), FALSE);
 
 	m_mapDropTargets[&Wnd] = &DropTarget;
 
@@ -54,21 +54,21 @@ BOOL CDragDropMgr::RegDropTarget(IDropTargetEx& DropTarget, CWnd& Wnd)
 
 DROPEFFECT CDragDropMgr::OnDragEnter(CWnd *pWnd, COleDataObject *pDataObject, DWORD dwKeyState, CPoint point)
 {
-	ASSERT_RETURN_EX(m_mapDropTargets[pWnd], DROPEFFECT_NONE);
+	__AssertReturn(m_mapDropTargets[pWnd], DROPEFFECT_NONE);
 		
 	return m_mapDropTargets[pWnd]->OnDragOver(pWnd, m_pCurrDragData, dwKeyState, point, TRUE);
 }
 
 DROPEFFECT CDragDropMgr::OnDragOver(CWnd *pWnd, COleDataObject *pDataObject, DWORD dwKeyState, CPoint point)
 {
-	ASSERT_RETURN_EX(m_mapDropTargets[pWnd], DROPEFFECT_NONE);
+	__AssertReturn(m_mapDropTargets[pWnd], DROPEFFECT_NONE);
 	
 	return m_mapDropTargets[pWnd]->OnDragOver(pWnd, m_pCurrDragData, dwKeyState, point);
 }
 
 BOOL CDragDropMgr::OnDrop(CWnd *pWnd, COleDataObject *pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
-	ASSERT_RETURN_EX(m_mapDropTargets[pWnd], FALSE);
+	__AssertReturn(m_mapDropTargets[pWnd], FALSE);
 
 	BOOL bResult = m_mapDropTargets[pWnd]->OnDrop(pWnd, m_pCurrDragData, dropEffect, point);
 
@@ -77,7 +77,7 @@ BOOL CDragDropMgr::OnDrop(CWnd *pWnd, COleDataObject *pDataObject, DROPEFFECT dr
 
 void CDragDropMgr::OnDragLeave(CWnd *pWnd)
 {
-	ASSERT_RETURN(m_mapDropTargets[pWnd]);
+	__Assert(m_mapDropTargets[pWnd]);
 
 	m_mapDropTargets[pWnd]->OnDragLeave(pWnd, m_pCurrDragData);
 }

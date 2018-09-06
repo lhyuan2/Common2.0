@@ -34,7 +34,7 @@ BOOL CPage::Active()
 {
 	if (!::IsWindowVisible(this->m_hWnd))
 	{
-		ENSURE_RETURN_EX(CMainApp::GetMainWnd()->ActivePage(*this), FALSE);
+		__EnsureReturn(CMainApp::GetMainWnd()->ActivePage(*this), FALSE);
 	}
 
 	(void)this->SetFocus();

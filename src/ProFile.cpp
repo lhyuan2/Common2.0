@@ -20,7 +20,7 @@ CProFile::~CProFile()
 BOOL CProFile::ReadString(const string& strSection, const string& strKey, string& strValue)
 {
 	CHAR pszValue[MAX_BUFFER];
-	ASSERT_RETURN_EX(0 != ::GetPrivateProfileStringA(strSection.c_str(), strKey.c_str(), strValue.c_str()
+	__AssertReturn(0 != ::GetPrivateProfileStringA(strSection.c_str(), strKey.c_str(), strValue.c_str()
 		, pszValue, MAX_BUFFER, m_strIniPath.c_str())
 	, FALSE);
 	
@@ -33,7 +33,7 @@ BOOL CProFile::ReadInt(const string& strSection, const string& strKey, int& nVal
 {
 	string strValue = std::to_string(nValue);
 
-	ENSURE_RETURN_EX(this->ReadString(strSection, strKey, strValue), FALSE);
+	__EnsureReturn(this->ReadString(strSection, strKey, strValue), FALSE);
 
 	nValue = atoi(strValue.c_str());
 	
@@ -44,7 +44,7 @@ double CProFile::ReadDouble(const string& strSection, const string& strKey, doub
 {
 	string strValue = std::to_string(dblValue);
 
-	ENSURE_RETURN_EX(this->ReadString(strSection, strKey, strValue), FALSE);
+	__EnsureReturn(this->ReadString(strSection, strKey, strValue), FALSE);
 
 	dblValue = atof(strValue.c_str());
 	

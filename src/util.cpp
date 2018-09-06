@@ -10,7 +10,7 @@ BOOL util::StrCompareIgnoreCase(const wstring& str1, const wstring& str2)
 
 int util::StrFind(const wstring& str, const wstring& strToFind, bool bIgnoreCase)
 {
-	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
+	__EnsureReturn(str.size() >= strToFind.size(), -1);
 
 	if (bIgnoreCase)
 	{
@@ -36,7 +36,7 @@ int util::StrFind(const wstring& str, const wstring& strToFind, bool bIgnoreCase
 
 //int util::StrLowercaseFind(const wstring& str, const wstring& strToFind)
 //{
-//	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
+//	__EnsureReturn(str.size() >= strToFind.size(), -1);
 //
 //	wstring::size_type pos = StrLowerCase(str).find(strToFind);
 //	if (wstring::npos == pos)
@@ -49,7 +49,7 @@ int util::StrFind(const wstring& str, const wstring& strToFind, bool bIgnoreCase
 //
 //int util::StrUppercaseFind(const wstring& str, const wstring& strToFind)
 //{
-//	ENSURE_RETURN_EX(str.size() >= strToFind.size(), -1);
+//	__EnsureReturn(str.size() >= strToFind.size(), -1);
 //
 //	wstring::size_type pos = StrUpperCase(str).find(strToFind);
 //	if (wstring::npos == pos)

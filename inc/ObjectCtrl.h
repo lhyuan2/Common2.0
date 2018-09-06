@@ -25,7 +25,7 @@ public:
 	{
 		BITMAP bmp;
 		(void)bitmap.GetBitmap(&bmp);
-		ASSERT_RETURN_EX(Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
+		__AssertReturn(Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
 		(void)Add(&bitmap, __ColorBlack);
 
 		return TRUE;
@@ -33,7 +33,7 @@ public:
 
 	BOOL CreateEx(UINT cx, UINT cy, const TD_ICONLIST& lstIcon)
 	{
-		ASSERT_RETURN_EX(Create(cx, cy, ILC_COLOR32, 0, lstIcon.size()), FALSE);
+		__AssertReturn(Create(cx, cy, ILC_COLOR32, 0, lstIcon.size()), FALSE);
 		for (auto hIcon : lstIcon)
 		{
 			(void)Add(hIcon);
@@ -213,7 +213,7 @@ public:
 	{
 		list<wstring> lstTexts;
 		GetListText(lstTexts);
-		ENSURE_RETURN_EX(!lstTexts.empty(), _T(""));
+		__EnsureReturn(!lstTexts.empty(), _T(""));
 
 		return lstTexts.front().c_str();
 	};
@@ -237,10 +237,17 @@ enum E_ListViewType
 	LVT_Report = LVS_REPORT
 };
 
+struct __CommonPrjExt tagListColumn
+{
+	CString cstrText;
+	UINT uWidth;
+	UINT uFlag = LVCFMT_LEFT;
+};
+
 class __CommonPrjExt CObjectList : public CListCtrl
 {
 public:
-	using ColumnList = list<pair<CString, int>>;
+	typedef list<tagListColumn> TD_ListColumn;
 
 	using CB_ListViewChanged = function<void(E_ListViewType)>;
 
@@ -268,7 +275,7 @@ private:
 	CB_ListViewChanged m_cbViewChanged;
 
 public:
-	BOOL InitCtrl(UINT uFontSize, const ColumnList &lstColumns = ColumnList());
+	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
 
 	BOOL InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
 	BOOL InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
