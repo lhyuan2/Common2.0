@@ -5,6 +5,7 @@
 
 #include <util.h>
 
+
 //CDockView
 CDockView::CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
 	: m_nStyle(nStyle)
@@ -237,4 +238,49 @@ void CDockView::OnSize()
 
 		pPage->MoveWindow(&rcPage);
 	}
+}
+//
+//if (!m_bTrackStatus)
+//{
+//	//   鼠标移入窗时，请求WM_MOUSEHOVER和WM_MOUSELEAVE 消息
+//	TRACKMOUSEEVENT tme;
+//	tme.cbSize = sizeof(tme);
+//	tme.hwndTrack = m_hWnd;
+//	tme.dwFlags = TME_LEAVE | TME_HOVER;
+//	tme.dwHoverTime = HOVER_DEFAULT;
+//	m_bTrackStatus = TrackMouseEvent(&tme);
+//}
+
+BOOL CDockView::PreTranslateMessage(MSG* pMsg)
+{
+	if (WM_MOUSEMOVE == pMsg->message)
+	{
+		auto pTabCtrl = this->GetTabControl();
+		if (NULL != pTabCtrl)
+		{
+			POINT ptPos = pMsg->pt;
+			this->ScreenToClient(&ptPos);
+
+			tagTCHITTESTINFO htInfo;
+			htInfo.pt = ptPos;
+			htInfo.flags = TCHT_ONITEM;
+			int iItem = pTabCtrl->HitTest(&htInfo);
+
+			do {
+				__EnsureBreak(iItem >= 0);
+
+				__EnsureBreak(iItem != GetActiveIndex());
+
+				__EnsureBreak(iItem < (int)m_vctPages.size());
+
+				__EnsureBreak(m_vctPages[iItem]->m_bAutoActive);
+
+				mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+				mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+				//(void)__super::SetActivePage(iItem);
+			} while (0);
+		}
+	}
+
+	return __super::PreTranslateMessage(pMsg);
 }

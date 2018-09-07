@@ -5,6 +5,113 @@
 
 #include "Resource.h"
 
+#include <atlimage.h>
+
+BOOL CImglst::Init(UINT cx, UINT cy)
+{
+	__AssertReturn(Create(cx, cy, ILC_COLOR32, 0, 0), FALSE);
+	
+	m_rcPos = { 0, 0, (int)cx, (int)cy };
+
+	CDC *pDC = CDC::FromHandle(GetDC(NULL));
+	__AssertReturn(pDC, FALSE);
+	
+	__AssertReturn(m_CompDC.CreateCompatibleDC(pDC), FALSE);
+
+	__AssertReturn(m_CompBitmap.CreateCompatibleBitmap(pDC, cx, cy), FALSE);
+	
+	(void)m_CompDC.SetStretchBltMode(COLORONCOLOR);
+	
+	return TRUE;
+}
+
+BOOL CImglst::Init(const TD_ICONLIST& lstIcon, const CSize& size)
+{
+	__AssertReturn(Init(size.cx, size.cy), FALSE);
+
+	for (auto hIcon : lstIcon)
+	{
+		(void)Add(hIcon);
+	}
+
+	return TRUE;
+}
+
+BOOL CImglst::Init(CBitmap& bitmap)
+{
+	BITMAP bmp;
+	(void)bitmap.GetBitmap(&bmp);
+	__AssertReturn(Init(bmp.bmHeight, bmp.bmHeight), FALSE);
+
+	(void)Add(&bitmap, __ColorBlack);
+
+	return TRUE;
+}
+
+void CImglst::LoadFile(const wstring& strFile, LPCRECT prcMargin, int iPosReplace)
+{
+	CBitmap *pOldBitmap = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
+
+	m_CompDC.FillSolidRect(m_rcPos, RGB(255, 255, 255));
+
+	CRect rcDst(m_rcPos);
+	if (NULL != prcMargin)
+	{
+		rcDst.left = prcMargin->left;
+		rcDst.top = prcMargin->top;
+		rcDst.right -= prcMargin->right;
+		rcDst.bottom -= prcMargin->bottom;
+	}
+
+	float fNeedHWRate = (float)rcDst.Height() / rcDst.Width();
+
+	CImage img;
+	HRESULT hr = img.Load(strFile.c_str());
+	if (S_OK == hr)
+	{
+		float fHWRate = (float)img.GetHeight() / img.GetWidth();
+
+		CRect rcSrc;
+		if (fHWRate > fNeedHWRate)
+		{
+			rcSrc.left = 0;
+			rcSrc.right = img.GetWidth();
+
+			rcSrc.top = LONG(img.GetHeight() - img.GetWidth()*fNeedHWRate) / 2;
+			rcSrc.bottom = img.GetHeight() - rcSrc.top;
+		}
+		else
+		{
+			rcSrc.top = 0;
+			rcSrc.bottom = img.GetHeight();
+
+			rcSrc.left = LONG(img.GetWidth() - img.GetHeight() / fNeedHWRate) / 2;
+			rcSrc.right = img.GetWidth() - rcSrc.left;
+		}
+		m_CompDC.StretchBlt(rcDst.left, rcDst.top, rcDst.Width(), rcDst.Height()
+			, CDC::FromHandle(img.GetDC()), rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), SRCCOPY);
+		img.ReleaseDC();
+	}
+	else
+	{
+		CPen pen(PS_SOLID, 1, RGB(196, 196, 196));
+		CPen *pOldPen = (CPen*)m_CompDC.SelectObject(&pen);
+		(void)m_CompDC.Rectangle(rcDst);
+		(void)m_CompDC.SelectObject(pOldPen);
+	}
+
+	(void)m_CompDC.SelectObject(pOldBitmap);
+
+	if (iPosReplace < 0)
+	{
+		this->AddBitmap(m_CompBitmap);
+	}
+	else
+	{
+		this->ReplaceBitmap(iPosReplace, m_CompBitmap);
+	}
+}
+
 // CBaseTree
 
 CBaseTree::CBaseTree()
@@ -13,7 +120,7 @@ CBaseTree::CBaseTree()
 
 CBaseTree::~CBaseTree()
 {
-	(void)m_ImageList.DeleteImageList();
+	(void)m_Imglst.DeleteImageList();
 }
 
 BEGIN_MESSAGE_MAP(CBaseTree, CTreeCtrl)
@@ -28,35 +135,29 @@ void CBaseTree::PreSubclassWindow()
 	(void)ModifyStyle(0, TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS);
 }
 
-BOOL CBaseTree::InitCtrl(CBitmap *pBitmap, ULONG uFontSize)
+BOOL CBaseTree::InitImglst(const TD_ICONLIST& lstIcon, const CSize& size)
+{
+	__AssertReturn(m_Imglst.Init(lstIcon, size), FALSE);
+	(void)__super::SetImageList(&m_Imglst, TVSIL_NORMAL);
+	
+	return TRUE;
+}
+
+BOOL CBaseTree::InitImglst(CBitmap& Bitmap)
+{
+	__AssertReturn(m_Imglst.Init(Bitmap), FALSE);
+	(void)__super::SetImageList(&m_Imglst, TVSIL_NORMAL);
+
+	return TRUE;
+}
+
+void CBaseTree::SetFont(ULONG uFontSize)
 {
 	if (0 < uFontSize)
 	{
 		(void)m_fontGuide.setFontSize(*this, uFontSize);
 	}
-
-	if (pBitmap)
-	{
-		__AssertReturn(m_ImageList.CreateEx(*pBitmap), FALSE);
-		(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
-	}
-
-	return TRUE;
 }
-
-BOOL CBaseTree::InitCtrl(const TD_ICONLIST& lstIcon, UINT uIconSize, ULONG uFontSize)
-{
-	if (0 < uFontSize)
-	{
-		(void)m_fontGuide.setFontSize(*this, uFontSize);
-	}
-
-	__AssertReturn(m_ImageList.CreateEx(uIconSize, uIconSize, lstIcon), FALSE);
-	(void)__super::SetImageList(&m_ImageList, TVSIL_NORMAL);
-
-	return TRUE;
-}
-
 
 HTREEITEM CBaseTree::InsertItem(HTREEITEM hParentItem, LPCTSTR lpszItem, DWORD_PTR dwData, int nImage)
 {
@@ -153,9 +254,6 @@ END_MESSAGE_MAP()
 
 BOOL CCheckObjectTree::InitCtrl()
 {
-	__EnsureReturn(__super::InitCtrl(), FALSE);
-
-
 	HBITMAP hStateBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_CHECKTREE_STATE));
 	__AssertReturn(hStateBitmap, FALSE);
 
@@ -170,7 +268,7 @@ BOOL CCheckObjectTree::InitCtrl()
 	
 	(void)StateBitmap.DeleteObject();
 
-	(void)__super::SetImageList(&m_StateImageList, TVSIL_STATE);
+	(void)CTreeCtrl::SetImageList(&m_StateImageList, TVSIL_STATE);
 
 	(void)ModifyStyle(TVS_CHECKBOXES, 0);
 
@@ -500,43 +598,43 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
 	return TRUE;
 }
 
-BOOL CObjectList::InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize)
+BOOL CObjectList::InitImglst(const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall)
 {
-	__AssertReturn(m_ImageList.CreateEx(uSize, uSize, lstIcon), FALSE);
-	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
+	__AssertReturn(m_Imglst.Init(lstIcon, size), FALSE);
+	(void)__super::SetImageList(&m_Imglst, LVSIL_NORMAL);
 
-	if (0 != uSmallSize)
+	if (NULL != pszSmall)
 	{
-		__AssertReturn(m_ImageListSmall.CreateEx(uSmallSize, uSmallSize, lstIcon), FALSE);
-		(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
+		__AssertReturn(m_ImglstSmall.Init(lstIcon, *pszSmall), FALSE);
+		(void)__super::SetImageList(&m_ImglstSmall, LVSIL_SMALL);
 	}
 	else
 	{
-		(void)__super::SetImageList(&m_ImageList, LVSIL_SMALL);
+		(void)__super::SetImageList(&m_Imglst, LVSIL_SMALL);
 	}
 	
 	return TRUE;
 }
 
-BOOL CObjectList::InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall)
+BOOL CObjectList::InitImglst(CBitmap& Bitmap, CBitmap *pBitmapSmall)
 {
-	__AssertReturn(m_ImageList.CreateEx(Bitmap), FALSE);
-	(void)__super::SetImageList(&m_ImageList, LVSIL_NORMAL);
+	__AssertReturn(m_Imglst.Init(Bitmap), FALSE);
+	(void)__super::SetImageList(&m_Imglst, LVSIL_NORMAL);
 
 	if (NULL != pBitmapSmall)
 	{
-		__AssertReturn(m_ImageListSmall.CreateEx(*pBitmapSmall), FALSE);
-		(void)__super::SetImageList(&m_ImageListSmall, LVSIL_SMALL);
+		__AssertReturn(m_ImglstSmall.Init(*pBitmapSmall), FALSE);
+		(void)__super::SetImageList(&m_ImglstSmall, LVSIL_SMALL);
 	}
 	else
 	{
-		(void)__super::SetImageList(&m_ImageList, LVSIL_SMALL);
+		(void)__super::SetImageList(&m_Imglst, LVSIL_SMALL);
 	}
 
 	return TRUE;
 }
 
-void CObjectList::SetTileSize(UINT cx, UINT cy)
+void CObjectList::SetTileSize(ULONG cx, ULONG cy)
 {
 	LVTILEVIEWINFO LvTileViewInfo = { sizeof(LVTILEVIEWINFO) };
 	LvTileViewInfo.dwFlags = LVTVIF_FIXEDSIZE;
@@ -901,14 +999,12 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 			CListObject *pObject = this->GetItemObject(pLVDispInfo->item.iItem);
 			__EnsureBreak(pObject);
 
-CEdit *pwndEdit = this->GetEditControl();
-__AssertBreak(pwndEdit);
+			CEdit *pwndEdit = this->GetEditControl();
+			__AssertBreak(pwndEdit);
 
-CString cstrRenameText = pObject->GetRenameText();
-pwndEdit->SetWindowText(cstrRenameText);
-pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
-
-//return TRUE;
+			CString cstrRenameText = pObject->GetRenameText();
+			pwndEdit->SetWindowText(cstrRenameText);
+			pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
 		}
 
 		break;

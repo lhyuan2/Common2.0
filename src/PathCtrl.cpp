@@ -17,11 +17,11 @@ void CPathList::PreSubclassWindow()
 	(void)ModifyStyle(LVS_ALIGNLEFT, LVS_AUTOARRANGE);
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize)
+BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall)
 {
 	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
-	__EnsureReturn(__super::InitImage(lstIcon, uSize, uSmallSize), FALSE);
+	__EnsureReturn(__super::InitImglst(lstIcon, size, pszSmall), FALSE);
 
 	return TRUE;
 }
@@ -39,7 +39,7 @@ BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap, CBitmap *pBitmapSmall
 
 		pBitmap = &Bitmap;
 	}
-	__EnsureReturn(__super::InitImage(*pBitmap, pBitmapSmall), FALSE);
+	__EnsureReturn(__super::InitImglst(*pBitmap, pBitmapSmall), FALSE);
 
 	(void)Bitmap.DeleteObject();
 

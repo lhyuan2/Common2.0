@@ -85,4 +85,6 @@ private:
 	afx_msg void OnSize(UINT nType, int, int);
 
 	void OnSize();
+
+	BOOL PreTranslateMessage(MSG* pMsg) override;
 };

@@ -13,9 +13,10 @@
 
 IMPLEMENT_DYNAMIC(CPage, CPropertyPage);
 
-CPage::CPage(IModuleApp& Module, UINT nIDDlgRes, const CString& cstrTitle)
+CPage::CPage(IModuleApp& Module, UINT nIDDlgRes, const CString& cstrTitle, bool bAutoActive)
 	: m_Module(Module)
 	, m_cstrTitle(cstrTitle)
+	, m_bAutoActive(bAutoActive)
 {
 	m_Module.ActivateResource();
 

@@ -13,34 +13,34 @@
 
 using TD_ICONLIST = list<HICON>;
 
-class CImageListEx : public CImageList
+enum class E_ImglstType
+{
+	ILT_Both = -1
+	, ILT_Normal = 0
+	, ILT_Small = LVSIL_SMALL
+};
+
+class __CommonPrjExt CImglst : public CImageList
 {
 public:
-	CImageListEx()
+	CImglst()
 	{
 	}
+
+private:
+	CRect m_rcPos;
+
+	CDC m_CompDC;
+	CBitmap m_CompBitmap;
 
 public:
-	BOOL CreateEx(CBitmap& bitmap)
-	{
-		BITMAP bmp;
-		(void)bitmap.GetBitmap(&bmp);
-		__AssertReturn(Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-		(void)Add(&bitmap, __ColorBlack);
+	BOOL Init(UINT cx, UINT cy);
 
-		return TRUE;
-	}
+	BOOL Init(const TD_ICONLIST& lstIcon, const CSize& size);
 
-	BOOL CreateEx(UINT cx, UINT cy, const TD_ICONLIST& lstIcon)
-	{
-		__AssertReturn(Create(cx, cy, ILC_COLOR32, 0, lstIcon.size()), FALSE);
-		for (auto hIcon : lstIcon)
-		{
-			(void)Add(hIcon);
-		}
+	BOOL Init(CBitmap& bitmap);
 
-		return TRUE;
-	}
+	void LoadFile(const wstring& strFile, LPCRECT prcMargin = NULL, int iPosReplace = -1);
 
 	void AddBitmap(CBitmap& bitmap)
 	{
@@ -51,6 +51,24 @@ public:
 	{
 		(void)__super::Replace(uPos, &bitmap, NULL);
 	}
+	
+	void SetToListCtrl(CListCtrl &wndListCtrl, E_ImglstType eImglstType)
+	{
+		if (E_ImglstType::ILT_Both == eImglstType)
+		{
+			(void)wndListCtrl.SetImageList(this, (int)E_ImglstType::ILT_Normal);
+			(void)wndListCtrl.SetImageList(this, (int)E_ImglstType::ILT_Small);
+		}
+		else
+		{
+			(void)wndListCtrl.SetImageList(this, (int)eImglstType);
+		}
+	}
+
+	void SetToTreeCtrl(CTreeCtrl &wndTreeCtrl)
+	{
+		(void)wndTreeCtrl.SetImageList(this, TVSIL_NORMAL);
+	}
 };
 
 class __CommonPrjExt CBaseTree: public CTreeCtrl
@@ -60,7 +78,7 @@ public:
 
 	virtual ~CBaseTree();
 
-	CImageListEx m_ImageList;
+	CImglst m_Imglst;
 
 	DECLARE_MESSAGE_MAP()
 
@@ -68,8 +86,16 @@ private:
 	CFontGuide m_fontGuide;
 
 public:
-	BOOL InitCtrl(CBitmap *pBitmap = NULL, ULONG uFontSize = 0);
-	BOOL InitCtrl(const TD_ICONLIST& lstIcon, UINT uIconSize, ULONG uFontSize=0);
+	BOOL InitImglst(const TD_ICONLIST& lstIcon, const CSize& size);
+
+	BOOL InitImglst(CBitmap& Bitmap);
+
+	void SetImageList(CImglst& imglst)
+	{
+		(void)__super::SetImageList(&imglst, TVSIL_NORMAL);
+	}
+
+	void SetFont(ULONG uFontSize);
 
 	void GetAllItems(list<HTREEITEM>& lstItems);
 	
@@ -211,11 +237,17 @@ public:
 
 	virtual CString GetRenameText()
 	{
+		CString strText;
+
 		list<wstring> lstTexts;
 		GetListText(lstTexts);
-		__EnsureReturn(!lstTexts.empty(), _T(""));
+		if (!lstTexts.empty())
+		{
+			strText = lstTexts.front().c_str();
+			strText.Trim();
+		}
 
-		return lstTexts.front().c_str();
+		return strText;
 	};
 
 	virtual bool OnListItemRename(const wstring& strNewName)
@@ -257,12 +289,12 @@ public:
 
 	virtual ~CObjectList()
 	{
-		(void)m_ImageList.DeleteImageList();
-		(void)m_ImageListSmall.DeleteImageList();		
+		(void)m_Imglst.DeleteImageList();
+		(void)m_ImglstSmall.DeleteImageList();		
 	}
 
-	CImageListEx m_ImageList;
-	CImageListEx m_ImageListSmall;
+	CImglst m_Imglst;
+	CImglst m_ImglstSmall;
 
 private:
 	CFontGuide m_fontGuide;
@@ -277,8 +309,21 @@ private:
 public:
 	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
 
-	BOOL InitImage(const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
-	BOOL InitImage(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
+	BOOL InitImglst(const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall = NULL);
+	BOOL InitImglst(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
+
+	void SetImageList(CImglst *pImglst, CImglst *pImglstSmall = NULL)
+	{
+		if (NULL != pImglst)
+		{
+			(void)__super::SetImageList(pImglst, LVSIL_NORMAL);
+		}
+
+		if (NULL != pImglstSmall)
+		{
+			(void)__super::SetImageList(pImglstSmall, LVSIL_SMALL);
+		}
+	}
 
 	void SetViewAutoChange(const CB_ListViewChanged& cb=NULL)
 	{
@@ -286,7 +331,7 @@ public:
 		m_cbViewChanged = cb;
 	}
 
-	void SetTileSize(UINT cx, UINT cy);
+	void SetTileSize(ULONG cx, ULONG cy);
 
 	void SetView(E_ListViewType eViewType, bool bArrange=false);
 	E_ListViewType GetView();

@@ -17,21 +17,25 @@ using CB_AsyncLoop = function<bool()>;
 
 class __CommonPrjExt CPage: public CPropertyPage
 {
+	friend class CDockView;
+
 	DECLARE_DYNAMIC(CPage);
-
-public:
-	CPage(IModuleApp& Module, UINT nIDDlgRes, const CString& cstrTitle=L"");
-
-	virtual ~CPage() {}
 
 	DECLARE_MESSAGE_MAP();
 
+public:
+	CPage(IModuleApp& Module, UINT nIDDlgRes, const CString& cstrTitle=L"", bool bAutoActive=false);
+
+	virtual ~CPage() {}
+
 	virtual void DoDataExchange(CDataExchange* pDX);
 
-public:
 	IModuleApp& m_Module;
 
+private:
 	CString m_cstrTitle;
+
+	bool m_bAutoActive;
 
 private:
 	set<HWND> m_setDragableCtrls;

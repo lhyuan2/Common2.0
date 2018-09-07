@@ -129,7 +129,7 @@ BOOL CMainWnd::CreateStatusBar(UINT nParts, ...)
 		return FALSE;
 	}
 
-	m_vecStatusPartWidth.resize(nParts);
+	m_vctStatusPartWidth.resize(nParts);
 
 	va_list argList;
 	va_start( argList, nParts );
@@ -139,7 +139,7 @@ BOOL CMainWnd::CreateStatusBar(UINT nParts, ...)
 	{
 		nWidth += va_arg(argList, int);
 
-		m_vecStatusPartWidth[nIndex] = nWidth;
+		m_vctStatusPartWidth[nIndex] = nWidth;
 	}
 
 	va_end( argList );
@@ -149,7 +149,7 @@ BOOL CMainWnd::CreateStatusBar(UINT nParts, ...)
 		return FALSE;
 	}
 
-	m_ctlStatusBar.SetParts(nParts, &m_vecStatusPartWidth[0]);
+	m_ctlStatusBar.SetParts(nParts, &m_vctStatusPartWidth[0]);
 
 	return TRUE;
 }

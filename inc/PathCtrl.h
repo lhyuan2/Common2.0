@@ -249,7 +249,7 @@ private:
 	virtual void PreSubclassWindow() override;
 
 public:
-	BOOL InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, UINT uSize, UINT uSmallSize=0);
+	BOOL InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall=NULL);
 
 	BOOL InitCtrl(UINT uFontSize = 0, CBitmap *pBitmap = NULL, CBitmap *pBitmapSmall = NULL);
 

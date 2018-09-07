@@ -9,7 +9,7 @@ private:
 	CFont m_font;
 
 public:
-	bool setFontSize(CWnd& wnd, UINT uFontSize)
+	bool setFontSize(CWnd& wnd, ULONG uFontSize)
 	{
 		if (0 == uFontSize)
 		{
@@ -28,7 +28,7 @@ public:
 			::ZeroMemory(&logFont, sizeof(logFont));
 			(void)pFont->GetLogFont(&logFont);
 			
-			logFont.lfHeight = (LONG)uFontSize;
+			logFont.lfHeight = uFontSize;
 
 			if (!m_font.CreateFontIndirect(&logFont))
 			{

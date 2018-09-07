@@ -24,11 +24,11 @@ struct tagMainWndInfo
 
 	BOOL bSizeable = FALSE;
 
-	UINT uWidth = 0;
-	UINT uHeight = 0;
+	ULONG uWidth = 0;
+	ULONG uHeight = 0;
 
-	UINT uMinWidth = 0;
-	UINT uMinHeight = 0;
+	ULONG uMinWidth = 0;
+	ULONG uMinHeight = 0;
 };
 
 class __CommonPrjExt CMainWnd: public CWnd
@@ -51,8 +51,8 @@ public:
 	
 	DECLARE_MESSAGE_MAP()
 
-private:
-	vector<int> m_vecStatusPartWidth;
+protected:
+	vector<int> m_vctStatusPartWidth;
 
 	CStatusBarCtrl m_ctlStatusBar;
 
