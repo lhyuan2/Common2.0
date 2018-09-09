@@ -5,31 +5,29 @@
 
 #include "Resource.h"
 
-#include <atlimage.h>
-
 BOOL CImglst::Init(UINT cx, UINT cy)
 {
 	__AssertReturn(Create(cx, cy, ILC_COLOR32, 0, 0), FALSE);
 	
 	m_rcPos = { 0, 0, (int)cx, (int)cy };
-
-	CDC *pDC = CDC::FromHandle(GetDC(NULL));
-	__AssertReturn(pDC, FALSE);
 	
+	CDC *pDC = CDC::FromHandle(::GetDC(NULL));
+	__AssertReturn(pDC, FALSE);
+
 	__AssertReturn(m_CompDC.CreateCompatibleDC(pDC), FALSE);
 
 	__AssertReturn(m_CompBitmap.CreateCompatibleBitmap(pDC, cx, cy), FALSE);
 	
 	(void)m_CompDC.SetStretchBltMode(COLORONCOLOR);
-	
+
 	return TRUE;
 }
 
-BOOL CImglst::Init(const TD_ICONLIST& lstIcon, const CSize& size)
+BOOL CImglst::Init(const CSize& size, const TD_IconVec& vecIcons)
 {
 	__AssertReturn(Init(size.cx, size.cy), FALSE);
 
-	for (auto hIcon : lstIcon)
+	for (auto hIcon : vecIcons)
 	{
 		(void)Add(hIcon);
 	}
@@ -48,7 +46,21 @@ BOOL CImglst::Init(CBitmap& bitmap)
 	return TRUE;
 }
 
-void CImglst::LoadFile(const wstring& strFile, LPCRECT prcMargin, int iPosReplace)
+void CImglst::SetFile(const wstring& strFile, LPCRECT prcMargin, int iPosReplace)
+{
+	CImage *pImg = NULL;
+
+	CImage img;
+	HRESULT hr = img.Load(strFile.c_str());
+	if (S_OK == hr)
+	{
+		pImg = &img;
+	}
+
+	SetImg(pImg, prcMargin, iPosReplace);
+}
+
+void CImglst::SetImg(CImage *pImg, LPCRECT prcMargin, int iPosReplace)
 {
 	CBitmap *pOldBitmap = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
 
@@ -65,32 +77,30 @@ void CImglst::LoadFile(const wstring& strFile, LPCRECT prcMargin, int iPosReplac
 
 	float fNeedHWRate = (float)rcDst.Height() / rcDst.Width();
 
-	CImage img;
-	HRESULT hr = img.Load(strFile.c_str());
-	if (S_OK == hr)
+	if (NULL != pImg)
 	{
-		float fHWRate = (float)img.GetHeight() / img.GetWidth();
+		float fHWRate = (float)pImg->GetHeight() / pImg->GetWidth();
 
 		CRect rcSrc;
 		if (fHWRate > fNeedHWRate)
 		{
 			rcSrc.left = 0;
-			rcSrc.right = img.GetWidth();
+			rcSrc.right = pImg->GetWidth();
 
-			rcSrc.top = LONG(img.GetHeight() - img.GetWidth()*fNeedHWRate) / 2;
-			rcSrc.bottom = img.GetHeight() - rcSrc.top;
+			rcSrc.top = LONG(pImg->GetHeight() - pImg->GetWidth()*fNeedHWRate) / 2;
+			rcSrc.bottom = pImg->GetHeight() - rcSrc.top;
 		}
 		else
 		{
 			rcSrc.top = 0;
-			rcSrc.bottom = img.GetHeight();
+			rcSrc.bottom = pImg->GetHeight();
 
-			rcSrc.left = LONG(img.GetWidth() - img.GetHeight() / fNeedHWRate) / 2;
-			rcSrc.right = img.GetWidth() - rcSrc.left;
+			rcSrc.left = LONG(pImg->GetWidth() - pImg->GetHeight() / fNeedHWRate) / 2;
+			rcSrc.right = pImg->GetWidth() - rcSrc.left;
 		}
 		m_CompDC.StretchBlt(rcDst.left, rcDst.top, rcDst.Width(), rcDst.Height()
-			, CDC::FromHandle(img.GetDC()), rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), SRCCOPY);
-		img.ReleaseDC();
+			, CDC::FromHandle(pImg->GetDC()), rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), SRCCOPY);
+		pImg->ReleaseDC();
 	}
 	else
 	{
@@ -101,14 +111,31 @@ void CImglst::LoadFile(const wstring& strFile, LPCRECT prcMargin, int iPosReplac
 	}
 
 	(void)m_CompDC.SelectObject(pOldBitmap);
+	
+	this->SetBitmap(m_CompBitmap, iPosReplace);
+}
 
-	if (iPosReplace < 0)
+void CImglst::SetBitmap(CBitmap& bitmap, int iPosReplace)
+{
+	if (iPosReplace >= 0)
 	{
-		this->AddBitmap(m_CompBitmap);
+		(void)__super::Replace(iPosReplace, &bitmap, NULL);
 	}
 	else
 	{
-		this->ReplaceBitmap(iPosReplace, m_CompBitmap);
+		(void)Add(&bitmap, RGB(0, 0, 0));
+	}
+}
+
+void CImglst::SetIcon(HICON hIcon, int iPosReplace)
+{
+	if (iPosReplace >= 0)
+	{
+		(void)Replace(iPosReplace, hIcon);
+	}
+	else
+	{
+		(void)Add(hIcon);
 	}
 }
 
@@ -135,9 +162,9 @@ void CBaseTree::PreSubclassWindow()
 	(void)ModifyStyle(0, TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS);
 }
 
-BOOL CBaseTree::InitImglst(const TD_ICONLIST& lstIcon, const CSize& size)
+BOOL CBaseTree::InitImglst(const CSize& size, const TD_IconVec& vecIcons)
 {
-	__AssertReturn(m_Imglst.Init(lstIcon, size), FALSE);
+	__AssertReturn(m_Imglst.Init(size, vecIcons), FALSE);
 	(void)__super::SetImageList(&m_Imglst, TVSIL_NORMAL);
 	
 	return TRUE;
@@ -598,14 +625,14 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
 	return TRUE;
 }
 
-BOOL CObjectList::InitImglst(const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall)
+BOOL CObjectList::InitImglst(const CSize& size, const CSize *pszSmall, const TD_IconVec& vecIcons)
 {
-	__AssertReturn(m_Imglst.Init(lstIcon, size), FALSE);
+	__AssertReturn(m_Imglst.Init(size, vecIcons), FALSE);
 	(void)__super::SetImageList(&m_Imglst, LVSIL_NORMAL);
 
 	if (NULL != pszSmall)
 	{
-		__AssertReturn(m_ImglstSmall.Init(lstIcon, *pszSmall), FALSE);
+		__AssertReturn(m_ImglstSmall.Init(*pszSmall, vecIcons), FALSE);
 		(void)__super::SetImageList(&m_ImglstSmall, LVSIL_SMALL);
 	}
 	else
@@ -632,6 +659,23 @@ BOOL CObjectList::InitImglst(CBitmap& Bitmap, CBitmap *pBitmapSmall)
 	}
 
 	return TRUE;
+}
+
+void CObjectList::SetImageList(CImglst *pImglst, CImglst *pImglstSmall)
+{
+	if (NULL != pImglst)
+	{
+		(void)__super::SetImageList(pImglst, LVSIL_NORMAL);
+	}
+
+	if (NULL == pImglstSmall)
+	{
+		pImglstSmall = pImglst;
+	}
+	if (NULL != pImglstSmall)
+	{
+		(void)__super::SetImageList(pImglstSmall, LVSIL_SMALL);
+	}
 }
 
 void CObjectList::SetTileSize(ULONG cx, ULONG cy)
@@ -793,11 +837,12 @@ BOOL CObjectList::DeleteObject(const CListObject *pObject)
 
 void CObjectList::SetItemObject(int nItem, CListObject& Object)
 {
-	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
-		, Object.GetListImage(), 0, 0, (LPARAM)&Object));
-
+	int iImage = 0;
 	list<wstring> lstTexts;
-	Object.GetListText(lstTexts);
+	Object.GetListDisplay(lstTexts, iImage);
+
+	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
+		, iImage, 0, 0, (LPARAM)&Object));
 
 	list<wstring>::iterator itSubTitle = lstTexts.begin();
 	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
@@ -1002,9 +1047,14 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 			CEdit *pwndEdit = this->GetEditControl();
 			__AssertBreak(pwndEdit);
 
-			CString cstrRenameText = pObject->GetRenameText();
-			pwndEdit->SetWindowText(cstrRenameText);
-			pwndEdit->SetSel(0, cstrRenameText.GetLength(), TRUE);
+			m_cstrRenameText = pObject->GetRenameText();
+			if (m_cstrRenameText.IsEmpty())
+			{
+				m_cstrRenameText = pLVDispInfo->item.pszText;
+				m_cstrRenameText.Trim();
+			}
+			pwndEdit->SetWindowText(m_cstrRenameText);
+			pwndEdit->SetSel(0, m_cstrRenameText.GetLength(), TRUE);
 		}
 
 		break;
@@ -1012,17 +1062,17 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 	{
 		NMLVDISPINFO *pLVDispInfo = reinterpret_cast<NMLVDISPINFO*>(&NMHDR);
 
-		CString cstrNewName(pLVDispInfo->item.pszText);
-		(void)cstrNewName.Trim();
-		__EnsureReturn(!cstrNewName.IsEmpty(), TRUE);
+		CString cstrNewText(pLVDispInfo->item.pszText);
+		(void)cstrNewText.Trim();
+		__EnsureReturn(!cstrNewText.IsEmpty(), TRUE);
+
+		__EnsureReturn(cstrNewText != m_cstrRenameText, TRUE);
 
 		int nItem = pLVDispInfo->item.iItem;
 		CListObject *pObject = GetItemObject(nItem);
 		__AssertReturn(pObject, TRUE);
 
-		__EnsureReturn(cstrNewName != pObject->GetRenameText(), TRUE);
-
-		if (pObject->OnListItemRename((LPCTSTR)cstrNewName))
+		if (pObject->OnListItemRename((LPCTSTR)cstrNewText))
 		{
 			this->UpdateItem(pLVDispInfo->item.iItem);
 		}
@@ -1046,6 +1096,14 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)
 	}
 
 	break;
+	case NM_CLICK:
+		m_bDblClick = false;
+	
+		break;
+	case NM_DBLCLK:
+		m_bDblClick = true;
+
+		break;
 	default:
 		break;
 	}

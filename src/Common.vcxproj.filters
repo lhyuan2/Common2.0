@@ -76,6 +76,9 @@
     <ClCompile Include="fsutil.cpp">
       <Filter>src\class</Filter>
     </ClCompile>
+    <ClCompile Include="Guide.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\App.h">
@@ -138,10 +141,10 @@
     <ClInclude Include="..\inc\fsutil.h">
       <Filter>inc\class</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\FontGuide.h">
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\inc\Guide.h">
       <Filter>inc\class</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Common.rc" />

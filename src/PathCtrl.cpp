@@ -17,29 +17,30 @@ void CPathList::PreSubclassWindow()
 	(void)ModifyStyle(LVS_ALIGNLEFT, LVS_AUTOARRANGE);
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall)
+BOOL CPathList::InitCtrl(UINT uFontSize)
+{
+	return __super::InitCtrl(uFontSize, m_lstColumns);
+}
+
+BOOL CPathList::InitCtrl(UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst, const TD_IconVec& vecIcons)
 {
 	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
-	__EnsureReturn(__super::InitImglst(lstIcon, size, pszSmall), FALSE);
+	__EnsureReturn(__super::InitImglst(szImglst, pszSmallImglst, vecIcons), FALSE);
 
 	return TRUE;
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize, CBitmap *pBitmap, CBitmap *pBitmapSmall)
+BOOL CPathList::InitCtrlEx(UINT uFontSize)
 {
 	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
 
 	CBitmap Bitmap;
-	if (NULL == pBitmap)
-	{
-		HBITMAP hBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_PATHCTRL_NORMAL));
-		__AssertReturn(hBitmap, FALSE);
-		Bitmap.Attach(hBitmap);
+	HBITMAP hBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_PATHCTRL_NORMAL));
+	__AssertReturn(hBitmap, FALSE);
+	Bitmap.Attach(hBitmap);
 
-		pBitmap = &Bitmap;
-	}
-	__EnsureReturn(__super::InitImglst(*pBitmap, pBitmapSmall), FALSE);
+	__EnsureReturn(__super::InitImglst(Bitmap, &Bitmap), FALSE);
 
 	(void)Bitmap.DeleteObject();
 

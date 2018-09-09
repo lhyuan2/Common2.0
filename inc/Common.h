@@ -23,7 +23,7 @@
 
 #include "fsutil.h"
 
-#include "FontGuide.h"
+#include "Guide.h"
 
 #include "ObjectCtrl.h"
 

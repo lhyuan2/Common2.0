@@ -5,7 +5,7 @@
 
 #include "Page.h"
 
-#include "FontGuide.h"
+#include "Guide.h"
 
 #define __DXView 5
 

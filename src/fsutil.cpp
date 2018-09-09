@@ -869,7 +869,7 @@ bool CPath::FindFile()
 {
 	if (NULL != m_plstSubPath)
 	{
-		return TRUE;
+		return true;
 	}
 
 	CString cstrFind = this->GetPath().c_str();
@@ -878,7 +878,7 @@ bool CPath::FindFile()
 	bool bExists = fileFind.FindFile(cstrFind);
 	if (!bExists)
 	{
-		return FALSE;
+		return false;
 	}
 	
 	m_plstSubPath = new TD_PathList();
@@ -901,22 +901,5 @@ bool CPath::FindFile()
 		}
 	}
 
-	return TRUE;
+	return true;
 }
-
-//bool CPath::ExistsFile()
-//{
-//	__EnsureReturn(this->FindFile(), FALSE);
-//	__EnsureReturn(m_plstSubPath, FALSE);
-//
-//	for (TD_PathList::iterator itSubPath = m_plstSubPath->begin()
-//		; itSubPath != m_plstSubPath->end(); ++itSubPath)
-//	{
-//		if (!(*itSubPath)->m_bDir)
-//		{
-//			return TRUE;
-//		}
-//	}
-//
-//	return FALSE;
-//}

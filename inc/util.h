@@ -121,29 +121,29 @@ public:
 
 	ptrvector(_PtrType ptr)
 	{
-		Insert(ptr);
+		insert(ptr);
 	}
 
 	template <typename _RefType>
 	ptrvector(const list<_RefType*>& container)
 	{
-		Insert(container);
+		insert(container);
 	}
 
 	template <typename _RefType>
 	ptrvector(const list<_RefType>& container)
 	{
-		Insert(container);
+		insert(container);
 	}
 
 public:
-	void Insert(_PtrType ptr)
+	void insert(_PtrType ptr)
 	{
 		push_back(ptr);
 	}
 
 	template <typename _RefType>
-	void Insert(const list<_RefType*>& container)
+	void insert(const list<_RefType*>& container)
 	{
 		for (list<_RefType*>::const_iterator it = container.begin(); it != container.end(); ++it)
 		{
@@ -152,7 +152,7 @@ public:
 	}
 
 	template <typename _RefType>
-	void Insert(const list<_RefType>& container)
+	void insert(const list<_RefType>& container)
 	{
 		for (list<_RefType>::const_iterator it = container.begin(); it != container.end(); ++it)
 		{

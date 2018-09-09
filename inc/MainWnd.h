@@ -8,8 +8,6 @@
 
 #include "Page.h"
 
-#include <afxcmn.h>
-
 //CMainWnd
 
 class CDockView;
@@ -98,38 +96,4 @@ public:
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-};
-
-// CWndRedrawGuide
-
-class __CommonPrjExt CRedrawLockGuide
-{
-public:
-	CRedrawLockGuide(CWnd& wndCtrl);
-
-	~CRedrawLockGuide();
-
-	void Unlock();
-
-private:
-	CWnd& m_wndCtrl;
-};
-
-class __CommonPrjExt CMenuGuide : public CMenu
-{
-public:
-	CMenuGuide(CPage& Page, UINT nIDMenu);
-
-private:
-	CPage& m_Page;
-	UINT m_uIDMenu;
-
-	map<UINT, pair<BOOL, CString>> m_mapMenuItemInfos;
-
-public:
-	void EnableItem(UINT nIDItem, BOOL bEnable);
-
-	void SetItemText(UINT nIDItem, const CString& cstrText);
-
-	BOOL Popup();
 };

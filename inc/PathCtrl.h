@@ -43,24 +43,6 @@ protected:
 	}
 
 public:
-	CString GetFileSize()
-	{
-		if (m_bDir)
-		{
-			return L"";
-		}
-
-		LONG nK = (LONG)(m_uFileSize / 1000);
-
-		int nM = nK / 1000;
-		nK %= 1000;
-
-		CString strFileSize;
-		strFileSize.Format(_T("% 3d,%03d"), nM, nK);
-		
-		return strFileSize;
-	}
-
 	CString GetFileModifyTime()
 	{
 		if (m_bDir)
@@ -71,11 +53,11 @@ public:
 		return CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M"));
 	}
 
-	void GetListText(list<wstring>& lstTexts) override
+	void GetListDisplay(list<wstring>& lstTexts, int& iImage) override
 	{
 		lstTexts.push_back(m_strName);
 		
-		lstTexts.push_back((LPCTSTR)GetFileSize());
+		lstTexts.push_back(to_wstring(m_uFileSize));
 		
 		lstTexts.push_back((LPCTSTR)GetFileModifyTime());
 	}
@@ -249,9 +231,11 @@ private:
 	virtual void PreSubclassWindow() override;
 
 public:
-	BOOL InitCtrl(UINT uFontSize, const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall=NULL);
+	BOOL InitCtrl(UINT uFontSize);
 
-	BOOL InitCtrl(UINT uFontSize = 0, CBitmap *pBitmap = NULL, CBitmap *pBitmapSmall = NULL);
+	BOOL InitCtrl(UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst = NULL, const TD_IconVec& vecIcons = {});
+
+	BOOL InitCtrlEx(UINT uFontSize = 0);
 
 	void SetPath(CPathObject* pPath);
 

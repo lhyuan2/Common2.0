@@ -130,6 +130,7 @@
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Guide.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SQLiteDB.cpp" />
     <ClCompile Include="sqlite\shell.c">
@@ -168,7 +169,7 @@
     <ClInclude Include="..\inc\Def.h" />
     <ClInclude Include="..\inc\DockView.h" />
     <ClInclude Include="..\inc\DragDrop.h" />
-    <ClInclude Include="..\inc\FontGuide.h" />
+    <ClInclude Include="..\inc\Guide.h" />
     <ClInclude Include="..\inc\fsutil.h" />
     <ClInclude Include="..\inc\IDB.h" />
     <ClInclude Include="..\inc\LogList.h" />

@@ -7,11 +7,13 @@
 
 #include "util.h"
 
-#include "FontGuide.h"
+#include "Guide.h"
+
+#include <atlimage.h>
 
 #define __ColorBlack RGB(0,0,0)
 
-using TD_ICONLIST = list<HICON>;
+using TD_IconVec = vector<HICON>;
 
 enum class E_ImglstType
 {
@@ -36,22 +38,18 @@ private:
 public:
 	BOOL Init(UINT cx, UINT cy);
 
-	BOOL Init(const TD_ICONLIST& lstIcon, const CSize& size);
+	BOOL Init(const CSize& size, const TD_IconVec& vecIcons = {});
 
 	BOOL Init(CBitmap& bitmap);
 
-	void LoadFile(const wstring& strFile, LPCRECT prcMargin = NULL, int iPosReplace = -1);
+	void SetFile(const wstring& strFile, LPCRECT prcMargin = NULL, int iPosReplace = -1);
 
-	void AddBitmap(CBitmap& bitmap)
-	{
-		(void)Add(&bitmap, RGB(0, 0, 0));
-	}
-
-	void ReplaceBitmap(UINT uPos, CBitmap& bitmap)
-	{
-		(void)__super::Replace(uPos, &bitmap, NULL);
-	}
+	void SetImg(CImage *pImg, LPCRECT prcMargin = NULL, int iPosReplace = -1);
 	
+	void SetBitmap(CBitmap& bitmap, int iPosReplace = -1);
+
+	void SetIcon(HICON hIcon, int iPosReplace = -1);
+
 	void SetToListCtrl(CListCtrl &wndListCtrl, E_ImglstType eImglstType)
 	{
 		if (E_ImglstType::ILT_Both == eImglstType)
@@ -86,7 +84,7 @@ private:
 	CFontGuide m_fontGuide;
 
 public:
-	BOOL InitImglst(const TD_ICONLIST& lstIcon, const CSize& size);
+	BOOL InitImglst(const CSize& size, const TD_IconVec& vecIcons = {});
 
 	BOOL InitImglst(CBitmap& Bitmap);
 
@@ -226,28 +224,13 @@ protected:
 class __CommonPrjExt CListObject
 {
 public:
-	virtual int GetListImage()
-	{
-		return 0;
-	}
-	
-	virtual void GetListText(list<wstring>& lstTexts)
+	virtual void GetListDisplay(list<wstring>& lstTexts, int& iImage)
 	{
 	};
 
 	virtual CString GetRenameText()
 	{
-		CString strText;
-
-		list<wstring> lstTexts;
-		GetListText(lstTexts);
-		if (!lstTexts.empty())
-		{
-			strText = lstTexts.front().c_str();
-			strText.Trim();
-		}
-
-		return strText;
+		return L"";
 	};
 
 	virtual bool OnListItemRename(const wstring& strNewName)
@@ -296,6 +279,8 @@ public:
 	CImglst m_Imglst;
 	CImglst m_ImglstSmall;
 
+	bool m_bDblClick = false;
+
 private:
 	CFontGuide m_fontGuide;
 
@@ -306,24 +291,15 @@ private:
 	bool m_bAutoChange = false;
 	CB_ListViewChanged m_cbViewChanged;
 
+	CString m_cstrRenameText;
+
 public:
 	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
 
-	BOOL InitImglst(const TD_ICONLIST& lstIcon, const CSize& size, const CSize *pszSmall = NULL);
+	BOOL InitImglst(const CSize& size, const CSize *pszSmall = NULL, const TD_IconVec& vecIcons = {});
 	BOOL InitImglst(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
 
-	void SetImageList(CImglst *pImglst, CImglst *pImglstSmall = NULL)
-	{
-		if (NULL != pImglst)
-		{
-			(void)__super::SetImageList(pImglst, LVSIL_NORMAL);
-		}
-
-		if (NULL != pImglstSmall)
-		{
-			(void)__super::SetImageList(pImglstSmall, LVSIL_SMALL);
-		}
-	}
+	void SetImageList(CImglst *pImglst, CImglst *pImglstSmall = NULL);
 
 	void SetViewAutoChange(const CB_ListViewChanged& cb=NULL)
 	{
