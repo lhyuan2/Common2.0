@@ -52,7 +52,7 @@ void CPathList::SetPath(CPathObject* pPath)
 	if (pPath)
 	{
 		TD_PathList lstSubPaths;
-		pPath->GetSubPath(lstSubPaths, TRUE, TRUE);
+		pPath->GetSubPath(lstSubPaths);
 
 		this->SetRedraw(FALSE);
 		DeleteAllItems();

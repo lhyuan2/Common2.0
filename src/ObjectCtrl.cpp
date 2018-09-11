@@ -5,12 +5,122 @@
 
 #include "Resource.h"
 
+BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT prcMargin)
+{
+	CRect rcDst(rcPos);
+	if (NULL != prcMargin)
+	{
+		dc.FillSolidRect(rcDst, RGB(255, 255, 255));
+
+		rcDst.left = prcMargin->left;
+		rcDst.top = prcMargin->top;
+		rcDst.right -= prcMargin->right;
+		rcDst.bottom -= prcMargin->bottom;
+	}
+
+	int iImgWidth = this->GetWidth();
+	int iImgHeight = this->GetHeight();
+	float fHWRate = (float)iImgHeight / iImgWidth;
+
+	int iDstWidth = rcDst.Width();
+	int iDstHeight = rcDst.Height();
+
+	float fNeedHWRate = (float)rcDst.Height() / rcDst.Width();
+
+	CRect rcSrc;
+	if (fHWRate > fNeedHWRate)
+	{
+		rcSrc.left = 0;
+		rcSrc.right = iImgWidth;
+
+		rcSrc.top = LONG(iImgHeight - iImgWidth*fNeedHWRate) / 2;
+		rcSrc.bottom = iImgHeight - rcSrc.top;
+	}
+	else
+	{
+		rcSrc.top = 0;
+		rcSrc.bottom = iImgHeight;
+
+		rcSrc.left = LONG(iImgWidth - iImgHeight / fNeedHWRate) / 2;
+		rcSrc.right = iImgWidth - rcSrc.left;
+	}
+
+	(void)dc.SetStretchBltMode(bHalfToneMode ? STRETCH_HALFTONE : STRETCH_DELETESCANS);
+
+	CDC *pdcThis = CDC::FromHandle(this->GetDC());
+
+	BOOL bRet = dc.StretchBlt(rcDst.left, rcDst.top, iDstWidth, iDstHeight
+		, pdcThis, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), SRCCOPY);
+
+	this->ReleaseDC();
+
+	return bRet;
+}
+
+BOOL CImg::InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin)
+{
+	m_cx = cx;
+	m_cy = cy;
+	m_rcDst = { 0, 0, (int)cx, (int)cy };
+
+	m_bHalfToneMode = bHalfToneMode;
+
+	CDC *pDC = CDC::FromHandle(::GetDC(NULL));
+	__AssertReturn(pDC, FALSE);
+
+	__AssertReturn(m_CompDC.CreateCompatibleDC(pDC), FALSE);
+
+	__AssertReturn(m_CompBitmap.CreateCompatibleBitmap(pDC, m_rcDst.Width(), m_rcDst.Height()), FALSE);
+
+	if (NULL != prcMargin)
+	{
+		m_CompDC.FillSolidRect(m_rcDst, RGB(255, 255, 255));
+
+		m_rcDst.left = prcMargin->left;
+		m_rcDst.top = prcMargin->top;
+		m_rcDst.right -= prcMargin->right;
+		m_rcDst.bottom -= prcMargin->bottom;
+	}
+
+	return TRUE;
+}
+
+CBitmap* CImg::LoadEx(const wstring& strFile)
+{
+	Destroy();
+	HRESULT hr = Load(strFile.c_str());
+	__EnsureReturn(S_OK == hr, NULL);
+
+	CBitmap *pbmpPrev = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
+
+	BOOL bRet = StretchBltEx(m_CompDC, m_rcDst, m_bHalfToneMode);
+	if (!bRet)
+	{
+		return NULL;
+	}
+
+	//(void)m_CompDC.SelectObject(pbmpPrev);
+
+	return &m_CompBitmap;
+}
+
+BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos)
+{
+	return dc.StretchBlt(rcPos.left, rcPos.top, rcPos.Width(), rcPos.Height(), &m_CompDC, 0, 0, m_cx, m_cy, SRCCOPY);
+}
+
+BOOL CImg::StretchBltEx(CImg& img)
+{
+	return StretchBltEx(img.m_CompDC, CRect(0, 0, m_cx, m_cy));
+}
+
 BOOL CImglst::Init(UINT cx, UINT cy)
 {
 	__AssertReturn(Create(cx, cy, ILC_COLOR32, 0, 0), FALSE);
-	
-	m_rcPos = { 0, 0, (int)cx, (int)cy };
-	
+
+	m_cx = cx;
+	m_cy = cy;
+
 	CDC *pDC = CDC::FromHandle(::GetDC(NULL));
 	__AssertReturn(pDC, FALSE);
 
@@ -18,8 +128,6 @@ BOOL CImglst::Init(UINT cx, UINT cy)
 
 	__AssertReturn(m_CompBitmap.CreateCompatibleBitmap(pDC, cx, cy), FALSE);
 	
-	(void)m_CompDC.SetStretchBltMode(COLORONCOLOR);
-
 	return TRUE;
 }
 
@@ -46,73 +154,29 @@ BOOL CImglst::Init(CBitmap& bitmap)
 	return TRUE;
 }
 
-void CImglst::SetFile(const wstring& strFile, LPCRECT prcMargin, int iPosReplace)
+BOOL CImglst::SetFile(const wstring& strFile, bool bHalfToneMode, LPCRECT prcMargin, int iPosReplace)
 {
-	CImage *pImg = NULL;
-
-	CImage img;
+	CImg img;
 	HRESULT hr = img.Load(strFile.c_str());
-	if (S_OK == hr)
+	__EnsureReturn(S_OK == hr, FALSE);
 	{
-		pImg = &img;
+		return NULL;
 	}
 
-	SetImg(pImg, prcMargin, iPosReplace);
+	SetImg(img, bHalfToneMode, prcMargin, iPosReplace);
+	
+	return TRUE;
 }
 
-void CImglst::SetImg(CImage *pImg, LPCRECT prcMargin, int iPosReplace)
+void CImglst::SetImg(CImg& img, bool bHalfToneMode, LPCRECT prcMargin, int iPosReplace)
 {
-	CBitmap *pOldBitmap = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
+	CBitmap *pbmpPrev = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
 
-	m_CompDC.FillSolidRect(m_rcPos, RGB(255, 255, 255));
+	img.StretchBltEx(m_CompDC, CRect(0, 0, m_cx, m_cy), bHalfToneMode, prcMargin);
 
-	CRect rcDst(m_rcPos);
-	if (NULL != prcMargin)
-	{
-		rcDst.left = prcMargin->left;
-		rcDst.top = prcMargin->top;
-		rcDst.right -= prcMargin->right;
-		rcDst.bottom -= prcMargin->bottom;
-	}
+	(void)m_CompDC.SelectObject(pbmpPrev);
 
-	float fNeedHWRate = (float)rcDst.Height() / rcDst.Width();
-
-	if (NULL != pImg)
-	{
-		float fHWRate = (float)pImg->GetHeight() / pImg->GetWidth();
-
-		CRect rcSrc;
-		if (fHWRate > fNeedHWRate)
-		{
-			rcSrc.left = 0;
-			rcSrc.right = pImg->GetWidth();
-
-			rcSrc.top = LONG(pImg->GetHeight() - pImg->GetWidth()*fNeedHWRate) / 2;
-			rcSrc.bottom = pImg->GetHeight() - rcSrc.top;
-		}
-		else
-		{
-			rcSrc.top = 0;
-			rcSrc.bottom = pImg->GetHeight();
-
-			rcSrc.left = LONG(pImg->GetWidth() - pImg->GetHeight() / fNeedHWRate) / 2;
-			rcSrc.right = pImg->GetWidth() - rcSrc.left;
-		}
-		m_CompDC.StretchBlt(rcDst.left, rcDst.top, rcDst.Width(), rcDst.Height()
-			, CDC::FromHandle(pImg->GetDC()), rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), SRCCOPY);
-		pImg->ReleaseDC();
-	}
-	else
-	{
-		CPen pen(PS_SOLID, 1, RGB(196, 196, 196));
-		CPen *pOldPen = (CPen*)m_CompDC.SelectObject(&pen);
-		(void)m_CompDC.Rectangle(rcDst);
-		(void)m_CompDC.SelectObject(pOldPen);
-	}
-
-	(void)m_CompDC.SelectObject(pOldBitmap);
-	
-	this->SetBitmap(m_CompBitmap, iPosReplace);
+	SetBitmap(m_CompBitmap, iPosReplace);
 }
 
 void CImglst::SetBitmap(CBitmap& bitmap, int iPosReplace)
@@ -529,8 +593,8 @@ HTREEITEM CObjectTree::InsertObjectEx(CTreeObject& Object, CTreeObject *pParentO
 
 void CObjectTree::UpdateImage(CTreeObject& Object)
 {
-	int nImage = Object.GetTreeImage();
-	SetItemImage(Object.m_hTreeItem, nImage, nImage);
+	int iImage = Object.GetTreeImage();
+	SetItemImage(Object.m_hTreeItem, iImage, iImage);
 	this->Invalidate(FALSE);
 }
 
@@ -715,6 +779,13 @@ E_ListViewType CObjectList::GetView()
 	return m_eViewType;
 }
 
+void CObjectList::TrackMouseEvent(const CB_ListMouseEvent& cbMouseEvent)
+{
+	m_cbMouseEvent = cbMouseEvent;
+
+	m_iTrackStatus = 0;
+}
+
 void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
 {
 	if (lstObjects.empty())
@@ -839,7 +910,7 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 {
 	int iImage = 0;
 	list<wstring> lstTexts;
-	Object.GetListDisplay(lstTexts, iImage);
+	Object.GetListDisplay(m_eViewType, lstTexts, iImage);
 
 	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
 		, iImage, 0, 0, (LPARAM)&Object));
@@ -857,6 +928,12 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 
 		(void)__super::SetItemText(nItem, nColumn, strText.c_str());
 	}
+}
+
+void CObjectList::SetItemImage(int nItem, int iImage)
+{
+	(void)SetItem(nItem, 0, LVIF_IMAGE, NULL, iImage, 0, 0, 0);
+	Update(nItem);
 }
 
 CListObject *CObjectList::GetItemObject(int nItem)
@@ -1008,9 +1085,9 @@ void CObjectList::DeselectAllItems()
 
 BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	if (m_bAutoChange)
+	if (WM_MOUSEWHEEL == message)
 	{
-		if (WM_MOUSEWHEEL == message)
+		if (m_bAutoChange)
 		{
 			UINT nFlag = GET_FLAGS_LPARAM(wParam);
 			if (nFlag & MK_CONTROL)
@@ -1022,7 +1099,7 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 				if (500 < dwTime - dwLastTime)
 				{
 					ChangeListCtrlView();
-				
+
 					dwLastTime = dwTime;
 				}
 
@@ -1030,8 +1107,46 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 			}
 		}
 	}
+	else if (-1 != m_iTrackStatus)
+	{
+		if (WM_MOUSEMOVE == message)
+		{
+			if (0 == m_iTrackStatus)
+			{
+				//   鼠标移入窗时，请求WM_MOUSEHOVER和WM_MOUSELEAVE 消息
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof(tme);
+				tme.hwndTrack = m_hWnd;
+				tme.dwFlags = TME_LEAVE | TME_HOVER;
+				tme.dwHoverTime = HOVER_DEFAULT;
+				m_iTrackStatus = ::TrackMouseEvent(&tme);
+			}
+
+			OnMouseEvent(E_ListMouseEvent::LME_MouseMove, CPoint(lParam));
+		}
+		else if (WM_MOUSEHOVER == message)
+		{
+			m_iTrackStatus = 0;
+
+			OnMouseEvent(E_ListMouseEvent::LME_MouseHover, CPoint(lParam));
+		}
+		else if (WM_MOUSELEAVE == message)
+		{
+			m_iTrackStatus = 0;
+			
+			OnMouseEvent(E_ListMouseEvent::LME_MouseLeave, CPoint(lParam));
+		}
+	}
 	
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
+}
+
+void CObjectList::OnMouseEvent(E_ListMouseEvent eMouseEvent, const CPoint& point)
+{
+	if (m_cbMouseEvent)
+	{
+		m_cbMouseEvent(eMouseEvent, point);
+	}
 }
 
 BOOL CObjectList::handleNMNotify(NMHDR& NMHDR)

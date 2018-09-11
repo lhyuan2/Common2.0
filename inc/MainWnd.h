@@ -72,17 +72,22 @@ public:
 	BOOL AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
 		, UINT uOffset = 0, UINT uTabFontSize=0, UINT uTabHeight = 0);
 
+	BOOL AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
+		, UINT uOffset, UINT uTabFontSize, CImageList *pImglst=NULL);
+
 	BOOL AddUndockView(CPage& Page, const CRect& rtPos);
 
 	BOOL AddPage(CPage& Page, ST_ViewStyle nStyle);
 
 	BOOL ActivePage(CPage& Page);
 
-	BOOL SetPageTitle(CPage& Page, const CString& cstrTitle);
-	
+	BOOL SetPageTitle(CPage& Page, const CString& cstrTitle, int iImage = -1);
+		
 	int MsgBox(const CString& cstrText, const CString& cstrTitle=L"", UINT uType=MB_OK);
 	
 private:
+	BOOL _AddView(CDockView& View, CPage& Page);
+
 	void OnSize();
 
 	CDockView* GetDockView(const CPoint& ptPos);

@@ -15,6 +15,34 @@
 
 using TD_IconVec = vector<HICON>;
 
+
+class __CommonPrjExt CImg : public CImage
+{
+public:
+	CImg()
+	{
+	}
+
+private:
+	bool m_bHalfToneMode = false;
+
+	UINT m_cx = 0;
+	UINT m_cy = 0;
+	CRect m_rcDst;
+
+	CDC m_CompDC;
+	CBitmap m_CompBitmap;
+	
+public:
+	BOOL StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT prcMargin=NULL);
+
+	BOOL InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin=NULL);
+	CBitmap* LoadEx(const wstring& strFile);
+	BOOL StretchBltEx(CDC& dc, const CRect& rcPos);
+
+	BOOL StretchBltEx(CImg& img);
+};
+
 enum class E_ImglstType
 {
 	ILT_Both = -1
@@ -30,7 +58,8 @@ public:
 	}
 
 private:
-	CRect m_rcPos;
+	UINT m_cx = 0;
+	UINT m_cy = 0;
 
 	CDC m_CompDC;
 	CBitmap m_CompBitmap;
@@ -42,9 +71,9 @@ public:
 
 	BOOL Init(CBitmap& bitmap);
 
-	void SetFile(const wstring& strFile, LPCRECT prcMargin = NULL, int iPosReplace = -1);
+	BOOL SetFile(const wstring& strFile, bool bHalfToneMode, LPCRECT prcMargin = NULL, int iPosReplace = -1);
 
-	void SetImg(CImage *pImg, LPCRECT prcMargin = NULL, int iPosReplace = -1);
+	void SetImg(CImg& img, bool bHalfToneMode, LPCRECT prcMargin, int iPosReplace);
 	
 	void SetBitmap(CBitmap& bitmap, int iPosReplace = -1);
 
@@ -221,10 +250,19 @@ protected:
 };
 
 
+enum E_ListViewType
+{
+	LVT_Tile = LV_VIEW_TILE,
+	LVT_Icon = LVS_ICON,
+	LVT_SmallIcon = LVS_SMALLICON,
+	LVT_List = LVS_LIST,
+	LVT_Report = LVS_REPORT
+};
+
 class __CommonPrjExt CListObject
 {
 public:
-	virtual void GetListDisplay(list<wstring>& lstTexts, int& iImage)
+	virtual void GetListDisplay(E_ListViewType eViewType, list<wstring>& lstTexts, int& iImage)
 	{
 	};
 
@@ -243,15 +281,6 @@ typedef ptrlist<CListObject*> TD_ListObjectList;
 
 // CObjectList
 
-enum E_ListViewType
-{
-	LVT_Tile = LV_VIEW_TILE,
-	LVT_Icon = LVS_ICON,
-	LVT_SmallIcon = LVS_SMALLICON,
-	LVT_List = LVS_LIST,
-	LVT_Report = LVS_REPORT
-};
-
 struct __CommonPrjExt tagListColumn
 {
 	CString cstrText;
@@ -265,6 +294,13 @@ public:
 	typedef list<tagListColumn> TD_ListColumn;
 
 	using CB_ListViewChanged = function<void(E_ListViewType)>;
+
+	enum class E_ListMouseEvent
+	{
+		LME_MouseMove
+		, LME_MouseHover
+		, LME_MouseLeave
+	};
 
 	CObjectList()
 	{
@@ -292,6 +328,11 @@ private:
 	CB_ListViewChanged m_cbViewChanged;
 
 	CString m_cstrRenameText;
+	
+	using CB_ListMouseEvent = function<void(E_ListMouseEvent eMouseEvent, const CPoint& point)>;
+	CB_ListMouseEvent m_cbMouseEvent;
+
+	int m_iTrackStatus = -1;
 
 public:
 	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
@@ -312,6 +353,8 @@ public:
 	void SetView(E_ListViewType eViewType, bool bArrange=false);
 	E_ListViewType GetView();
 	
+	void TrackMouseEvent(const CB_ListMouseEvent& cbMouseEvent=NULL);
+
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);
 
 	int InsertObject(CListObject& Object, int nItem=-1);
@@ -326,6 +369,9 @@ public:
 
 public:
 	void SetItemObject(int nItem, CListObject& Object);
+
+	void SetItemImage(int nItem, int iImage);
+
 	CListObject *GetItemObject(int nItem);
 	int GetObjectItem(const CListObject *pObject);
 	void GetAllObjects(TD_ListObjectList& lstListObjects);
@@ -348,10 +394,11 @@ protected:
 	virtual void PreSubclassWindow() override;
 
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
-	
+
+	virtual void OnMouseEvent(E_ListMouseEvent eMouseEvent, const CPoint& point);
+
 	virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 
-protected:
 	virtual BOOL handleNMNotify(NMHDR& NMHDR);
 
 	void ChangeListCtrlView(short zDelta=0);

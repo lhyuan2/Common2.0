@@ -49,7 +49,7 @@ private:
 public:
 	BOOL Active();
 
-	BOOL SetTitle(const CString& cstrTitle);
+	BOOL SetTitle(const CString& cstrTitle, int iImage = -1);
 
 	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
 

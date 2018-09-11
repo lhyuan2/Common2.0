@@ -43,9 +43,9 @@ BOOL CPage::Active()
 	return TRUE;
 }
 
-BOOL CPage::SetTitle(const CString& cstrTitle)
+BOOL CPage::SetTitle(const CString& cstrTitle, int iImage)
 {
-	return CMainApp::GetMainWnd()->SetPageTitle(*this, cstrTitle);
+	return CMainApp::GetMainWnd()->SetPageTitle(*this, cstrTitle, iImage);
 }
 
 int CPage::MsgBox(const CString& cstrText, UINT uType)

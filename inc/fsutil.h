@@ -139,9 +139,9 @@ public:
 
 	wstring GetPath();
 
-	void GetSubPath(TD_PathList& lstSubPath, bool bFindFile=false, bool bSort=false);
+	bool GetSubPath(TD_PathList& lstSubPath);
 	
-	void GetSubPath(TD_PathList *plstSubDir, TD_PathList *plstSubFile=NULL);
+	bool GetSubPath(TD_PathList *plstSubDir, TD_PathList *plstSubFile=NULL);
 	
 	CPath *GetSubPath(wstring strSubPath, bool bDir);
 	

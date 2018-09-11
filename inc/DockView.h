@@ -36,6 +36,14 @@ typedef UINT ST_ViewStyle;
 
 class CPage;
 
+class CTabCtrlEx : public CTabCtrl
+{
+public:
+	CTabCtrlEx()
+	{
+	}
+};
+
 class CDockView: public CPropertySheet
 {
 protected:
@@ -44,6 +52,9 @@ protected:
 public:
 	CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize
 		, UINT uOffset = 0, UINT uTabFontSize=0, UINT uTabHeight=0);
+
+	CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize
+		, UINT uOffset = 0, UINT uTabFontSize = 0, CImageList *pImglst=NULL);
 
 	CDockView(CWnd& wndParent, ST_ViewStyle nStyle, const CRect& rtPos);
 
@@ -58,24 +69,28 @@ public:
 
 private:
 	UINT m_uOffset = 0;
+	
+	CTabCtrlEx m_wndTabCtrl;
 
 	UINT m_uTabFontSize = 0;
 	UINT m_uTabHeight = 0;
 
 	CRect m_rtPos;
 
+	CImageList *m_pImglst = NULL;
+
+	CImageList m_InnerImglst;
+
 	PageVector m_vctPages;
 
 	CFontGuide m_fontGuide;
-
-	CImageList m_ImageList;
 
 public:
 	BOOL AddPage(CPage& Page);
 
 	BOOL ActivePage(CPage& pPage);
 
-	BOOL SetPageTitle(CPage& Page, const CString& cstrTitle);
+	BOOL SetPageTitle(CPage& Page, const CString& cstrTitle, int iImage = -1);
 
 	void Resize(CRect& rcRestrict);
 

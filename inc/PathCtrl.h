@@ -53,7 +53,7 @@ public:
 		return CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M"));
 	}
 
-	void GetListDisplay(list<wstring>& lstTexts, int& iImage) override
+	void GetListDisplay(E_ListViewType eViewType, list<wstring>& lstTexts, int& iImage) override
 	{
 		lstTexts.push_back(m_strName);
 		
@@ -164,7 +164,7 @@ public:
 	void InsertChilds(CDirObject *pDirObject)
 	{
 		TD_PathList lstSubDirs;
-		pDirObject->GetSubPath(lstSubDirs, TRUE, FALSE);
+		pDirObject->GetSubPath(lstSubDirs);
 	
 		for (TD_PathList::iterator itSubDir = lstSubDirs.begin()
 			; itSubDir != lstSubDirs.end(); ++itSubDir)
@@ -198,7 +198,7 @@ private:
 	void InsertChildsEx(CDirObject *pDirObject)
 	{
 		TD_PathList lstSubDirs;
-		pDirObject->GetSubPath(lstSubDirs, TRUE, FALSE);
+		pDirObject->GetSubPath(lstSubDirs);
 
 		for (TD_PathList::iterator itSubDir = lstSubDirs.begin()
 			; itSubDir != lstSubDirs.end(); ++itSubDir)

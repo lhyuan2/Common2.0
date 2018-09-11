@@ -171,7 +171,18 @@ public:
 	}
 
 	static void SendMessageEx(UINT nMsg, WPARAM wParam=0, LPARAM lParam=0);
-	
+
+	static void SendMessageEx(UINT nMsg, LPVOID pPara)
+	{
+		CMainApp::SendMessageEx(nMsg, (WPARAM)pPara);
+	}
+
+	template <typename _T1, typename _T2>
+	static void SendMessageEx(UINT nMsg, _T1 para1, _T2 para2)
+	{
+		CMainApp::SendMessageEx(nMsg, (WPARAM)para1, (LPARAM)para2);
+	}
+
 	static BOOL RegisterInterface(UINT nIndex, LPVOID lpInterface);
 	static LPVOID GetInterface(UINT nIndex);
 

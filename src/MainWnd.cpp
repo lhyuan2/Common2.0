@@ -161,31 +161,38 @@ BOOL CMainWnd::SetStatusText(UINT nPart, const CString& cstrText)
 	return m_ctlStatusBar.SetText(cstrText, (int)nPart, 0);
 }
 
-BOOL CMainWnd::AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
-	, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
+BOOL CMainWnd::_AddView(CDockView& View, CPage& Page)
 {
-	CDockView *pView = new CDockView(*this, nStyle, nDockSize, uOffset, uTabFontSize, uTabHeight);
+	__AssertReturn(View.AddPage(Page), FALSE);
 
-	__AssertReturn(pView->AddPage(Page), FALSE);
-
-	m_vctDockViews.push_back(pView);
+	m_vctDockViews.push_back(&View);
 
 	this->OnSize();
 
 	return TRUE;
 }
 
+BOOL CMainWnd::AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
+	, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
+{
+	CDockView *pView = new CDockView(*this, nStyle, nDockSize, uOffset, uTabFontSize, uTabHeight);
+
+	return _AddView(*pView, Page);
+}
+
+BOOL CMainWnd::AddDockView(CPage& Page, ST_ViewStyle nStyle, UINT nDockSize
+	, UINT uOffset, UINT uTabFontSize, CImageList *pImglst)
+{
+	CDockView *pView = new CDockView(*this, nStyle, nDockSize, uOffset, uTabFontSize, pImglst);
+
+	return _AddView(*pView, Page);
+}
+
 BOOL CMainWnd::AddUndockView(CPage& Page, const CRect& rtPos)
 {
 	CDockView *pView = new CDockView(*this, VS_Undock, rtPos);
 
-	__AssertReturn(pView->AddPage(Page), FALSE);
-
-	m_vctDockViews.push_back(pView);
-
-	this->OnSize();
-	
-	return TRUE;
+	return _AddView(*pView, Page);
 }
 
 BOOL CMainWnd::AddPage(CPage& Page, ST_ViewStyle nStyle)
@@ -215,11 +222,11 @@ BOOL CMainWnd::ActivePage(CPage& Page)
 	return FALSE;
 }
 
-BOOL CMainWnd::SetPageTitle(CPage& Page, const CString& cstrTitle)
+BOOL CMainWnd::SetPageTitle(CPage& Page, const CString& cstrTitle, int iImage)
 {
 	for (TD_DockViewVector::iterator itView=m_vctDockViews.begin(); itView!=m_vctDockViews.end(); ++itView)
 	{
-		if ((*itView)->SetPageTitle(Page, cstrTitle))
+		if ((*itView)->SetPageTitle(Page, cstrTitle, iImage))
 		{
 			return TRUE;
 		}

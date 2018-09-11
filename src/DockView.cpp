@@ -8,22 +8,30 @@
 
 //CDockView
 CDockView::CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize, UINT uOffset, UINT uTabFontSize, UINT uTabHeight)
-	: m_nStyle(nStyle)
+	: CPropertySheet(L"", &wndParent)
+	, m_nStyle(nStyle)
 	, m_nDockSize(nDockSize)
 	, m_uOffset(uOffset)
 	, m_uTabFontSize(uTabFontSize)
 	, m_uTabHeight(uTabHeight)
 {
-	CPropertySheet::m_pParentWnd = &wndParent;
-	
-	m_rtPos.SetRect(0,0,0,0);
+}
+
+CDockView::CDockView(CWnd& wndParent, ST_ViewStyle nStyle, UINT nDockSize, UINT uOffset, UINT uTabFontSize, CImageList *pImglst)
+	: CPropertySheet(L"", &wndParent)
+	, m_nStyle(nStyle)
+	, m_nDockSize(nDockSize)
+	, m_uOffset(uOffset)
+	, m_uTabFontSize(uTabFontSize)
+	, m_pImglst(pImglst)
+{
 }
 
 CDockView::CDockView(CWnd& wndParent, ST_ViewStyle nStyle, const CRect& rtPos)
-	: m_nStyle(nStyle)
+	: CPropertySheet(L"", &wndParent)
+	, m_nStyle(nStyle)
 	, m_rtPos(rtPos)
 {
-	CPropertySheet::m_pParentWnd = &wndParent;
 }
 
 BEGIN_MESSAGE_MAP(CDockView, CPropertySheet)
@@ -39,31 +47,33 @@ BOOL CDockView::Create()
 	}
 
 	__AssertReturn(__super::Create(m_pParentWnd, dwStyle, WS_EX_CONTROLPARENT), FALSE);
-
-	CTabCtrl *pTabCtrl = this->GetTabControl();
-	__AssertReturn(pTabCtrl, FALSE);
+	
+	__AssertReturn(m_wndTabCtrl.SubclassWindow(this->GetTabControl()->GetSafeHwnd()), FALSE);
 
 	if (__TabStyle(m_nStyle))
 	{
-		//TCS_FIXEDWIDTH
-		pTabCtrl->ModifyStyle(TCS_MULTILINE, TCS_FOCUSNEVER| (VS_BottomTab == __TabStyle(m_nStyle)? TCS_BOTTOM:0));
+		m_wndTabCtrl.ModifyStyle(TCS_MULTILINE, TCS_FOCUSNEVER| (VS_BottomTab == __TabStyle(m_nStyle)? TCS_BOTTOM:0));
 
 		if (m_uTabFontSize > 0)
 		{
-			(void)m_fontGuide.setFontSize(*pTabCtrl, m_uTabFontSize);
+			(void)m_fontGuide.setFontSize(m_wndTabCtrl, m_uTabFontSize);
 		}
 
-		if (m_uTabHeight > 0)
+		if (NULL != m_pImglst)
 		{
-			if (m_ImageList.Create(m_uTabHeight, m_uTabHeight, ILC_COLOR8, 1, 0))
+			m_wndTabCtrl.SetImageList(m_pImglst);
+		}
+		else if (m_uTabHeight > 0)
+		{
+			if (m_InnerImglst.Create(m_uTabHeight, m_uTabHeight, ILC_COLOR8, 1, 0))
 			{
-				pTabCtrl->SetImageList(&m_ImageList);
+				m_wndTabCtrl.SetImageList(&m_InnerImglst);
 			}
 		}
 	}
 	else
 	{
-		pTabCtrl->ShowWindow(SW_HIDE);
+		m_wndTabCtrl.ShowWindow(SW_HIDE);
 	}
 
 	return TRUE;
@@ -75,9 +85,9 @@ BOOL CDockView::AddPage(CPage& Page)
 
 	m_vctPages.push_back(&Page);
 
-	CPropertySheet::AddPage(&Page);
+	__super::AddPage(&Page);
 
-	if (!m_hWnd)
+	if (NULL == m_hWnd)
 	{
 		__AssertReturn(this->Create(), FALSE);
 	}
@@ -86,12 +96,10 @@ BOOL CDockView::AddPage(CPage& Page)
 
 	if (__TabStyle(m_nStyle) && !Page.m_cstrTitle.IsEmpty())
 	{
-		CTabCtrl *pTabCtrl = this->GetTabControl();
-
 		TCITEM tci = {0};
 		tci.mask = TCIF_TEXT;
 		tci.pszText = (LPTSTR)(LPCTSTR)Page.m_cstrTitle;
-		(void)pTabCtrl->SetItem(pTabCtrl->GetItemCount()-1, &tci);
+		(void)m_wndTabCtrl.SetItem(m_wndTabCtrl.GetItemCount()-1, &tci);
 	}
 
 	return TRUE;
@@ -114,22 +122,26 @@ BOOL CDockView::ActivePage(CPage& Page)
 	return TRUE;
 }
 
-BOOL CDockView::SetPageTitle(CPage& Page, const CString& cstrTitle)
+BOOL CDockView::SetPageTitle(CPage& Page, const CString& cstrTitle, int iImage)
 {
 	PageVector::iterator itPage = std::find(m_vctPages.begin(), m_vctPages.end(),& Page);
 	__EnsureReturn(itPage != m_vctPages.end(), FALSE);
 
 	int nPage = (int)(itPage - m_vctPages.begin());
 	
-	CTabCtrl *pTabCtrl = this->GetTabControl();
-	__AssertReturn(pTabCtrl->GetItemCount() > nPage, TRUE);
+	__AssertReturn(m_wndTabCtrl.GetItemCount() > nPage, TRUE);
 
 	Page.m_cstrTitle = cstrTitle;
 
-	TCITEM tci = {0};
+	TCITEM tci;
 	tci.mask = TCIF_TEXT;
+	//if (-1 != iImage)
+	{
+		tci.mask |= TCIF_IMAGE;
+		tci.iImage = iImage;
+	}
 	tci.pszText = (LPTSTR)(LPCTSTR)Page.m_cstrTitle;
-	(void)pTabCtrl->SetItem(nPage, &tci);
+	(void)m_wndTabCtrl.SetItem(nPage, &tci);
 
 	return TRUE;
 }
@@ -255,31 +267,27 @@ BOOL CDockView::PreTranslateMessage(MSG* pMsg)
 {
 	if (WM_MOUSEMOVE == pMsg->message)
 	{
-		auto pTabCtrl = this->GetTabControl();
-		if (NULL != pTabCtrl)
-		{
-			POINT ptPos = pMsg->pt;
-			this->ScreenToClient(&ptPos);
+		POINT ptPos = pMsg->pt;
+		this->ScreenToClient(&ptPos);
 
-			tagTCHITTESTINFO htInfo;
-			htInfo.pt = ptPos;
-			htInfo.flags = TCHT_ONITEM;
-			int iItem = pTabCtrl->HitTest(&htInfo);
+		tagTCHITTESTINFO htInfo;
+		htInfo.pt = ptPos;
+		htInfo.flags = TCHT_ONITEM;
+		int iItem = m_wndTabCtrl.HitTest(&htInfo);
 
-			do {
-				__EnsureBreak(iItem >= 0);
+		do {
+			__EnsureBreak(iItem >= 0);
 
-				__EnsureBreak(iItem != GetActiveIndex());
+			__EnsureBreak(iItem != GetActiveIndex());
 
-				__EnsureBreak(iItem < (int)m_vctPages.size());
+			__EnsureBreak(iItem < (int)m_vctPages.size());
 
-				__EnsureBreak(m_vctPages[iItem]->m_bAutoActive);
+			__EnsureBreak(m_vctPages[iItem]->m_bAutoActive);
 
-				mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-				mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-				//(void)__super::SetActivePage(iItem);
-			} while (0);
-		}
+			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+			//(void)__super::SetActivePage(iItem);
+		} while (0);
 	}
 
 	return __super::PreTranslateMessage(pMsg);

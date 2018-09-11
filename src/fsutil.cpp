@@ -720,56 +720,40 @@ wstring CPath::GetPath()
 	return m_strName;
 }
 
-void CPath::GetSubPath(TD_PathList& lstSubPath, bool bFindFile, bool bSort)
+bool CPath::GetSubPath(TD_PathList& lstSubPath)
 {
-	__Ensure(m_bDir);
+	__EnsureReturn(FindFile() && m_plstSubPath, false);
+	
+	lstSubPath.Insert(*m_plstSubPath);
 
-	if (bFindFile)
-	{
-		__Ensure(FindFile() && m_plstSubPath);
-	}
-
-	if (NULL != m_plstSubPath)
-	{
-		if (bSort)
-		{
-			m_plstSubPath->sort(tagPathSortor());
-		}
-
-		lstSubPath.Insert(*m_plstSubPath);
-	}
+	return true;
 }
 
-void CPath::GetSubPath(TD_PathList *plstSubDir, TD_PathList *plstSubFile)
+bool CPath::GetSubPath(TD_PathList *plstSubDir, TD_PathList *plstSubFile)
 {
-	if (!plstSubDir && !plstSubFile)
-	{
-		return;
-	}
+	__EnsureReturn(FindFile() && m_plstSubPath, false);
 
-	TD_PathList lstSubPath;
-	this->GetSubPath(lstSubPath);
-
-	for (TD_PathList::iterator itSubPath = lstSubPath.begin()
-		; itSubPath != lstSubPath.end(); ++itSubPath)
+	for (auto& pSubPath : *m_plstSubPath)
 	{
-		if ((*itSubPath)->m_bDir)
+		if (pSubPath->m_bDir)
 		{
 			if (plstSubDir)
 			{
-				plstSubDir->push_back(*itSubPath);
+				plstSubDir->push_back(pSubPath);
 			}
 		}
 		else
 		{
 			if (plstSubFile)
 			{
-				plstSubFile->push_back(*itSubPath);
+				plstSubFile->push_back(pSubPath);
 			}
 		}
 	}
+
+	return true;
 }
-	
+
 CPath *CPath::GetSubPath(wstring strSubPath, bool bDir)
 {
 	list<wstring> lstSubDirs;
@@ -798,7 +782,7 @@ CPath *CPath::GetSubPath(wstring strSubPath, bool bDir)
 		lstSubDirs.pop_back();
 
 		TD_PathList lstSubPath;
-		pPath->GetSubPath(lstSubPath, TRUE);
+		pPath->GetSubPath(lstSubPath);
 		
 		pPath = NULL;
 
@@ -867,7 +851,7 @@ void CPath::RemoveSubPath(const TD_PathList& lstDeletePaths)
 
 bool CPath::FindFile()
 {
-	if (NULL != m_plstSubPath)
+	if (!m_bDir || NULL != m_plstSubPath)
 	{
 		return true;
 	}
@@ -900,6 +884,8 @@ bool CPath::FindFile()
 			m_plstSubPath->push_back(pSubPath);
 		}
 	}
+
+	m_plstSubPath->sort(tagPathSortor());
 
 	return true;
 }
