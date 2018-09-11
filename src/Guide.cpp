@@ -79,28 +79,14 @@ BOOL CMenuGuide::Popup()
 	return pSubMenu->TrackPopupMenu(0, ptCursor.x, ptCursor.y, &m_Page);
 }
 
+
 bool CFontGuide::setFontSize(CWnd& wnd, ULONG uFontSize)
 {
-	if (0 == uFontSize)
+	if (NULL == m_font.m_hObject)
 	{
-		return true;
-	}
-
-	if (NULL == m_font.GetSafeHandle())
-	{
-		CFont *pFont = wnd.GetFont();
-		if (NULL == pFont)
-		{
-			return false;
-		}
-
-		LOGFONT logFont;
-		::ZeroMemory(&logFont, sizeof(logFont));
-		(void)pFont->GetLogFont(&logFont);
-
-		logFont.lfHeight = uFontSize;
-
-		if (!m_font.CreateFontIndirect(&logFont))
+		if (!m_font.create(wnd, [uFontSize](LOGFONT& logFont) {
+			logFont.lfHeight = uFontSize;
+		}))
 		{
 			return false;
 		}

@@ -5,7 +5,8 @@
 
 #include <fsutil.h>
 
-#include <ObjectCtrl.h>
+#include <TreeCtrl.h>
+#include <ListCtrl.h>
 
 class CPathObject;
 typedef ptrlist<CPathObject*> TD_PathObjectList;

@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Guide.cpp" />
+    <ClCompile Include="img.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SQLiteDB.cpp" />
     <ClCompile Include="sqlite\shell.c">
@@ -148,10 +149,11 @@
     <ClCompile Include="DragDrop.cpp" />
     <ClCompile Include="fsutil.cpp" />
     <ClCompile Include="LogList.cpp" />
-    <ClCompile Include="ObjectCtrl.cpp" />
+    <ClCompile Include="ListCtrl.cpp" />
     <ClCompile Include="PathCtrl.cpp" />
     <ClCompile Include="ProFile.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
+    <ClCompile Include="TreeCtrl.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="WorkThread.cpp" />
     <ClCompile Include="App.cpp" />
@@ -172,14 +174,16 @@
     <ClInclude Include="..\inc\Guide.h" />
     <ClInclude Include="..\inc\fsutil.h" />
     <ClInclude Include="..\inc\IDB.h" />
+    <ClInclude Include="..\inc\img.h" />
     <ClInclude Include="..\inc\LogList.h" />
     <ClInclude Include="..\inc\MainWnd.h" />
-    <ClInclude Include="..\inc\ObjectCtrl.h" />
+    <ClInclude Include="..\inc\ListCtrl.h" />
     <ClInclude Include="..\inc\Page.h" />
     <ClInclude Include="..\inc\PathCtrl.h" />
     <ClInclude Include="..\inc\ProFile.h" />
     <ClInclude Include="..\inc\ProgressDlg.h" />
     <ClInclude Include="..\inc\SQLiteDB.h" />
+    <ClInclude Include="..\inc\TreeCtrl.h" />
     <ClInclude Include="..\inc\util.h" />
     <ClInclude Include="..\inc\WorkThread.h" />
     <ClInclude Include="resource.h" />

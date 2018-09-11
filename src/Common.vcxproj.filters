@@ -32,9 +32,6 @@
     <ClCompile Include="LogList.cpp">
       <Filter>src\class</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectCtrl.cpp">
-      <Filter>src\class</Filter>
-    </ClCompile>
     <ClCompile Include="PathCtrl.cpp">
       <Filter>src\class</Filter>
     </ClCompile>
@@ -79,6 +76,15 @@
     <ClCompile Include="Guide.cpp">
       <Filter>src\class</Filter>
     </ClCompile>
+    <ClCompile Include="img.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeCtrl.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
+    <ClCompile Include="ListCtrl.cpp">
+      <Filter>src\class</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\App.h">
@@ -94,9 +100,6 @@
       <Filter>inc\app</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\LogList.h">
-      <Filter>inc\class</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\ObjectCtrl.h">
       <Filter>inc\class</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\PathCtrl.h">
@@ -143,6 +146,15 @@
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\inc\Guide.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\img.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\TreeCtrl.h">
+      <Filter>inc\class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\ListCtrl.h">
       <Filter>inc\class</Filter>
     </ClInclude>
   </ItemGroup>

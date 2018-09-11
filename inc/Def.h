@@ -21,6 +21,9 @@
 using namespace std;
 
 
+#define __ColorBlack ((COLORREF)0)
+
+
 #define __Ensure(x) \
 	if (!(x)) \
 	{ \

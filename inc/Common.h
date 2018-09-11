@@ -25,7 +25,9 @@
 
 #include "Guide.h"
 
-#include "ObjectCtrl.h"
+#include "ListCtrl.h"
+
+#include "TreeCtrl.h"
 
 #include "PathCtrl.h"
 
