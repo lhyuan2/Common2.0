@@ -45,23 +45,33 @@ struct __CommonPrjExt tagListColumn
 	UINT uFlag = LVCFMT_LEFT;
 };
 
+typedef list<tagListColumn> TD_ListColumn;
+
 using CB_LVCostomDraw = function<void(class CObjectList& wndList, NMLVCUSTOMDRAW& lvcd, bool& bSkipDefault)>;
 
-typedef list<tagListColumn> TD_ListColumn;
+class CHeaderCtrlEx : public CHeaderCtrl
+{
+	DECLARE_MESSAGE_MAP()
+
+public:
+	CHeaderCtrlEx(UINT uHeight)
+		: m_uHeight(uHeight)
+	{
+	}
+
+private:
+	UINT m_uHeight = 0;
+
+	LRESULT OnLayout(WPARAM wParam, LPARAM lParam);
+};
 
 class __CommonPrjExt CObjectList : public CListCtrl
 {
 public:
 	using CB_ListViewChanged = function<void(E_ListViewType)>;
 
-	enum class E_ListMouseEvent
-	{
-		LME_MouseMove
-		, LME_MouseHover
-		, LME_MouseLeave
-	};
-
-	CObjectList()
+	CObjectList(UINT uHeaderHeight = 0)
+		: m_wndHeader(uHeaderHeight)
 	{
 	}
 
@@ -83,6 +93,8 @@ public:
 	bool m_bDblClick = false;
 
 private:
+	CHeaderCtrlEx m_wndHeader;
+
 	CFontGuide m_fontGuide;
 
 	UINT m_nColumnCount = 1;
@@ -100,8 +112,7 @@ private:
 
 	CString m_cstrRenameText;
 	
-	using CB_ListMouseEvent = function<void(E_ListMouseEvent eMouseEvent, const CPoint& point)>;
-	CB_ListMouseEvent m_cbMouseEvent;
+	CB_TrackMouseEvent m_cbMouseEvent;
 
 	int m_iTrackStatus = -1;
 
@@ -128,7 +139,7 @@ public:
 	void SetView(E_ListViewType eViewType, bool bArrange=false);
 	E_ListViewType GetView();
 	
-	void TrackMouseEvent(const CB_ListMouseEvent& cbMouseEvent=NULL);
+	void SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent=NULL);
 
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);
 
@@ -170,7 +181,7 @@ protected:
 
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 
-	virtual void OnMouseEvent(E_ListMouseEvent eMouseEvent, const CPoint& point);
+	virtual void OnTrackMouseEvent(E_TrackMouseEvent eMouseEvent, const CPoint& point);
 
 	virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 

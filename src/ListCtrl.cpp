@@ -5,6 +5,23 @@
 
 #include "Resource.h"
 
+LRESULT CHeaderCtrlEx::OnLayout(WPARAM wParam, LPARAM lParam)
+{
+	LRESULT lResult = CHeaderCtrl::DefWindowProc(HDM_LAYOUT, 0, lParam);
+
+	if (0 != m_uHeight)
+	{
+		HD_LAYOUT& hdl = *(HD_LAYOUT*)lParam;
+		hdl.prc->top = hdl.pwpos->cy = m_uHeight;
+	}
+
+	return lResult;
+}
+
+BEGIN_MESSAGE_MAP(CHeaderCtrlEx, CHeaderCtrl)
+	ON_MESSAGE(HDM_LAYOUT, OnLayout)
+END_MESSAGE_MAP()
+
 // CObjectList
 
 void CObjectList::PreSubclassWindow()
@@ -35,6 +52,8 @@ BOOL CObjectList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
 			m_nColumnCount++;
 		}
 	}
+
+	m_wndHeader.SubclassWindow(CListCtrl::GetHeaderCtrl()->GetSafeHwnd());
 
 	return TRUE;
 }
@@ -150,7 +169,7 @@ E_ListViewType CObjectList::GetView()
 	return m_eViewType;
 }
 
-void CObjectList::TrackMouseEvent(const CB_ListMouseEvent& cbMouseEvent)
+void CObjectList::SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent)
 {
 	m_cbMouseEvent = cbMouseEvent;
 
@@ -604,7 +623,7 @@ void CObjectList::OnCustomDraw(NMLVCUSTOMDRAW& lvcd, bool& bSkipDefault)
 	}
 }
 
-void CObjectList::OnMouseEvent(E_ListMouseEvent eMouseEvent, const CPoint& point)
+void CObjectList::OnTrackMouseEvent(E_TrackMouseEvent eMouseEvent, const CPoint& point)
 {
 	if (m_cbMouseEvent)
 	{
@@ -642,7 +661,6 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 		{
 			if (0 == m_iTrackStatus)
 			{
-				//   鼠标移入窗时，请求WM_MOUSEHOVER和WM_MOUSELEAVE 消息
 				TRACKMOUSEEVENT tme;
 				tme.cbSize = sizeof(tme);
 				tme.hwndTrack = m_hWnd;
@@ -651,19 +669,19 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 				m_iTrackStatus = ::TrackMouseEvent(&tme);
 			}
 
-			OnMouseEvent(E_ListMouseEvent::LME_MouseMove, CPoint(lParam));
-		}
-		else if (WM_MOUSEHOVER == message)
-		{
-			m_iTrackStatus = 0;
-
-			OnMouseEvent(E_ListMouseEvent::LME_MouseHover, CPoint(lParam));
+			OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseMove, CPoint(lParam));
 		}
 		else if (WM_MOUSELEAVE == message)
 		{
 			m_iTrackStatus = 0;
 
-			OnMouseEvent(E_ListMouseEvent::LME_MouseLeave, CPoint(lParam));
+			OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseLeave, CPoint(lParam));
+		}
+		else if (WM_MOUSEHOVER == message)
+		{
+			//m_iTrackStatus = 0;
+
+			OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseHover, CPoint(lParam));
 		}
 	}
 

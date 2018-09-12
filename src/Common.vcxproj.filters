@@ -117,9 +117,6 @@
     <ClInclude Include="..\inc\DragDrop.h">
       <Filter>inc\class</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\Common.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\Def.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -157,6 +154,7 @@
     <ClInclude Include="..\inc\ListCtrl.h">
       <Filter>inc\class</Filter>
     </ClInclude>
+    <ClInclude Include="..\inc\CommonExt.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Common.rc" />

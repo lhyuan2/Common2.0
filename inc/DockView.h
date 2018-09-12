@@ -42,6 +42,18 @@ public:
 	CTabCtrlEx()
 	{
 	}
+
+private:
+	int m_iTrackStatus = -1;
+
+	CB_TrackMouseEvent m_cbMouseEvent;
+
+	void OnTrackMouseEvent(E_TrackMouseEvent eMouseEvent, const CPoint& point);
+
+public:
+	void SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent);
+
+	BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 };
 
 class CDockView: public CPropertySheet
@@ -100,6 +112,4 @@ private:
 	afx_msg void OnSize(UINT nType, int, int);
 
 	void OnSize();
-
-	BOOL PreTranslateMessage(MSG* pMsg) override;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common.h>
+#include <WorkThread.h>
 
 
 #define WM_SetProgress WM_USER+1
