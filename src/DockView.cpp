@@ -3,9 +3,6 @@
 
 #include <DockView.h>
 
-#include <util.h>
-
-
 void CTabCtrlEx::OnTrackMouseEvent(E_TrackMouseEvent eMouseEvent, const CPoint& point)
 {
 	m_iTrackStatus = 0;

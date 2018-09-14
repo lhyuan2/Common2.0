@@ -1,8 +1,6 @@
 
 #include "stdafx.h"
 
-#include <util.h>
-
 #include <DragDrop.h>
 
 #define __InnerClipboardFormat ((UINT)-1)

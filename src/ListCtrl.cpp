@@ -127,7 +127,7 @@ void CObjectList::SetItemHeight(UINT uItemHeight)
 	}
 }
 
-bool CObjectList::SetUnderlineColumn(const set<int>& setColumns)
+bool CObjectList::SetUnderlineColumn(const set<UINT>& setColumns)
 {
 	m_setUnderlineColumns = setColumns;
 
@@ -307,17 +307,17 @@ BOOL CObjectList::DeleteObject(const CListObject *pObject)
 void CObjectList::SetItemObject(int nItem, CListObject& Object)
 {
 	int iImage = 0;
-	list<wstring> lstTexts;
-	Object.GetListDisplay(m_eViewType, lstTexts, iImage);
+	vector<wstring> vecText;
+	GenListItem(Object, vecText, iImage);
 
 	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
 		, iImage, 0, 0, (LPARAM)&Object));
 
-	list<wstring>::iterator itSubTitle = lstTexts.begin();
+	auto itSubTitle = vecText.begin();
 	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
 	{
 		wstring strText;
-		if (itSubTitle != lstTexts.end())
+		if (itSubTitle != vecText.end())
 		{
 			strText = *itSubTitle;
 
@@ -326,6 +326,11 @@ void CObjectList::SetItemObject(int nItem, CListObject& Object)
 
 		(void)__super::SetItemText(nItem, nColumn, strText.c_str());
 	}
+}
+
+void CObjectList::GenListItem(CListObject& Object, vector<wstring>& vecText, int& iImage)
+{
+	Object.GenListItem(*this, vecText, iImage);
 }
 
 void CObjectList::SetItemImage(int nItem, int iImage)

@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include "def.h"
-
-
 class __CommonPrjExt util
 {
 public:

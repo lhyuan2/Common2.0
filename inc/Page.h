@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "def.h"
-
 #include "DragDrop.h"
 
 #include "App.h"
@@ -51,7 +49,7 @@ public:
 
 	BOOL SetTitle(const CString& cstrTitle, int iImage = -1);
 
-	int MsgBox(const CString& cstrText, UINT uType=MB_OK);
+	virtual int MsgBox(const CString& cstrText, UINT uType=MB_OK);
 
 	void Async(const CB_Async& cb, UINT uDelayTime=0);
 	void AsyncLoop(const CB_AsyncLoop& cb, UINT uDelayTime);

@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include <def.h>
-
-
 // CLogList
 
 class __CommonPrjExt CLogList : public CListCtrl

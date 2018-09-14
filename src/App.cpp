@@ -3,9 +3,6 @@
 
 #include <App.h>
 
-#include <fsutil.h>
-#include <util.h>
-
 #include "MainWnd.h"
 
 

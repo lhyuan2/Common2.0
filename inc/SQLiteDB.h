@@ -2,8 +2,6 @@
 
 #include "IDB.h"
 
-#include <def.h>
-
 class CSQLiteDB;
 class __CommonPrjExt CSQLiteDBResult : public IDBResult
 {

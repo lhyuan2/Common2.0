@@ -3,8 +3,6 @@
 
 #include <img.h>
 
-#define __ColorBlack ((COLORREF)0)
-
 BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT prcMargin)
 {
 	CRect rcDst(rcPos);
@@ -149,7 +147,7 @@ BOOL CImglst::Init(CBitmap& bitmap)
 	(void)bitmap.GetBitmap(&bmp);
 	__AssertReturn(Init(bmp.bmHeight, bmp.bmHeight), FALSE);
 
-	(void)Add(&bitmap, __ColorBlack);
+	(void)Add(&bitmap, __Color_Black);
 
 	return TRUE;
 }

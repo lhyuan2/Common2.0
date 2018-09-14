@@ -20,9 +20,6 @@
 
 using namespace std;
 
-
-#define __ColorBlack ((COLORREF)0)
-
 enum class E_TrackMouseEvent
 {
 	LME_MouseMove
@@ -31,6 +28,8 @@ enum class E_TrackMouseEvent
 };
 
 using CB_TrackMouseEvent = function<void(E_TrackMouseEvent eMouseEvent, const CPoint& point)>;
+
+#define	__BackSlant L'\\'
 
 #define __Ensure(x) \
 	if (!(x)) \

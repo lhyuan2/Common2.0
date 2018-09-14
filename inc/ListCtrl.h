@@ -3,8 +3,6 @@
 
 #include <img.h>
 
-#include <util.h>
-
 #include <Guide.h>
 
 enum E_ListViewType
@@ -19,9 +17,9 @@ enum E_ListViewType
 class __CommonPrjExt CListObject
 {
 public:
-	virtual void GetListDisplay(E_ListViewType eViewType, list<wstring>& lstTexts, int& iImage)
+	virtual void GenListItem(class CObjectList& wndList, vector<wstring>& vecText, int& iImage)
 	{
-	};
+	}
 
 	virtual CString GetRenameText()
 	{
@@ -103,7 +101,7 @@ private:
 	CB_LVCostomDraw m_cbCustomDraw;
 
 	CCompatableFont m_fontUnderline;
-	set<int> m_setUnderlineColumns;
+	set<UINT> m_setUnderlineColumns;
 	
 	E_ListViewType m_eViewType = (E_ListViewType)-1;
 
@@ -128,7 +126,7 @@ public:
 
 	void SetItemHeight(UINT uItemHeight);
 
-	bool SetUnderlineColumn(const set<int>& setColumns);
+	bool SetUnderlineColumn(const set<UINT>& setColumns);
 
 	void SetTileSize(ULONG cx, ULONG cy);
 
@@ -155,7 +153,6 @@ public:
 
 	BOOL DeleteObject(const CListObject *pObject);
 
-public:
 	void SetItemObject(int nItem, CListObject& Object);
 
 	void SetItemImage(int nItem, int iImage);
@@ -179,6 +176,8 @@ public:
 	void DeselectAllItems();
 
 protected:
+	virtual void GenListItem(CListObject& Object, vector<wstring>& vecText, int& iImage);
+
 	virtual void PreSubclassWindow() override;
 
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;

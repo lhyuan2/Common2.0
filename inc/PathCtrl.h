@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <def.h>
-
 #include <fsutil.h>
 
 #include <TreeCtrl.h>
@@ -54,13 +52,13 @@ public:
 		return CTime(m_modifyTime).Format(_T("%y-%m-%d %H:%M"));
 	}
 
-	void GetListDisplay(E_ListViewType eViewType, list<wstring>& lstTexts, int& iImage) override
+	void GenListItem(CObjectList& wndList, vector<wstring>& vecText, int& iImage) override
 	{
-		lstTexts.push_back(m_strName);
+		vecText.push_back(m_strName);
 		
-		lstTexts.push_back(to_wstring(m_uFileSize));
+		vecText.push_back(to_wstring(m_uFileSize));
 		
-		lstTexts.push_back((LPCTSTR)GetFileModifyTime());
+		vecText.push_back((LPCTSTR)GetFileModifyTime());
 	}
 };
 
@@ -213,13 +211,9 @@ private:
 class __CommonPrjExt CPathList: public CObjectList
 {
 public:
-	CPathList(const TD_ListColumn& lstColumns, UINT uHeaderHeight)
+	CPathList(UINT uHeaderHeight)
 		: CObjectList(uHeaderHeight)
 	{
-		if (!lstColumns.empty())
-		{
-			m_lstColumns = lstColumns;
-		}
 	}
 
 private:
@@ -233,7 +227,7 @@ private:
 	virtual void PreSubclassWindow() override;
 
 public:
-	BOOL InitCtrl(UINT uFontSize);
+	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
 
 	BOOL InitCtrl(UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst = NULL, const TD_IconVec& vecIcons = {});
 

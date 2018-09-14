@@ -3,8 +3,6 @@
 
 #include <Page.h>
 
-#include <util.h>
-
 #include "MainWnd.h"
 
 #define WM_Async WM_USER+1

@@ -3,8 +3,6 @@
 
 #include <MainWnd.h>
 
-#include <util.h>
-
 
 #define __CursorName(_Style) ( \
 		VS_DockLeft == __DockStyle(_Style) || VS_DockRight == __DockStyle(_Style) \

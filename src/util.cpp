@@ -1,8 +1,6 @@
 
 #include "stdafx.h"
 
-#include <util.h>
-
 BOOL util::StrCompareIgnoreCase(const wstring& str1, const wstring& str2)
 {
 	return 0 == _wcsicmp(str1.c_str(), str2.c_str());

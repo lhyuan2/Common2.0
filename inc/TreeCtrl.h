@@ -3,8 +3,6 @@
 
 #include <img.h>
 
-#include <util.h>
-
 #include <Guide.h>
 
 class __CommonPrjExt CBaseTree: public CTreeCtrl

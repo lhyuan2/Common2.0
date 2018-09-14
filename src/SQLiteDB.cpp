@@ -3,8 +3,6 @@
 
 #include <SQLiteDB.h>
 
-#include <util.h>
-
 #include "sqlite/sqlite3.h"
 
 

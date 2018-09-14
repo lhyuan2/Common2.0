@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <def.h>
-
 class __CommonPrjExt CProFile
 {
 public:

@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "def.h"
-
 #include "Page.h"
 
 #include "Guide.h"

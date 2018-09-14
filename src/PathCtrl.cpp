@@ -5,9 +5,6 @@
 
 #include "Resource.h"
 
-#include <util.h>
-
-
 //CPathList
 
 void CPathList::PreSubclassWindow()
@@ -17,9 +14,9 @@ void CPathList::PreSubclassWindow()
 	(void)ModifyStyle(LVS_ALIGNLEFT, LVS_AUTOARRANGE);
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize)
+BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
 {
-	return __super::InitCtrl(uFontSize, m_lstColumns);
+	return __super::InitCtrl(uFontSize, lstColumns.empty()?m_lstColumns:lstColumns);
 }
 
 BOOL CPathList::InitCtrl(UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst, const TD_IconVec& vecIcons)

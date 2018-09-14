@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include <def.h>
-
-
 // CWorkThread
 
 class CWorkThread;

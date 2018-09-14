@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "def.h"
-
 enum E_OLEVarType
 {
 	OLEVT_Boolean = VT_BOOL,

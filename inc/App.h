@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include "def.h"
-
-
 // Hotkey
 enum class E_HotkeyFlag
 {

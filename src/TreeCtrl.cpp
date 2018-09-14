@@ -157,7 +157,7 @@ BOOL CCheckObjectTree::InitCtrl()
 	(void)StateBitmap.GetBitmap(&bmp);
 
 	__AssertReturn(m_StateImageList.Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32, 0, 0), FALSE);
-	(void)m_StateImageList.Add(&StateBitmap, __ColorBlack);
+	(void)m_StateImageList.Add(&StateBitmap, __Color_Black);
 	
 	(void)StateBitmap.DeleteObject();
 

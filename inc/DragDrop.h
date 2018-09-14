@@ -1,9 +1,6 @@
 #pragma once
 
-#include "def.h"
-
 #include <afxole.h>
-
 
 interface IDropTargetEx
 {

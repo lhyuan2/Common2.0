@@ -3,9 +3,6 @@
 
 #include <ProFile.h>
 
-#include <util.h>
-
-
 #define MAX_BUFFER 1024
 
 CProFile::CProFile(const string& strIniPath)

@@ -7,40 +7,40 @@
 #define __CommonPrjExt __declspec(dllimport)
 #endif
 
-#include "def.h"
+#include <CommonDef.h>
 
-#include "App.h"
+#include <util.h>
 
-#include "MainWnd.h"
+#include <App.h>
 
-#include "DockView.h"
+#include <MainWnd.h>
 
-#include "Page.h"
+#include <DockView.h>
 
-
-#include "IDB.h"
-
-#include "SQLiteDB.h"
+#include <Page.h>
 
 
-#include "util.h"
+#include <IDB.h>
 
-#include "ProFile.h"
+#include <SQLiteDB.h>
 
-#include "fsutil.h"
 
-#include "Guide.h"
+#include <ProFile.h>
 
-#include "ListCtrl.h"
+#include <fsutil.h>
 
-#include "TreeCtrl.h"
+#include <Guide.h>
 
-#include "PathCtrl.h"
+#include <ListCtrl.h>
 
-#include "LogList.h"
+#include <TreeCtrl.h>
 
-#include "DragDrop.h"
+#include <PathCtrl.h>
 
-#include "WorkThread.h"
+#include <LogList.h>
 
-#include "ProgressDlg.h"
+#include <DragDrop.h>
+
+#include <WorkThread.h>
+
+#include <ProgressDlg.h>
