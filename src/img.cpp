@@ -10,7 +10,7 @@ BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT
 	CRect rcDst(rcPos);
 	if (NULL != prcMargin)
 	{
-		dc.FillSolidRect(rcDst, RGB(255, 255, 255));
+		dc.FillSolidRect(rcDst, __Color_White);
 
 		rcDst.left = prcMargin->left;
 		rcDst.top = prcMargin->top;
@@ -74,7 +74,7 @@ BOOL CImg::InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin)
 
 	if (NULL != prcMargin)
 	{
-		m_CompDC.FillSolidRect(m_rcDst, RGB(255, 255, 255));
+		m_CompDC.FillSolidRect(m_rcDst, __Color_White);
 
 		m_rcDst.left = prcMargin->left;
 		m_rcDst.top = prcMargin->top;
@@ -187,7 +187,7 @@ void CImglst::SetBitmap(CBitmap& bitmap, int iPosReplace)
 	}
 	else
 	{
-		(void)Add(&bitmap, RGB(0, 0, 0));
+		(void)Add(&bitmap, __Color_Black);
 	}
 }
 

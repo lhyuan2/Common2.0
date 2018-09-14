@@ -1,6 +1,12 @@
 
 #pragma once
 
+#ifdef __CommonPrj
+#define __CommonPrjExt __declspec(dllexport)
+#else
+#define __CommonPrjExt __declspec(dllimport)
+#endif
+
 #include "def.h"
 
 #include "App.h"

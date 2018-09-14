@@ -155,6 +155,9 @@
       <Filter>inc\class</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\CommonExt.h" />
+    <ClInclude Include="stdafx.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Common.rc" />

@@ -213,7 +213,8 @@ private:
 class __CommonPrjExt CPathList: public CObjectList
 {
 public:
-	CPathList(const TD_ListColumn& lstColumns)
+	CPathList(const TD_ListColumn& lstColumns, UINT uHeaderHeight)
+		: CObjectList(uHeaderHeight)
 	{
 		if (!lstColumns.empty())
 		{

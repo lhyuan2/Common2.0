@@ -124,6 +124,8 @@ public:
 
 	void SetImageList(CImglst *pImglst, CImglst *pImglstSmall = NULL);
 
+	void SetColumnText(UINT uColumn, const wstring& strText);
+
 	void SetItemHeight(UINT uItemHeight);
 
 	bool SetUnderlineColumn(const set<int>& setColumns);

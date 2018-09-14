@@ -111,6 +111,14 @@ void CObjectList::SetImageList(CImglst *pImglst, CImglst *pImglstSmall)
 	}
 }
 
+void CObjectList::SetColumnText(UINT uColumn, const wstring& strText)
+{
+	HDITEM hdItem;
+	hdItem.mask = HDI_TEXT;
+	hdItem.pszText = (LPWSTR)strText.c_str();
+	m_wndHeader.SetItem(uColumn, &hdItem);
+}
+
 void CObjectList::SetItemHeight(UINT uItemHeight)
 {
 	if (m_ImglstSmall.Create(1, uItemHeight, ILC_COLOR8, 1, 0))

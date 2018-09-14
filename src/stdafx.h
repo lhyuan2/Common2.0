@@ -56,3 +56,5 @@
 extern HINSTANCE g_hInstance;
 
 extern void DoEvents(bool bOnce = false);
+
+#include "CommonExt.h"

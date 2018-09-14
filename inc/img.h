@@ -5,6 +5,9 @@
 
 #include <atlimage.h>
 
+#define __Color_White RGB(255, 255, 255)
+#define __Color_Black RGB(0, 0, 0)
+
 using TD_IconVec = vector<HICON>;
 
 class __CommonPrjExt CImg : public CImage

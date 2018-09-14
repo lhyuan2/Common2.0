@@ -95,9 +95,3 @@ using CB_TrackMouseEvent = function<void(E_TrackMouseEvent eMouseEvent, const CP
 \
 	private: \
 		_CLASS();
-
-#ifdef __CommonPrj
-	#define __CommonPrjExt __declspec(dllexport)
-#else
-	#define __CommonPrjExt __declspec(dllimport)
-#endif
