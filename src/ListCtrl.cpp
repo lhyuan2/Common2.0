@@ -261,6 +261,30 @@ void CObjectList::UpdateObject(CListObject& Object)
 	}
 }
 
+void CObjectList::SetItemObject(int nItem, CListObject& Object)
+{
+	int iImage = 0;
+	vector<wstring> vecText;
+	GenListItem(Object, vecText, iImage);
+
+	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
+		, iImage, 0, 0, (LPARAM)&Object));
+
+	auto itSubTitle = vecText.begin();
+	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
+	{
+		wstring strText;
+		if (itSubTitle != vecText.end())
+		{
+			strText = *itSubTitle;
+
+			itSubTitle++;
+		}
+
+		(void)__super::SetItemText(nItem, nColumn, strText.c_str());
+	}
+}
+
 void CObjectList::UpdateItem(UINT uItem)
 {
 	__Ensure(m_hWnd);
@@ -269,6 +293,24 @@ void CObjectList::UpdateItem(UINT uItem)
 	if (NULL != pObject)
 	{
 		this->SetItemObject(uItem, *pObject);
+	}
+}
+
+void CObjectList::UpdateItem(UINT uItem, CListObject& Object, const list<UINT>& lstColumn)
+{
+	int iImage = 0;
+	vector<wstring> vecText;
+	GenListItem(Object, vecText, iImage);
+
+	__Assert(SetItem(uItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
+		, iImage, 0, 0, (LPARAM)&Object));
+
+	for (auto nColumn : lstColumn)
+	{
+		if (nColumn < vecText.size())
+		{
+			(void)__super::SetItemText(uItem, nColumn, vecText[nColumn].c_str());
+		}
 	}
 }
 
@@ -302,30 +344,6 @@ BOOL CObjectList::DeleteObject(const CListObject *pObject)
 	__EnsureReturn(0 <= nItem, FALSE);
 
 	return this->DeleteItem(nItem);
-}
-
-void CObjectList::SetItemObject(int nItem, CListObject& Object)
-{
-	int iImage = 0;
-	vector<wstring> vecText;
-	GenListItem(Object, vecText, iImage);
-
-	__Assert(SetItem(nItem, 0, LVIF_IMAGE | LVIF_PARAM, NULL
-		, iImage, 0, 0, (LPARAM)&Object));
-
-	auto itSubTitle = vecText.begin();
-	for (UINT nColumn = 0; nColumn < m_nColumnCount; ++nColumn)
-	{
-		wstring strText;
-		if (itSubTitle != vecText.end())
-		{
-			strText = *itSubTitle;
-
-			itSubTitle++;
-		}
-
-		(void)__super::SetItemText(nItem, nColumn, strText.c_str());
-	}
 }
 
 void CObjectList::GenListItem(CListObject& Object, vector<wstring>& vecText, int& iImage)

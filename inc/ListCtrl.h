@@ -24,7 +24,7 @@ public:
 	virtual CString GetRenameText()
 	{
 		return L"";
-	};
+	}
 
 	virtual bool OnListItemRename(const wstring& strNewName)
 	{
@@ -148,6 +148,7 @@ public:
 	void UpdateObjects();
 	void UpdateObject(CListObject& Object);
 	void UpdateItem(UINT uItem);
+	void UpdateItem(UINT uItem, CListObject& Object, const list<UINT>& lstColumn);
 
 	void DeleteObjects(const TD_ListObjectList& lstDeleteObjects);
 

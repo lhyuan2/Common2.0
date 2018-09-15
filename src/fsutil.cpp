@@ -3,8 +3,6 @@
 
 #include <fsutil.h>
 
-#include <fstream>
-
 // fsutil
 
 void fsutil::SplitPath(const wstring& strPath, wstring *pstrDir, wstring *pstrFile)
@@ -191,24 +189,19 @@ bool fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 #define MAX_BUFFER 1024
 	char lpBuffer[MAX_BUFFER];
 
-	size_t nReadedSize = 0;
-
 	ifstream srcStream;
-	ofstream snkStream;
-
 	try
 	{
 		srcStream.open(strSrcFile.c_str(), ios::in | ios::binary);
-
 		//pfSrc = fopen(strSrcFile.c_str(), "r");
 		//bResult = srcfile.Open(util::StrToWStr(strSrcFile), CFile::modeRead| CFile::shareDenyNone);
 	}
 	catch (...)
 	{
-	}
-	
+	}	
 	__EnsureReturn(srcStream, FALSE);
 
+	ofstream snkStream;
 	try
 	{
 		snkStream.open(strSnkFile.c_str(), ios::out | ios::binary | ios::trunc);
@@ -217,12 +210,10 @@ bool fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 	catch (...)
 	{
 	}
-
 	if (!snkStream)
 	{
 		srcStream.close();
 		//(void)fclose(pfSrc);
-
 		//srcfile.Close();
 		return FALSE;
 	}
@@ -232,20 +223,19 @@ bool fsutil::CopyFile(const wstring& strSrcFile, const wstring& strSnkFile)
 	{
 		while (true)
 		{
+			//nReadedSize = fread(lpBuffer, 1, MAX_BUFFER, pfSrc)
+
 			srcStream.read(lpBuffer, MAX_BUFFER);
-			nReadedSize = (size_t)srcStream.gcount();
-				
-			if (nReadedSize)
+			auto nReadedSize = srcStream.gcount();
+			
+			//fwrite(lpBuffer, nReadedSize, 1, pfSnk);
+			//snkfile.Write(lpBuffer, nReadedSize);
+
+			if (0 < nReadedSize)
 			{
 				snkStream.write(lpBuffer, nReadedSize);
 			}
-
-			//nReadedSize = fread(lpBuffer, 1, MAX_BUFFER, pfSrc)
-			//fwrite(lpBuffer, nReadedSize, 1, pfSnk);
-
-			//snkfile.Write(lpBuffer, nReadedSize);
-
-			if (srcStream.gcount() < MAX_BUFFER)
+			if (nReadedSize < MAX_BUFFER)
 			{
 				break;
 			}

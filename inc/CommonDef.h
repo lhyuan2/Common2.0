@@ -18,6 +18,8 @@
 
 #include <stdlib.h>
 
+#include <fstream>
+
 using namespace std;
 
 enum class E_TrackMouseEvent
