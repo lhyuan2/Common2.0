@@ -85,7 +85,14 @@ bool CFontGuide::setFontSize(CWnd& wnd, ULONG uFontSize)
 	if (NULL == m_font.m_hObject)
 	{
 		if (!m_font.create(wnd, [uFontSize](LOGFONT& logFont) {
-			logFont.lfHeight = uFontSize;
+			if (logFont.lfHeight < 0)
+			{
+				logFont.lfHeight -= uFontSize;
+			}
+			else
+			{
+				logFont.lfHeight += uFontSize;
+			}
 		}))
 		{
 			return false;

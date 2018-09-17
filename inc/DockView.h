@@ -42,7 +42,7 @@ public:
 	}
 
 private:
-	int m_iTrackStatus = -1;
+	int m_iTrackMouseFlag = -1;
 
 	CB_TrackMouseEvent m_cbMouseEvent;
 

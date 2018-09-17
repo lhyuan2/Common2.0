@@ -5,7 +5,7 @@
 
 #include <Guide.h>
 
-enum E_ListViewType
+enum class E_ListViewType
 {
 	LVT_Tile = LV_VIEW_TILE,
 	LVT_Icon = LVS_ICON,
@@ -68,15 +68,30 @@ class __CommonPrjExt CObjectList : public CListCtrl
 public:
 	using CB_ListViewChanged = function<void(E_ListViewType)>;
 
+	struct tagListPara
+	{
+		UINT uFontSize = 0;
+		UINT uFontSizeHeader = 0;
+
+		E_ListViewType eViewType = (E_ListViewType)-1;
+
+		TD_ListColumn lstColumns;
+
+		set<UINT> setUnderlineColumns;
+
+		UINT uItemHeight = 0;
+
+		UINT uTileWidth = 0;
+		UINT uTileHeight = 0;
+
+		CB_LVCostomDraw cbCustomDraw;
+		CB_ListViewChanged cbViewChanged;
+		CB_TrackMouseEvent cbMouseEvent;
+	};
+
 	CObjectList(UINT uHeaderHeight = 0)
 		: m_wndHeader(uHeaderHeight)
 	{
-	}
-
-	void SetCusomDrawNotify(const CB_LVCostomDraw& cbCustomDraw=NULL)
-	{
-		m_bCusomDrawNotify = true;
-		m_cbCustomDraw = cbCustomDraw;
 	}
 
 	virtual ~CObjectList()
@@ -93,28 +108,23 @@ public:
 private:
 	CHeaderCtrlEx m_wndHeader;
 
+	tagListPara m_para;
+
 	CFontGuide m_fontGuide;
 
 	UINT m_nColumnCount = 1;
 
-	bool m_bCusomDrawNotify = false;
-	CB_LVCostomDraw m_cbCustomDraw;
-
 	CCompatableFont m_fontUnderline;
-	set<UINT> m_setUnderlineColumns;
 	
-	E_ListViewType m_eViewType = (E_ListViewType)-1;
-
+	bool m_bCusomDrawNotify = false;
 	bool m_bAutoChange = false;
-	CB_ListViewChanged m_cbViewChanged;
-
-	CString m_cstrRenameText;
+	int m_iTrackMouseFlag = -1;
 	
-	CB_TrackMouseEvent m_cbMouseEvent;
-
-	int m_iTrackStatus = -1;
+	CString m_cstrRenameText;
 
 public:
+	BOOL InitCtrl(const tagListPara& para);
+
 	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
 
 	BOOL InitImglst(const CSize& size, const CSize *pszSmall = NULL, const TD_IconVec& vecIcons = {});
@@ -122,33 +132,42 @@ public:
 
 	void SetImageList(CImglst *pImglst, CImglst *pImglstSmall = NULL);
 
-	void SetColumnText(UINT uColumn, const wstring& strText);
+	BOOL SetItemHeight(UINT uItemHeight);
 
-	void SetItemHeight(UINT uItemHeight);
-
-	bool SetUnderlineColumn(const set<UINT>& setColumns);
+	BOOL SetUnderlineColumn(const set<UINT>& setColumns);
 
 	void SetTileSize(ULONG cx, ULONG cy);
+
+	void SetCusomDrawNotify(const CB_LVCostomDraw& cbCustomDraw = NULL)
+	{
+		m_bCusomDrawNotify = true;
+		m_para.cbCustomDraw = cbCustomDraw;
+	}
 
 	void SetViewAutoChange(const CB_ListViewChanged& cb = NULL)
 	{
 		m_bAutoChange = true;
-		m_cbViewChanged = cb;
+		m_para.cbViewChanged = cb;
 	}
+
+	void SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent=NULL);
 
 	void SetView(E_ListViewType eViewType, bool bArrange=false);
 	E_ListViewType GetView();
 	
-	void SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent=NULL);
+	void SetColumnText(UINT uColumn, const wstring& strText);
 
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);
 
 	int InsertObject(CListObject& Object, int nItem=-1);
 	
-	void UpdateObjects();
 	void UpdateObject(CListObject& Object);
+
 	void UpdateItem(UINT uItem);
 	void UpdateItem(UINT uItem, CListObject& Object, const list<UINT>& lstColumn);
+
+	void UpdateItems();
+	void UpdateItems(const list<UINT>& lstColumn);
 
 	void DeleteObjects(const TD_ListObjectList& lstDeleteObjects);
 
@@ -165,7 +184,7 @@ public:
 	int GetSingleSelectedItem();
 	CListObject *GetSingleSelectedObject();
 
-	void GetMultiSelectedItems(list<int>& lstItems);
+	void GetMultiSelectedItems(list<UINT>& lstItems);
 	void GetMultiSelectedObjects(map<int, CListObject*>& mapObjects);
 	void GetMultiSelectedObjects(TD_ListObjectList& lstObjects);
 
@@ -175,6 +194,8 @@ public:
 	void SelectItems(int nItem, int nSelectCount);
 	void SelectAllItems();
 	void DeselectAllItems();
+
+	UINT GetHeaderHeight();
 
 protected:
 	virtual void GenListItem(CListObject& Object, vector<wstring>& vecText, int& iImage);

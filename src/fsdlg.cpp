@@ -116,13 +116,13 @@ int CFolderDlg::BrowseFolderCallBack(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM
 					break;
 				}
 
-				CRect rcPreClient(0,0,0,0);
+				CRect rcPreClient;
 				pWnd->GetClientRect(&rcPreClient);
 
 				pWnd->MoveWindow(0, 0, pInstance->m_nWidth, pInstance->m_nHeight, FALSE);
 				pWnd->CenterWindow();
 
-				CRect rcClient(0,0,0,0);
+				CRect rcClient;
 				pWnd->GetClientRect(&rcClient);
 				
 				int nWidthOff = rcClient.Width() - rcPreClient.Width();
@@ -130,7 +130,7 @@ int CFolderDlg::BrowseFolderCallBack(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM
 
 
 				HWND hWndStatic = NULL;
-				CRect rcStatic(0,0,0,0);
+				CRect rcStatic;
 				while (TRUE)
 				{
 					hWndStatic = ::FindWindowEx(hWnd, hWndStatic, L"Static", NULL);
@@ -155,20 +155,20 @@ int CFolderDlg::BrowseFolderCallBack(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM
 					break;
 				}
 
-				CRect rcTreeCtrl(0,0,0,0);
+				CRect rcTreeCtrl;
 				pWndTreeCtrl->GetWindowRect(&rcTreeCtrl);
 				pWnd->ScreenToClient(&rcTreeCtrl);
 				pWndTreeCtrl->MoveWindow(rcTreeCtrl.left, rcTreeCtrl.top
 					, rcTreeCtrl.Width() + nWidthOff, rcTreeCtrl.Height() + nHeightOff, FALSE);
 
 
-				CRect rcOkButton(0,0,0,0);
+				CRect rcOkButton;
 				pWndOkButton->GetWindowRect(&rcOkButton);
 				pWnd->ScreenToClient(&rcOkButton);
 				pWndOkButton->MoveWindow(rcOkButton.left + nWidthOff, rcOkButton.top + nHeightOff
 					, rcOkButton.Width() , rcOkButton.Height(), FALSE);
 
-				CRect rcCancelButton(0,0,0,0);
+				CRect rcCancelButton;
 				pWndCancelButton->GetWindowRect(&rcCancelButton);
 				pWnd->ScreenToClient(&rcCancelButton);
 				pWndCancelButton->MoveWindow(rcCancelButton.left + nWidthOff, rcCancelButton.top + nHeightOff

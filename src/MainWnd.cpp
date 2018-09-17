@@ -93,7 +93,7 @@ void CMainWnd::OnSize()
 	this->GetClientRect(&m_rtBlankArea);
 	if (m_ctlStatusBar.m_hWnd)
 	{
-		CRect rcStatusBar(0,0,0,0);
+		CRect rcStatusBar;
 		m_ctlStatusBar.GetWindowRect(&rcStatusBar);
 
 		m_rtBlankArea.bottom -= rcStatusBar.Height();
@@ -277,7 +277,7 @@ void CMainWnd::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 CDockView* CMainWnd::GetDockView(const CPoint& ptPos)
 {
 	CDockView* pView = NULL;
-	CRect rcPos(0,0,0,0);
+	CRect rcPos;
 	UINT nDockStyle = 0;
 
 	for (TD_DockViewVector::iterator itView=m_vctDockViews.begin(); itView!=m_vctDockViews.end(); ++itView)
@@ -309,7 +309,7 @@ CDockView* CMainWnd::GetDockView(const CPoint& ptPos)
 
 void CMainWnd::ResizeView(CDockView &wndTargetView, CPoint &ptPos)
 {
-	CRect rcPos(0,0,0,0);
+	CRect rcPos;
 	this->GetClientRect(&rcPos);
 
 	if (!::PtInRect(&rcPos, ptPos))

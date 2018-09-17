@@ -5,7 +5,7 @@
 
 void CTabCtrlEx::OnTrackMouseEvent(E_TrackMouseEvent eMouseEvent, const CPoint& point)
 {
-	m_iTrackStatus = 0;
+	m_iTrackMouseFlag = 0;
 
 	if (m_cbMouseEvent)
 	{
@@ -17,7 +17,7 @@ void CTabCtrlEx::SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent)
 {
 	m_cbMouseEvent = cbMouseEvent;
 
-	m_iTrackStatus = 0;
+	m_iTrackMouseFlag = 0;
 }
 
 BOOL CTabCtrlEx::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
@@ -25,28 +25,28 @@ BOOL CTabCtrlEx::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* p
 	switch (message)
 	{
 	case WM_MOUSEMOVE:
-		if (0 == m_iTrackStatus)
+		if (0 == m_iTrackMouseFlag)
 		{
 			TRACKMOUSEEVENT tme;
 			tme.cbSize = sizeof(tme);
 			tme.hwndTrack = m_hWnd;
 			tme.dwFlags = TME_LEAVE | TME_HOVER;
 			tme.dwHoverTime = HOVER_DEFAULT;
-			m_iTrackStatus = ::TrackMouseEvent(&tme);
+			m_iTrackMouseFlag = ::TrackMouseEvent(&tme);
 		}
 
 		OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseMove, CPoint(lParam));
 
 		break;
 	case WM_MOUSELEAVE:
-		m_iTrackStatus = 0;
+		m_iTrackMouseFlag = 0;
 
 		OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseLeave, CPoint(lParam));
 
 		break;
 	case WM_MOUSEHOVER:
 	{
-		//m_iTrackStatus = 0;
+		//m_iTrackMouseFlag = 0;
 
 		OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseHover, CPoint(lParam));
 	}
@@ -284,7 +284,7 @@ void CDockView::OnSize(UINT nType, int, int)
 
 void CDockView::OnSize()
 {
-	CRect rcClient(0,0,0,0);
+	CRect rcClient;
 	this->GetClientRect(&rcClient);
 
 	CTabCtrl* pTabCtrl = this->GetTabControl();

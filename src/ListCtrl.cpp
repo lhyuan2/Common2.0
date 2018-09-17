@@ -34,6 +34,50 @@ void CObjectList::PreSubclassWindow()
 		| LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_LABELTIP);
 }
 
+BOOL CObjectList::InitCtrl(const tagListPara& para)
+{
+	m_para = para;
+
+	__EnsureReturn(InitCtrl(m_para.uFontSize, m_para.lstColumns), FALSE);
+	
+	if (-1 != (int)m_para.eViewType)
+	{
+		SetView(m_para.eViewType);
+	}
+
+	if (!m_para.setUnderlineColumns.empty())
+	{
+		__EnsureReturn(SetUnderlineColumn(m_para.setUnderlineColumns), FALSE);
+	}
+
+	if (0 != m_para.uItemHeight)
+	{
+		__EnsureReturn(SetItemHeight(m_para.uItemHeight), FALSE);
+	}
+
+	if (0 != m_para.uTileWidth && 0 != m_para.uTileHeight)
+	{
+		SetTileSize(m_para.uTileWidth, m_para.uTileHeight);
+	}
+
+	if (m_para.cbCustomDraw)
+	{
+		m_bCusomDrawNotify = true;
+	}
+	
+	if (m_para.cbViewChanged)
+	{
+		m_bAutoChange = true;
+	}
+
+	if (m_para.cbMouseEvent)
+	{
+		m_iTrackMouseFlag = 0;
+	}
+
+	return TRUE;
+}
+
 BOOL CObjectList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
 {
 	if (0 < uFontSize)
@@ -119,25 +163,26 @@ void CObjectList::SetColumnText(UINT uColumn, const wstring& strText)
 	m_wndHeader.SetItem(uColumn, &hdItem);
 }
 
-void CObjectList::SetItemHeight(UINT uItemHeight)
+BOOL CObjectList::SetItemHeight(UINT uItemHeight)
 {
-	if (m_ImglstSmall.Create(1, uItemHeight, ILC_COLOR8, 1, 0))
-	{
-		SetImageList(NULL, &m_ImglstSmall);
-	}
+	__AssertReturn(m_ImglstSmall.Create(1, uItemHeight, ILC_COLOR8, 1, 0), FALSE);
+
+	SetImageList(NULL, &m_ImglstSmall);
+	
+	return TRUE;
 }
 
-bool CObjectList::SetUnderlineColumn(const set<UINT>& setColumns)
+BOOL CObjectList::SetUnderlineColumn(const set<UINT>& setColumns)
 {
-	m_setUnderlineColumns = setColumns;
+	m_para.setUnderlineColumns = setColumns;
 
 	__AssertReturn(m_fontUnderline.create(*this, [](LOGFONT& logFont) {
 		logFont.lfUnderline = 1;
-	}), false);
+	}), FALSE);
 
 	SetCusomDrawNotify();
 
-	return true;
+	return TRUE;
 }
 
 void CObjectList::SetTileSize(ULONG cx, ULONG cy)
@@ -154,8 +199,8 @@ void CObjectList::SetView(E_ListViewType eViewType, bool bArrange)
 {
 	this->SetRedraw(FALSE);
 
-	m_eViewType = eViewType;
-	(void)__super::SetView(eViewType);
+	m_para.eViewType = eViewType;
+	(void)__super::SetView((int)eViewType);
 
 	if (bArrange)
 	{
@@ -167,21 +212,21 @@ void CObjectList::SetView(E_ListViewType eViewType, bool bArrange)
 
 E_ListViewType CObjectList::GetView()
 {
-	if ((E_ListViewType)-1 != m_eViewType)
+	if ((E_ListViewType)-1 != m_para.eViewType)
 	{
-		return m_eViewType;
+		return m_para.eViewType;
 	}
 
-	m_eViewType = (E_ListViewType)__super::GetView();
+	m_para.eViewType = (E_ListViewType)__super::GetView();
 
-	return m_eViewType;
+	return m_para.eViewType;
 }
 
 void CObjectList::SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent)
 {
-	m_cbMouseEvent = cbMouseEvent;
+	m_para.cbMouseEvent = cbMouseEvent;
 
-	m_iTrackStatus = 0;
+	m_iTrackMouseFlag = 0;
 }
 
 void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
@@ -238,16 +283,6 @@ int CObjectList::InsertObject(CListObject& Object, int nItem)
 	this->SetItemObject(nItem, Object);
 	
 	return nItem;
-}
-
-void CObjectList::UpdateObjects()
-{
-	__Ensure(m_hWnd);
-
-	for (int nItem = 0; nItem < this->GetItemCount(); ++nItem)
-	{
-		SetItemObject(nItem, *(CListObject*)__super::GetItemData(nItem));
-	}
 }
 
 void CObjectList::UpdateObject(CListObject& Object)
@@ -311,6 +346,26 @@ void CObjectList::UpdateItem(UINT uItem, CListObject& Object, const list<UINT>& 
 		{
 			(void)__super::SetItemText(uItem, nColumn, vecText[nColumn].c_str());
 		}
+	}
+}
+
+void CObjectList::UpdateItems()
+{
+	CRedrawLockGuide RedrawLockGuide(*this);
+
+	for (int iItem = 0; iItem < this->GetItemCount(); ++iItem)
+	{
+		SetItemObject(iItem, *(CListObject*)__super::GetItemData(iItem));
+	}
+}
+
+void CObjectList::UpdateItems(const list<UINT>& lstColumn)
+{
+	CRedrawLockGuide RedrawLockGuide(*this);
+
+	for (UINT uItem = 0; uItem < (UINT)this->GetItemCount(); uItem++)
+	{
+		UpdateItem(uItem, *(CListObject*)__super::GetItemData(uItem), lstColumn);
 	}
 }
 
@@ -400,10 +455,8 @@ CListObject *CObjectList::GetSingleSelectedObject()
 	return this->GetItemObject(nItem);
 }
 
-void CObjectList::GetMultiSelectedItems(list<int>& lstItems)
+void CObjectList::GetMultiSelectedItems(list<UINT>& lstItems)
 {
-	int nItem = 0;
-
 	POSITION lpPos = __super::GetFirstSelectedItemPosition();
 	while (lpPos)
 	{
@@ -413,25 +466,23 @@ void CObjectList::GetMultiSelectedItems(list<int>& lstItems)
 
 void CObjectList::GetMultiSelectedObjects(map<int, CListObject*>& mapObjects)
 {
-	list<int> lstItems;
+	list<UINT> lstItems;
 	this->GetMultiSelectedItems(lstItems);
 
-	for (list<int>::iterator itrItem = lstItems.begin()
-		; itrItem != lstItems.end(); ++itrItem)
+	for (auto uItem : lstItems)
 	{
-		mapObjects[*itrItem] = this->GetItemObject(*itrItem);
+		mapObjects[uItem] = this->GetItemObject(uItem);
 	}
 }
 
 void CObjectList::GetMultiSelectedObjects(TD_ListObjectList& lstObjects)
 {
-	list<int> lstItems;
+	list<UINT> lstItems;
 	this->GetMultiSelectedItems(lstItems);
 
-	for (list<int>::iterator itrItem = lstItems.begin()
-		; itrItem != lstItems.end(); ++itrItem)
+	for (auto uItem : lstItems)
 	{
-		lstObjects.push_back(this->GetItemObject(*itrItem));
+		lstObjects.push_back(this->GetItemObject(uItem));
 	}
 }
 
@@ -632,18 +683,18 @@ BOOL CObjectList::handleNMNotify(NMHDR& NMHDR, LRESULT* pResult)
 
 void CObjectList::OnCustomDraw(NMLVCUSTOMDRAW& lvcd, bool& bSkipDefault)
 {
-	if (m_cbCustomDraw)
+	if (m_para.cbCustomDraw)
 	{
-		m_cbCustomDraw(*this, lvcd, bSkipDefault);
+		m_para.cbCustomDraw(*this, lvcd, bSkipDefault);
 		if (bSkipDefault)
 		{
 			return;
 		}
 	}
 
-	if (!m_setUnderlineColumns.empty())
+	if (!m_para.setUnderlineColumns.empty())
 	{
-		if (m_setUnderlineColumns.find(lvcd.iSubItem) != m_setUnderlineColumns.end())
+		if (m_para.setUnderlineColumns.find(lvcd.iSubItem) != m_para.setUnderlineColumns.end())
 		{
 			::SelectObject(lvcd.nmcd.hdc, m_fontUnderline);
 		}
@@ -656,9 +707,9 @@ void CObjectList::OnCustomDraw(NMLVCUSTOMDRAW& lvcd, bool& bSkipDefault)
 
 void CObjectList::OnTrackMouseEvent(E_TrackMouseEvent eMouseEvent, const CPoint& point)
 {
-	if (m_cbMouseEvent)
+	if (m_para.cbMouseEvent)
 	{
-		m_cbMouseEvent(eMouseEvent, point);
+		m_para.cbMouseEvent(eMouseEvent, point);
 	}
 }
 
@@ -686,31 +737,31 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 			}
 		}
 	}
-	else if (-1 != m_iTrackStatus)
+	else if (-1 != m_iTrackMouseFlag)
 	{
 		if (WM_MOUSEMOVE == message)
 		{
-			if (0 == m_iTrackStatus)
+			if (0 == m_iTrackMouseFlag)
 			{
 				TRACKMOUSEEVENT tme;
 				tme.cbSize = sizeof(tme);
 				tme.hwndTrack = m_hWnd;
 				tme.dwFlags = TME_LEAVE | TME_HOVER;
 				tme.dwHoverTime = HOVER_DEFAULT;
-				m_iTrackStatus = ::TrackMouseEvent(&tme);
+				m_iTrackMouseFlag = ::TrackMouseEvent(&tme);
 			}
 
 			OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseMove, CPoint(lParam));
 		}
 		else if (WM_MOUSELEAVE == message)
 		{
-			m_iTrackStatus = 0;
+			m_iTrackMouseFlag = 0;
 
 			OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseLeave, CPoint(lParam));
 		}
 		else if (WM_MOUSEHOVER == message)
 		{
-			//m_iTrackStatus = 0;
+			//m_iTrackMouseFlag = 0;
 
 			OnTrackMouseEvent(E_TrackMouseEvent::LME_MouseHover, CPoint(lParam));
 		}
@@ -722,11 +773,11 @@ BOOL CObjectList::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* 
 void CObjectList::ChangeListCtrlView(short zDelta)
 {
 	E_ListViewType lpViewType[] = {
-		LVT_Tile
-		, LVT_Report
-		, LVT_List
+		E_ListViewType::LVT_Tile
+		, E_ListViewType::LVT_Report
+		, E_ListViewType::LVT_List
 		//, LVT_SmallIcon
-		, LVT_Icon
+		, E_ListViewType::LVT_Icon
 	};
 
 	E_ListViewType nPreViewType = this->GetView();
@@ -742,17 +793,26 @@ void CObjectList::ChangeListCtrlView(short zDelta)
 				nIndex = 0;
 			}
 			
-			m_eViewType = lpViewType[nIndex];
-			this->SetView(m_eViewType);
+			m_para.eViewType = lpViewType[nIndex];
+			this->SetView(m_para.eViewType);
 
-			if (m_cbViewChanged)
+			if (m_para.cbViewChanged)
 			{
-				m_cbViewChanged(m_eViewType);
+				m_para.cbViewChanged(m_para.eViewType);
 			}
 
 			break;
 		}
 	}
+}
 
-	//(void)this->RedrawWindow();
+UINT CObjectList::GetHeaderHeight()
+{
+	CRect rcHeader;
+	m_wndHeader.GetWindowRect(&rcHeader);
+
+	//this->ScreenToClient(&rcHeader);
+	//return rcHeader.bottom;
+
+	return (UINT)rcHeader.Height();
 }

@@ -4,7 +4,7 @@
 
 interface IDropTargetEx
 {
-	virtual DROPEFFECT OnDragOver(CWnd *pWnd, LPVOID pDragData, DWORD dwKeyState, CPoint point, BOOL bFirstTime=FALSE) = 0;
+	virtual DROPEFFECT OnDragOver(CWnd *pWnd, LPVOID pDragData, DWORD dwKeyState, CPoint point, BOOL bFirstEnter=FALSE) = 0;
 
 	virtual BOOL OnDrop(CWnd *pWnd, LPVOID pDragData, DROPEFFECT dropEffect, CPoint point) = 0;
 
