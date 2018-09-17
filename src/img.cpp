@@ -3,13 +3,13 @@
 
 #include <img.h>
 
-BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT prcMargin)
+BOOL CImg::StretchBltFix(E_ImgFixMode eFixMode, CDC& dcTarget, const CRect& rcTarget, bool bHalfToneMode, LPCRECT prcMargin)
 {
-	CRect rcDst(rcPos);
+	CRect rcDst(rcTarget);
+	dcTarget.FillSolidRect(rcDst, m_crBkgrd);
+	
 	if (NULL != prcMargin)
 	{
-		dc.FillSolidRect(rcDst, __Color_White);
-
 		rcDst.left = prcMargin->left;
 		rcDst.top = prcMargin->top;
 		rcDst.right -= prcMargin->right;
@@ -25,14 +25,50 @@ BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT
 
 	float fNeedHWRate = (float)rcDst.Height() / rcDst.Width();
 
+	if (E_ImgFixMode::IFM_Inner == eFixMode)
+	{
+		if (fHWRate > fNeedHWRate)
+		{
+			eFixMode = E_ImgFixMode::IFM_Width;
+		}
+		else
+		{
+			eFixMode = E_ImgFixMode::IFM_Height;
+		}
+	}
+	else if (E_ImgFixMode::IFM_Outer == eFixMode)
+	{
+		if (fHWRate > fNeedHWRate)
+		{
+			eFixMode = E_ImgFixMode::IFM_Height;
+			
+			iDstWidth = iDstHeight / fHWRate;
+			auto offset = (rcDst.Width() - iDstWidth) / 2;
+			rcDst.left += offset;
+			rcDst.right -= offset;
+		}
+		else
+		{
+			eFixMode = E_ImgFixMode::IFM_Width;
+
+			iDstHeight = iDstWidth * fHWRate;
+			auto offset = (rcDst.Height() - iDstHeight) / 2;
+			rcDst.top += offset;
+			rcDst.bottom -= offset;
+		}
+	}
+
 	CRect rcSrc;
-	if (fHWRate > fNeedHWRate)
+	if (E_ImgFixMode::IFM_Width == eFixMode)
 	{
 		rcSrc.left = 0;
 		rcSrc.right = iImgWidth;
 
 		rcSrc.top = LONG(iImgHeight - iImgWidth*fNeedHWRate) / 2;
+		rcSrc.top = max(rcSrc.top, 0);
+
 		rcSrc.bottom = iImgHeight - rcSrc.top;
+		rcSrc.bottom = max(rcSrc.bottom, 0);
 	}
 	else
 	{
@@ -40,14 +76,17 @@ BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT
 		rcSrc.bottom = iImgHeight;
 
 		rcSrc.left = LONG(iImgWidth - iImgHeight / fNeedHWRate) / 2;
+		rcSrc.left = max(rcSrc.left, 0);
+		
 		rcSrc.right = iImgWidth - rcSrc.left;
+		rcSrc.right = max(rcSrc.right, 0);
 	}
 
-	(void)dc.SetStretchBltMode(bHalfToneMode ? STRETCH_HALFTONE : STRETCH_DELETESCANS);
+	(void)dcTarget.SetStretchBltMode(bHalfToneMode ? STRETCH_HALFTONE : STRETCH_DELETESCANS);
 
-	CDC *pdcThis = CDC::FromHandle(this->GetDC());
+	CDC *pdcThis = GetDC();
 
-	BOOL bRet = dc.StretchBlt(rcDst.left, rcDst.top, iDstWidth, iDstHeight
+	BOOL bRet = dcTarget.StretchBlt(rcDst.left, rcDst.top, iDstWidth, iDstHeight
 		, pdcThis, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), SRCCOPY);
 
 	this->ReleaseDC();
@@ -55,8 +94,15 @@ BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT
 	return bRet;
 }
 
-BOOL CImg::InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin)
+CDC *CImg::GetDC()
 {
+	return CDC::FromHandle(__super::GetDC());
+}
+
+BOOL CImg::InitMemDC(E_ImgFixMode eFixMode, bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin)
+{
+	m_eFixMode = eFixMode;
+
 	m_cx = cx;
 	m_cy = cy;
 	m_rcDst = { 0, 0, (int)cx, (int)cy };
@@ -66,13 +112,13 @@ BOOL CImg::InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin)
 	CDC *pDC = CDC::FromHandle(::GetDC(NULL));
 	__AssertReturn(pDC, FALSE);
 
-	__AssertReturn(m_CompDC.CreateCompatibleDC(pDC), FALSE);
+	__AssertReturn(m_MemDC.CreateCompatibleDC(pDC), FALSE);
 
-	__AssertReturn(m_CompBitmap.CreateCompatibleBitmap(pDC, m_rcDst.Width(), m_rcDst.Height()), FALSE);
+	__AssertReturn(m_MemBitmap.CreateCompatibleBitmap(pDC, m_rcDst.Width(), m_rcDst.Height()), FALSE);
 
 	if (NULL != prcMargin)
 	{
-		m_CompDC.FillSolidRect(m_rcDst, __Color_White);
+		m_MemDC.FillSolidRect(m_rcDst, __Color_White);
 
 		m_rcDst.left = prcMargin->left;
 		m_rcDst.top = prcMargin->top;
@@ -83,33 +129,59 @@ BOOL CImg::InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin)
 	return TRUE;
 }
 
-CBitmap* CImg::LoadEx(const wstring& strFile)
+BOOL CImg::Load(const wstring& strFile)
 {
 	Destroy();
-	HRESULT hr = Load(strFile.c_str());
-	__EnsureReturn(S_OK == hr, NULL);
+	HRESULT hr = __super::Load(strFile.c_str());
+	__EnsureReturn(S_OK == hr, FALSE);
 
-	CBitmap *pbmpPrev = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
-
-	BOOL bRet = StretchBltEx(m_CompDC, m_rcDst, m_bHalfToneMode);
-	if (!bRet)
+	if (NULL == m_pbmpPrev && m_MemBitmap.m_hObject)
 	{
-		return NULL;
+		m_pbmpPrev = (CBitmap*)m_MemDC.SelectObject(&m_MemBitmap);
 	}
 
-	//(void)m_CompDC.SelectObject(pbmpPrev);
-
-	return &m_CompBitmap;
+	return TRUE;
 }
 
-BOOL CImg::StretchBltEx(CDC& dc, const CRect& rcPos)
+BOOL CImg::LoadEx(const wstring& strFile, const function<E_ImgFixMode(UINT uWidth, UINT uHeight)>& cb)
 {
-	return dc.StretchBlt(rcPos.left, rcPos.top, rcPos.Width(), rcPos.Height(), &m_CompDC, 0, 0, m_cx, m_cy, SRCCOPY);
+	__EnsureReturn(Load(strFile), FALSE);
+
+	E_ImgFixMode eFixMode = m_eFixMode;
+	if (cb)
+	{
+		eFixMode = cb((UINT)CImage::GetWidth(), (UINT)CImage::GetHeight());
+	}
+
+	__EnsureReturn(StretchBltFix(eFixMode, m_MemDC, m_rcDst, m_bHalfToneMode), FALSE);
+
+	return TRUE;
 }
 
-BOOL CImg::StretchBltEx(CImg& img)
+BOOL CImg::StretchBltEx(CDC& dcTarget, const CRect& rcTarget)
 {
-	return StretchBltEx(img.m_CompDC, CRect(0, 0, m_cx, m_cy));
+	return dcTarget.StretchBlt(rcTarget.left, rcTarget.top, rcTarget.Width(), rcTarget.Height()
+		, &m_MemDC, 0, 0, m_cx, m_cy, SRCCOPY);
+}
+
+BOOL CImg::StretchBltEx(CImg& imgTarget)
+{
+	return StretchBltEx(imgTarget.m_MemDC, CRect(0, 0, m_cx, m_cy));
+}
+
+void CImg::RestoreMemDC()
+{
+	if (NULL != m_pbmpPrev)
+	{
+		(void)m_MemDC.SelectObject(m_pbmpPrev);
+		m_pbmpPrev = NULL;
+	}
+}
+
+CBitmap& CImg::FetchMemBitmap()
+{
+	RestoreMemDC();
+	return m_MemBitmap;
 }
 
 BOOL CImglst::Init(UINT cx, UINT cy)
@@ -122,9 +194,9 @@ BOOL CImglst::Init(UINT cx, UINT cy)
 	CDC *pDC = CDC::FromHandle(::GetDC(NULL));
 	__AssertReturn(pDC, FALSE);
 
-	__AssertReturn(m_CompDC.CreateCompatibleDC(pDC), FALSE);
+	__AssertReturn(m_MemDC.CreateCompatibleDC(pDC), FALSE);
 
-	__AssertReturn(m_CompBitmap.CreateCompatibleBitmap(pDC, cx, cy), FALSE);
+	__AssertReturn(m_MemBitmap.CreateCompatibleBitmap(pDC, cx, cy), FALSE);
 	
 	return TRUE;
 }
@@ -155,11 +227,7 @@ BOOL CImglst::Init(CBitmap& bitmap)
 BOOL CImglst::SetFile(const wstring& strFile, bool bHalfToneMode, LPCRECT prcMargin, int iPosReplace)
 {
 	CImg img;
-	HRESULT hr = img.Load(strFile.c_str());
-	__EnsureReturn(S_OK == hr, FALSE);
-	{
-		return NULL;
-	}
+	__EnsureReturn(img.Load(strFile.c_str()), FALSE);
 
 	SetImg(img, bHalfToneMode, prcMargin, iPosReplace);
 	
@@ -168,13 +236,13 @@ BOOL CImglst::SetFile(const wstring& strFile, bool bHalfToneMode, LPCRECT prcMar
 
 void CImglst::SetImg(CImg& img, bool bHalfToneMode, LPCRECT prcMargin, int iPosReplace)
 {
-	CBitmap *pbmpPrev = (CBitmap*)m_CompDC.SelectObject(&m_CompBitmap);
+	CBitmap *pbmpPrev = (CBitmap*)m_MemDC.SelectObject(&m_MemBitmap);
 
-	img.StretchBltEx(m_CompDC, CRect(0, 0, m_cx, m_cy), bHalfToneMode, prcMargin);
+	img.StretchBltFix(E_ImgFixMode::IFM_Inner, m_MemDC, CRect(0, 0, m_cx, m_cy), bHalfToneMode, prcMargin);
 
-	(void)m_CompDC.SelectObject(pbmpPrev);
+	(void)m_MemDC.SelectObject(pbmpPrev);
 
-	SetBitmap(m_CompBitmap, iPosReplace);
+	SetBitmap(m_MemBitmap, iPosReplace);
 }
 
 void CImglst::SetBitmap(CBitmap& bitmap, int iPosReplace)

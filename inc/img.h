@@ -8,31 +8,72 @@
 
 using TD_IconVec = vector<HICON>;
 
+enum class E_ImgFixMode
+{
+	IFM_Inner
+	, IFM_Outer
+	, IFM_Width
+	, IFM_Height
+};
+
 class __CommonPrjExt CImg : public CImage
 {
 public:
-	CImg()
+	CImg(COLORREF crBkgrd= __Color_White)
+		: m_crBkgrd(crBkgrd)
 	{
 	}
 
+	~CImg()
+	{
+		RestoreMemDC();
+
+		if (NULL )
+		CDC m_MemDC;
+		CBitmap m_MemBitmap;
+
+	}
+
 private:
+	COLORREF m_crBkgrd = 0;
+
+	E_ImgFixMode m_eFixMode = E_ImgFixMode::IFM_Inner;
+	
 	bool m_bHalfToneMode = false;
 
 	UINT m_cx = 0;
 	UINT m_cy = 0;
 	CRect m_rcDst;
 
-	CDC m_CompDC;
-	CBitmap m_CompBitmap;
+	CDC m_MemDC;
+	CBitmap m_MemBitmap;
 	
+	CBitmap *m_pbmpPrev = NULL;
+
+private:
+	void RestoreMemDC();
+
 public:
-	BOOL StretchBltEx(CDC& dc, const CRect& rcPos, bool bHalfToneMode, LPCRECT prcMargin=NULL);
+	BOOL Load(const wstring& strFile);
 
-	BOOL InitInnerDC(bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin=NULL);
-	CBitmap* LoadEx(const wstring& strFile);
-	BOOL StretchBltEx(CDC& dc, const CRect& rcPos);
+	CDC *GetDC();
 
-	BOOL StretchBltEx(CImg& img);
+	BOOL InitMemDC(E_ImgFixMode eFixMode, bool bHalfToneMode, UINT cx, UINT cy, LPCRECT prcMargin=NULL);
+
+	CDC& GetMemDC()
+	{
+		return m_MemDC;
+	}
+
+	BOOL LoadEx(const wstring& strFile, const function<E_ImgFixMode(UINT uWidth, UINT uHeight)>& cb=NULL);
+
+	BOOL StretchBltFix(E_ImgFixMode eFixMode, CDC& dcTarget, const CRect& rcTarget, bool bHalfToneMode, LPCRECT prcMargin = NULL);
+
+	BOOL StretchBltEx(CDC& dcTarget, const CRect& rcTarget);
+
+	BOOL StretchBltEx(CImg& imgTarget);
+
+	CBitmap& FetchMemBitmap();
 };
 
 enum class E_ImglstType
@@ -53,8 +94,8 @@ private:
 	UINT m_cx = 0;
 	UINT m_cy = 0;
 
-	CDC m_CompDC;
-	CBitmap m_CompBitmap;
+	CDC m_MemDC;
+	CBitmap m_MemBitmap;
 
 public:
 	BOOL Init(UINT cx, UINT cy);
