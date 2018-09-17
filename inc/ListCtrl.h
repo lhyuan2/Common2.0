@@ -5,6 +5,25 @@
 
 #include <Guide.h>
 
+class CHeader : public CHeaderCtrl
+{
+	DECLARE_MESSAGE_MAP()
+
+public:
+	CHeader(){}
+	
+private:
+	UINT m_uHeight = 0;
+
+	CFontGuide m_fontGuide;
+
+private:
+	LRESULT OnLayout(WPARAM wParam, LPARAM lParam);
+
+public:
+	BOOL Init(UINT uHeight, UINT uFontSize = 0);
+};
+
 enum class E_ListViewType
 {
 	LVT_Tile = LV_VIEW_TILE,
@@ -42,42 +61,28 @@ struct __CommonPrjExt tagListColumn
 	UINT uWidth;
 	UINT uFlag = LVCFMT_LEFT;
 };
-
 typedef list<tagListColumn> TD_ListColumn;
-
-using CB_LVCostomDraw = function<void(class CObjectList& wndList, NMLVCUSTOMDRAW& lvcd, bool& bSkipDefault)>;
-
-class CHeaderCtrlEx : public CHeaderCtrl
-{
-	DECLARE_MESSAGE_MAP()
-
-public:
-	CHeaderCtrlEx(UINT uHeight)
-		: m_uHeight(uHeight)
-	{
-	}
-
-private:
-	UINT m_uHeight = 0;
-
-	LRESULT OnLayout(WPARAM wParam, LPARAM lParam);
-};
 
 class __CommonPrjExt CObjectList : public CListCtrl
 {
 public:
+	using CB_LVCostomDraw = function<void(class CObjectList& wndList, NMLVCUSTOMDRAW& lvcd, bool& bSkipDefault)>;
 	using CB_ListViewChanged = function<void(E_ListViewType)>;
 
 	struct tagListPara
 	{
+		COLORREF crText = 0;
+
 		UINT uFontSize = 0;
 		UINT uFontSizeHeader = 0;
 
 		E_ListViewType eViewType = (E_ListViewType)-1;
 
 		TD_ListColumn lstColumns;
-
 		set<UINT> setUnderlineColumns;
+
+		UINT uHeaderHeight = 0;
+		UINT uHeaderFontSize = 0;
 
 		UINT uItemHeight = 0;
 
@@ -89,10 +94,7 @@ public:
 		CB_TrackMouseEvent cbMouseEvent;
 	};
 
-	CObjectList(UINT uHeaderHeight = 0)
-		: m_wndHeader(uHeaderHeight)
-	{
-	}
+	CObjectList(){}
 
 	virtual ~CObjectList()
 	{
@@ -106,11 +108,11 @@ public:
 	bool m_bDblClick = false;
 
 private:
-	CHeaderCtrlEx m_wndHeader;
-
 	tagListPara m_para;
 
 	CFontGuide m_fontGuide;
+
+	CHeader m_wndHeader;
 
 	UINT m_nColumnCount = 1;
 
@@ -125,16 +127,21 @@ private:
 public:
 	BOOL InitCtrl(const tagListPara& para);
 
-	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
+	BOOL InitFont(COLORREF crText, UINT uFontSize = 0);
 
 	BOOL InitImglst(const CSize& size, const CSize *pszSmall = NULL, const TD_IconVec& vecIcons = {});
 	BOOL InitImglst(CBitmap& Bitmap, CBitmap *pBitmapSmall=NULL);
-
 	void SetImageList(CImglst *pImglst, CImglst *pImglstSmall = NULL);
 
-	BOOL SetItemHeight(UINT uItemHeight);
+	void SetView(E_ListViewType eViewType, bool bArrange = false);
+	E_ListViewType GetView();
 
-	BOOL SetUnderlineColumn(const set<UINT>& setColumns);
+	BOOL InitColumn(const TD_ListColumn &lstColumns, const set<UINT>& setUnderlineColumns = {});
+	BOOL SetUnderlineColumn(const set<UINT>& setUnderlineColumns);
+
+	BOOL InitHeader(UINT uHeaderHeight, UINT uHeaderFontSize = 0);
+
+	BOOL SetItemHeight(UINT uItemHeight);
 
 	void SetTileSize(ULONG cx, ULONG cy);
 
@@ -152,9 +159,6 @@ public:
 
 	void SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent=NULL);
 
-	void SetView(E_ListViewType eViewType, bool bArrange=false);
-	E_ListViewType GetView();
-	
 	void SetColumnText(UINT uColumn, const wstring& strText);
 
 	void SetObjects(const TD_ListObjectList& lstObjects, int nPos=0);

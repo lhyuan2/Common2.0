@@ -211,10 +211,7 @@ private:
 class __CommonPrjExt CPathList: public CObjectList
 {
 public:
-	CPathList(UINT uHeaderHeight)
-		: CObjectList(uHeaderHeight)
-	{
-	}
+	CPathList(){}
 
 private:
 	TD_ListColumn m_lstColumns = {
@@ -227,11 +224,11 @@ private:
 	virtual void PreSubclassWindow() override;
 
 public:
-	BOOL InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
+	BOOL InitCtrl(COLORREF crText, UINT uFontSize, const TD_ListColumn &lstColumns = TD_ListColumn());
 
-	BOOL InitCtrl(UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst = NULL, const TD_IconVec& vecIcons = {});
+	BOOL InitCtrl(COLORREF crText, UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst = NULL, const TD_IconVec& vecIcons = {});
 
-	BOOL InitCtrlEx(UINT uFontSize = 0);
+	BOOL InitCtrlEx(COLORREF crText, UINT uFontSize = 0);
 
 	void SetPath(CPathObject* pPath);
 

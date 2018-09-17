@@ -14,23 +14,24 @@ void CPathList::PreSubclassWindow()
 	(void)ModifyStyle(LVS_ALIGNLEFT, LVS_AUTOARRANGE);
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
+BOOL CPathList::InitCtrl(COLORREF crText, UINT uFontSize, const TD_ListColumn &lstColumns)
 {
-	return __super::InitCtrl(uFontSize, lstColumns.empty()?m_lstColumns:lstColumns);
+	__EnsureReturn(__super::InitFont(crText, uFontSize), FALSE);
+	return __super::InitColumn(lstColumns.empty() ? m_lstColumns : lstColumns);
 }
 
-BOOL CPathList::InitCtrl(UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst, const TD_IconVec& vecIcons)
+BOOL CPathList::InitCtrl(COLORREF crText, UINT uFontSize, const CSize& szImglst, const CSize *pszSmallImglst, const TD_IconVec& vecIcons)
 {
-	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
+	__EnsureReturn(this->InitCtrl(crText, uFontSize, m_lstColumns), FALSE);
 
 	__EnsureReturn(__super::InitImglst(szImglst, pszSmallImglst, vecIcons), FALSE);
 
 	return TRUE;
 }
 
-BOOL CPathList::InitCtrlEx(UINT uFontSize)
+BOOL CPathList::InitCtrlEx(COLORREF crText, UINT uFontSize)
 {
-	__EnsureReturn(__super::InitCtrl(uFontSize, m_lstColumns), FALSE);
+	__EnsureReturn(this->InitCtrl(crText, uFontSize, m_lstColumns), FALSE);
 
 	CBitmap Bitmap;
 	HBITMAP hBitmap = ::LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_PATHCTRL_NORMAL));

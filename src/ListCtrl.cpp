@@ -5,7 +5,11 @@
 
 #include "Resource.h"
 
-LRESULT CHeaderCtrlEx::OnLayout(WPARAM wParam, LPARAM lParam)
+BEGIN_MESSAGE_MAP(CHeader, CHeaderCtrl)
+	ON_MESSAGE(HDM_LAYOUT, OnLayout)
+END_MESSAGE_MAP()
+
+LRESULT CHeader::OnLayout(WPARAM wParam, LPARAM lParam)
 {
 	LRESULT lResult = CHeaderCtrl::DefWindowProc(HDM_LAYOUT, 0, lParam);
 
@@ -18,9 +22,18 @@ LRESULT CHeaderCtrlEx::OnLayout(WPARAM wParam, LPARAM lParam)
 	return lResult;
 }
 
-BEGIN_MESSAGE_MAP(CHeaderCtrlEx, CHeaderCtrl)
-	ON_MESSAGE(HDM_LAYOUT, OnLayout)
-END_MESSAGE_MAP()
+BOOL CHeader::Init(UINT uHeight, UINT uFontSize)
+{
+	if (0 != uFontSize)
+	{
+		__EnsureReturn(m_fontGuide.setFontSize(*this, uFontSize), FALSE);
+	}
+
+	m_uHeight = uHeight;
+	this->Invalidate();
+
+	return TRUE;
+}
 
 // CObjectList
 
@@ -37,17 +50,22 @@ void CObjectList::PreSubclassWindow()
 BOOL CObjectList::InitCtrl(const tagListPara& para)
 {
 	m_para = para;
-
-	__EnsureReturn(InitCtrl(m_para.uFontSize, m_para.lstColumns), FALSE);
+	
+	__EnsureReturn(InitFont(m_para.crText, m_para.uFontSize), FALSE);
 	
 	if (-1 != (int)m_para.eViewType)
 	{
 		SetView(m_para.eViewType);
 	}
 
-	if (!m_para.setUnderlineColumns.empty())
+	if (!m_para.lstColumns.empty())
 	{
-		__EnsureReturn(SetUnderlineColumn(m_para.setUnderlineColumns), FALSE);
+		__EnsureReturn(InitColumn(m_para.lstColumns, m_para.setUnderlineColumns), FALSE);
+	}
+
+	if (0 != m_para.uHeaderHeight || 0 != m_para.uHeaderFontSize)
+	{
+		__EnsureReturn(InitHeader(m_para.uHeaderHeight, m_para.uHeaderFontSize), FALSE);
 	}
 
 	if (0 != m_para.uItemHeight)
@@ -78,26 +96,14 @@ BOOL CObjectList::InitCtrl(const tagListPara& para)
 	return TRUE;
 }
 
-BOOL CObjectList::InitCtrl(UINT uFontSize, const TD_ListColumn &lstColumns)
+BOOL CObjectList::InitFont(COLORREF crText, UINT uFontSize)
 {
-	if (0 < uFontSize)
-	{
-		(void)m_fontGuide.setFontSize(*this, uFontSize);
-	}
+	__AssertReturn(SetTextColor(crText), FALSE);
 
-	if (!lstColumns.empty())
+	if (0 != uFontSize)
 	{
-		m_nColumnCount = 0;
-		for (auto& column : lstColumns)
-		{
-			(void)__super::InsertColumn(m_nColumnCount, (0 == column.uFlag) ? L' ' + column.cstrText
-				: column.cstrText, column.uFlag, column.uWidth);
-			
-			m_nColumnCount++;
-		}
+		__AssertReturn(m_fontGuide.setFontSize(*this, uFontSize), FALSE);
 	}
-
-	m_wndHeader.SubclassWindow(CListCtrl::GetHeaderCtrl()->GetSafeHwnd());
 
 	return TRUE;
 }
@@ -155,46 +161,6 @@ void CObjectList::SetImageList(CImglst *pImglst, CImglst *pImglstSmall)
 	}
 }
 
-void CObjectList::SetColumnText(UINT uColumn, const wstring& strText)
-{
-	HDITEM hdItem;
-	hdItem.mask = HDI_TEXT;
-	hdItem.pszText = (LPWSTR)strText.c_str();
-	m_wndHeader.SetItem(uColumn, &hdItem);
-}
-
-BOOL CObjectList::SetItemHeight(UINT uItemHeight)
-{
-	__AssertReturn(m_ImglstSmall.Create(1, uItemHeight, ILC_COLOR8, 1, 0), FALSE);
-
-	SetImageList(NULL, &m_ImglstSmall);
-	
-	return TRUE;
-}
-
-BOOL CObjectList::SetUnderlineColumn(const set<UINT>& setColumns)
-{
-	m_para.setUnderlineColumns = setColumns;
-
-	__AssertReturn(m_fontUnderline.create(*this, [](LOGFONT& logFont) {
-		logFont.lfUnderline = 1;
-	}), FALSE);
-
-	SetCusomDrawNotify();
-
-	return TRUE;
-}
-
-void CObjectList::SetTileSize(ULONG cx, ULONG cy)
-{
-	LVTILEVIEWINFO LvTileViewInfo = { sizeof(LVTILEVIEWINFO) };
-	LvTileViewInfo.dwFlags = LVTVIF_FIXEDSIZE;
-	LvTileViewInfo.sizeTile = { (LONG)cx, (LONG)cy };
-	//LvTileViewInfo.cLines = 2;
-	LvTileViewInfo.dwMask = LVTVIM_TILESIZE;// | LVTVIM_COLUMNS;
-	(void)__super::SetTileViewInfo(&LvTileViewInfo);
-}
-
 void CObjectList::SetView(E_ListViewType eViewType, bool bArrange)
 {
 	this->SetRedraw(FALSE);
@@ -220,6 +186,70 @@ E_ListViewType CObjectList::GetView()
 	m_para.eViewType = (E_ListViewType)__super::GetView();
 
 	return m_para.eViewType;
+}
+
+BOOL CObjectList::InitColumn(const TD_ListColumn &lstColumns, const set<UINT>& setUnderlineColumns)
+{
+	m_nColumnCount = 0;
+	for (auto& column : lstColumns)
+	{
+		(void)__super::InsertColumn(m_nColumnCount, (0 == column.uFlag) ? L' ' + column.cstrText
+			: column.cstrText, column.uFlag, column.uWidth);
+
+		m_nColumnCount++;
+	}
+
+	if (!setUnderlineColumns.empty())
+	{
+		__EnsureReturn(SetUnderlineColumn(setUnderlineColumns), FALSE);
+	}
+
+	return TRUE;
+}
+
+BOOL CObjectList::SetUnderlineColumn(const set<UINT>& setUnderlineColumns)
+{
+	m_para.setUnderlineColumns = setUnderlineColumns;
+
+	__AssertReturn(m_fontUnderline.create(*this, [](LOGFONT& logFont) {
+		logFont.lfUnderline = 1;
+	}), FALSE);
+
+	SetCusomDrawNotify();
+
+	return TRUE;
+}
+
+BOOL CObjectList::InitHeader(UINT uHeaderHeight, UINT uHeaderFontSize)
+{
+	if (!m_wndHeader)
+	{
+		__AssertReturn(m_wndHeader.SubclassWindow(CListCtrl::GetHeaderCtrl()->GetSafeHwnd()), FALSE);
+		m_wndHeader.SetFont(this->GetFont());
+	}
+
+	__EnsureReturn(m_wndHeader.Init(uHeaderHeight, uHeaderFontSize), FALSE);
+	
+	return TRUE;
+}
+
+BOOL CObjectList::SetItemHeight(UINT uItemHeight)
+{
+	__AssertReturn(m_ImglstSmall.Create(1, uItemHeight, ILC_COLOR8, 1, 0), FALSE);
+
+	SetImageList(NULL, &m_ImglstSmall);
+	
+	return TRUE;
+}
+
+void CObjectList::SetTileSize(ULONG cx, ULONG cy)
+{
+	LVTILEVIEWINFO LvTileViewInfo = { sizeof(LVTILEVIEWINFO) };
+	LvTileViewInfo.dwFlags = LVTVIF_FIXEDSIZE;
+	LvTileViewInfo.sizeTile = { (LONG)cx, (LONG)cy };
+	//LvTileViewInfo.cLines = 2;
+	LvTileViewInfo.dwMask = LVTVIM_TILESIZE;// | LVTVIM_COLUMNS;
+	(void)__super::SetTileViewInfo(&LvTileViewInfo);
 }
 
 void CObjectList::SetTrackMouse(const CB_TrackMouseEvent& cbMouseEvent)
@@ -269,6 +299,14 @@ void CObjectList::SetObjects(const TD_ListObjectList& lstObjects, int nPos)
 	}
 
 	this->SetRedraw(TRUE);
+}
+
+void CObjectList::SetColumnText(UINT uColumn, const wstring& strText)
+{
+	HDITEM hdItem;
+	hdItem.mask = HDI_TEXT;
+	hdItem.pszText = (LPWSTR)strText.c_str();
+	CListCtrl::GetHeaderCtrl()->SetItem(uColumn, &hdItem);
 }
 
 int CObjectList::InsertObject(CListObject& Object, int nItem)
@@ -809,10 +847,7 @@ void CObjectList::ChangeListCtrlView(short zDelta)
 UINT CObjectList::GetHeaderHeight()
 {
 	CRect rcHeader;
-	m_wndHeader.GetWindowRect(&rcHeader);
-
-	//this->ScreenToClient(&rcHeader);
-	//return rcHeader.bottom;
+	CListCtrl::GetHeaderCtrl()->GetWindowRect(&rcHeader);
 
 	return (UINT)rcHeader.Height();
 }
