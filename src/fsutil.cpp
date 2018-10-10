@@ -297,7 +297,7 @@ bool fsutil::CreateDir(const wstring& strDir)
 	return CreateDir(strDir);
 }
 
-void fsutil::FindFile(const wstring& strPath, list<wstring>& lstResult)
+void fsutil::FindFile(const wstring& strPath, map<wstring, wstring>& mapFiles)
 {
 	CFileFind fileFind;
 	bool bExists = fileFind.FindFile(strPath.c_str());
@@ -310,7 +310,7 @@ void fsutil::FindFile(const wstring& strPath, list<wstring>& lstResult)
 			continue;
 		}
 		
-		lstResult.push_back((LPCTSTR)fileFind.GetFilePath());
+		mapFiles[(LPCTSTR)fileFind.GetFileName()] = (LPCTSTR)fileFind.GetFilePath();
 	}
 }
 

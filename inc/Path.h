@@ -85,4 +85,6 @@ public:
 	void RemoveSubPath(const TD_PathList& lstDeletePaths);
 
 	bool FindFile();
+
+	bool HasFile();
 };

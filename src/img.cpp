@@ -42,7 +42,7 @@ BOOL CImg::StretchBltFix(E_ImgFixMode eFixMode, CDC& dcTarget, const CRect& rcTa
 		{
 			eFixMode = E_ImgFixMode::IFM_Height;
 			
-			iDstWidth = iDstHeight / fHWRate;
+			iDstWidth = int(iDstHeight / fHWRate);
 			auto offset = (rcDst.Width() - iDstWidth) / 2;
 			rcDst.left += offset;
 			rcDst.right -= offset;
@@ -51,7 +51,7 @@ BOOL CImg::StretchBltFix(E_ImgFixMode eFixMode, CDC& dcTarget, const CRect& rcTa
 		{
 			eFixMode = E_ImgFixMode::IFM_Width;
 
-			iDstHeight = iDstWidth * fHWRate;
+			iDstHeight = int(iDstWidth * fHWRate);
 			auto offset = (rcDst.Height() - iDstHeight) / 2;
 			rcDst.top += offset;
 			rcDst.bottom -= offset;

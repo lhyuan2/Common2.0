@@ -30,7 +30,7 @@ public:
 
 	static bool CreateDir(const wstring& strDir);
 
-	static void FindFile(const wstring& strPath, list<wstring>& lstResult);
+	static void FindFile(const wstring& strPath, map<wstring, wstring>& mapFiles);
 
 	static bool ExistsFile(const wstring& strFile);
 	static bool ExistsPath(const wstring& strDir);

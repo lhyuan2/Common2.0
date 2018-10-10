@@ -208,3 +208,18 @@ bool CPath::FindFile()
 	m_plstSubPath->swap(lstSubPath);
 	return true;
 }
+
+bool CPath::HasFile()
+{
+	__EnsureReturn(m_plstSubPath, FALSE);
+
+	for (auto pSubPath : *m_plstSubPath)
+	{
+		if (!pSubPath->m_bDir)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
