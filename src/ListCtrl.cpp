@@ -371,6 +371,8 @@ void CObjectList::UpdateItem(UINT uItem)
 
 void CObjectList::UpdateItem(UINT uItem, CListObject& Object, const list<UINT>& lstColumn)
 {
+	__Ensure(m_hWnd);
+
 	int iImage = 0;
 	vector<wstring> vecText;
 	GenListItem(Object, vecText, iImage);
@@ -389,6 +391,8 @@ void CObjectList::UpdateItem(UINT uItem, CListObject& Object, const list<UINT>& 
 
 void CObjectList::UpdateItems()
 {
+	__Ensure(m_hWnd);
+
 	CRedrawLockGuide RedrawLockGuide(*this);
 
 	for (int iItem = 0; iItem < this->GetItemCount(); ++iItem)
@@ -399,6 +403,8 @@ void CObjectList::UpdateItems()
 
 void CObjectList::UpdateItems(const list<UINT>& lstColumn)
 {
+	__Ensure(m_hWnd);
+
 	CRedrawLockGuide RedrawLockGuide(*this);
 
 	for (UINT uItem = 0; uItem < (UINT)this->GetItemCount(); uItem++)

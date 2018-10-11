@@ -105,7 +105,7 @@ bool fsutil::CheckSubPath(const wstring& strPath, const wstring& strSubPath)
 	__EnsureReturn(size > 0, FALSE);
 	__EnsureReturn(size < strSubPath.size(), FALSE);
 
-	__EnsureReturn(0 == wcsncmp(strPath.c_str(), strSubPath.c_str(), size), FALSE);
+	__EnsureReturn(0 == _wcsnicmp(strPath.c_str(), strSubPath.c_str(), size), FALSE);
 
 	__EnsureReturn(__BackSlant == *strPath.rbegin() || __BackSlant == strSubPath[size], FALSE);
 
